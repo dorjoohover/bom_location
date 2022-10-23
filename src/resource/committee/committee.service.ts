@@ -12,7 +12,7 @@ export class CommitteeService {
         let committee = await this.model.findOne({name: dto.name})
 
         if(committee) {
-            throw new ForbiddenException('founded that committee')
+            throw new ForbiddenException('found that committee')
         }
 
         committee = await this.model.create({
@@ -20,6 +20,14 @@ export class CommitteeService {
             zipcode: dto.zipcode,
             district_id: dto.discrict_id
         })
+        return committee
+    }
+
+    async getData() {
+        let committee = await this.model.find()
+        if(!committee) {
+            throw new ForbiddenException('not found that committee')
+        }
         return committee
     }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CommitteeDto } from './committee.dto';
 import { CommitteeService } from './committee.service';
 
@@ -8,5 +8,9 @@ export class CommitteeController {
     @Post()
     create(@Body() dto: CommitteeDto) {
         return this.service.create(dto)
+    }
+    @Get() 
+    getData() {
+        return this.service.getData()
     }
 }

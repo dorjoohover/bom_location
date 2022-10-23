@@ -21,4 +21,13 @@ export class DistrictService {
         })
         return discrict 
     }
+
+    async getData() {
+        let discrict = await this.model.find()
+        if(!discrict ) {
+            throw new ForbiddenException ('found that district')
+        }
+
+        return discrict
+    }
 }

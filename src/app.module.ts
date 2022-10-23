@@ -5,6 +5,7 @@ import configuration from './config/configuration';
 import { CommitteeModule } from './resource/committee/committee.module';
 import { DistrictModule } from './resource/district/district.module';
 import { LocationModule } from './resource/location/location.module';
+import { UserModule } from './resource/user/user.module';
 import { ZoneModule } from './resource/zone/zone.module';
 
 @Module({
@@ -21,10 +22,12 @@ import { ZoneModule } from './resource/zone/zone.module';
       useUnifiedTopology: true, 
       dbName: 'zipcode'
     }),
+    UserModule,
     ZoneModule,
     DistrictModule,
     LocationModule,
-    CommitteeModule
+    CommitteeModule,
+   
   ],
   controllers: [],
   providers: [],

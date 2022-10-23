@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { DiscoveryService } from '@nestjs/core';
 import { DiscrictDto } from './district.dto';
 import { DistrictService } from './district.service';
@@ -9,5 +9,10 @@ export class DistrictController {
     @Post()
     create(@Body() dto: DiscrictDto) {
         return this.service.create(dto)
+    }
+
+    @Get()
+    getData() {
+        return this.service.getData()
     }
 }
