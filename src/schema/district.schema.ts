@@ -8,16 +8,16 @@ export class Discrict {
     @Prop({required: true})
     name: string
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Zones'})
-    zone_id: string
+    // @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Zones'})
+    // zone_id: string
     
-    @Prop({required: true})
+    @Prop()
     zipcode: number
 
-    @Prop({required: true})
+    @Prop()
     latitude: number
 
-    @Prop({required: true})
+    @Prop()
     longtitude: number
     
 }

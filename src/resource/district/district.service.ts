@@ -17,7 +17,6 @@ export class DistrictService {
             zipcode: dto.zipcode,
             latitude: dto.latitude,
             longtitude: dto.longitude,
-            zone_id: dto.zone_id
         })
         return discrict 
     }

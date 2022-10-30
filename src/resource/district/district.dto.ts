@@ -7,10 +7,10 @@ export class DiscrictDto {
     @ApiProperty()
     name:string
     
-    @IsNotEmpty()
-    @IsString()
-    @ApiProperty()
-    zone_id:string
+    // @IsNotEmpty()
+    // @IsString()
+    // @ApiProperty()
+    // zone_id:string
     
     @IsNotEmpty()
     @IsNumber()
