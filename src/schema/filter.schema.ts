@@ -10,5 +10,14 @@ export class Filter {
 
     @Prop()
     choices: []
+    // @Prop()
+    // type: Types
 }
 export const FilterSchema = SchemaFactory.createForClass(Filter)
+
+export enum Types {
+    Textarea = "Textarea",
+    Dropdown = 'Dropdown',
+    InputText = 'Inputtext',
+    InputFile = 'Inputfile'
+}
