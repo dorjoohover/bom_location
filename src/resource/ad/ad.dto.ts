@@ -25,4 +25,18 @@ export class CreateAdDto {
     @ApiProperty()
     types: []
 
+
+    @IsNotEmpty()
+    @ApiProperty({isArray: true})
+    @IsArray()
+    filters: [{
+        id: string,
+        value: string
+    }]
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    subCategory: string
+
 }

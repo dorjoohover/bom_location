@@ -31,7 +31,7 @@ export class CategoryService {
     }
 
     async getCategoryById(id: string) {
-        let category = await this.model.find().where('parentId').equals(id).populate('parentId', "name", this.model).populate('filters',"name",  this.filterModel).populate('types', 'name', this.typeModel).exec()
+        let category = await this.model.find().where('parentId').equals(id).populate('parentId', "name", this.model).populate('filters',"name choices",  this.filterModel).populate('types', 'name', this.typeModel).exec()
         if(!category)
         throw new ForbiddenException('not found')
         return category

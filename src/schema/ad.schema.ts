@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
 import { AdType } from "./ad_type.schema";
+import { Category } from "./category.schema";
+import { Filter } from "./filter.schema";
 import { Position } from "./position.schema";
 
 export type AdDocument = Document & Ad
@@ -21,6 +23,15 @@ export class Ad {
 
     @Prop()
     location: string
+
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: "categories"})
+    subCategory: Category
+
+    @Prop()
+    filters: [{
+        id: Filter,
+        value: string
+    }]
     
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'adtypes'})
     types: AdType[]
