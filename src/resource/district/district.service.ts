@@ -29,4 +29,10 @@ export class DistrictService {
 
         return discrict
     }
+
+    async getDataById(id) {
+        let discrict = await this.model.findById(id)
+        return discrict
+    }
+    
 }

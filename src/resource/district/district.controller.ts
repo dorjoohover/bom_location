@@ -15,4 +15,9 @@ export class DistrictController {
     getData() {
         return this.service.getData()
     }
+
+    @Get(':id')
+    getDataById(params) {
+        return this.service.getDataById(params.id)
+    }
 }

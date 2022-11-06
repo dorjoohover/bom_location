@@ -1,12 +1,19 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Ad, AdDocument, Filter, FilterDocument } from 'src/schema';
+import { Ad, AdDocument, Filter, FilterDocument, Location,Committee, CommitteeDocument, LocationDocument, Discrict, DistrictDocument, Town, TownDocument } from 'src/schema';
 import { CreateAdDto } from './ad.dto';
 
 @Injectable()
 export class AdService {
-    constructor (@InjectModel(Ad.name) private model: Model<AdDocument>, @InjectModel(Filter.name) private filterModel: Model<FilterDocument>) {}
+    constructor (
+        @InjectModel(Ad.name) private model: Model<AdDocument>,
+         @InjectModel(Filter.name) private filterModel: Model<FilterDocument>,
+         @InjectModel(Discrict.name) private disrtictModel: Model<DistrictDocument>,
+         @InjectModel(Committee.name) private committeeModel: Model<CommitteeDocument>,
+         @InjectModel(Location.name) private locationModel: Model<LocationDocument>,
+         @InjectModel(Town.name) private townModel: Model<TownDocument>,
+         ) {}
 
     async createAd(dto: CreateAdDto) {
         let ad = await this.model.create({
@@ -27,8 +34,9 @@ export class AdService {
     }
 
     async getAdById(id:string) {
-        let ad = await this.model.findById(id).populate('filters.id', 'name type', this.filterModel)
+        let ad = await this.model.findById(id).populate('filters.id', 'name type', this.filterModel).populate('positions.district_id', 'name', this.disrtictModel).populate('positions.location_id', 'name', this.locationModel)
         if(!ad) throw new ForbiddenException('not found ad')
+       
         return ad
     }
 }

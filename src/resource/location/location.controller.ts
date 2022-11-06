@@ -19,4 +19,9 @@ export class LocationController {
     getByDiscrict(@Param() params) {
         return this.service.getByDiscrict(params.id);
     }
+
+    @Get('byId/:id') 
+    getByLocationId(@Param('id') id) {
+        return this.service.getByLocationId(id)
+    }
 }

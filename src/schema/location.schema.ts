@@ -10,7 +10,7 @@ export class Location {
     name: string
 
     @Prop({required:true, type: mongoose.Schema.Types.ObjectId, ref: 'Discricts'})
-    district_id: string
+    district_id: Discrict
 
     @Prop()
     zipcode: number
