@@ -21,13 +21,13 @@ export class AdService {
     }
 
     async getAllAds() {
-        let ads = await this.model.find()
+        let ads = await this.model.find().populate('filters.id', 'name type', this.filterModel).sort({'createdAt': 'desc'})
         if(!ads) throw new ForbiddenException('not found ads')
         return ads
     }
 
     async getAdById(id:string) {
-        let ad = await this.model.findById(id).populate('filters.id', 'name', this.filterModel)
+        let ad = await this.model.findById(id).populate('filters.id', 'name type', this.filterModel)
         if(!ad) throw new ForbiddenException('not found ad')
         return ad
     }

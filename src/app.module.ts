@@ -13,6 +13,7 @@ import { AdTypeModule } from './resource/adtype/ad_type.module';
 import { TownModule } from './resource/town/town.module';
 import { UserModule } from './resource/user/user.module';
 import { ZoneModule } from './resource/zone/zone.module';
+import { TypeModule } from './resource/type/type.module';
 
 @Module({
   imports: [
@@ -40,8 +41,8 @@ import { ZoneModule } from './resource/zone/zone.module';
     DistrictModule,
     LocationModule,
     CommitteeModule,
-    AdTypeModule
-   
+    AdTypeModule,
+    TypeModule
   ],
   controllers: [],
   providers: [],

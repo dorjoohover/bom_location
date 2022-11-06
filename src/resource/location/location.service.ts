@@ -14,10 +14,27 @@ export class LocationService {
         }
         location = await this.model.create({
             name: dto.name,
-            committee_id: dto.committee_id,
+            district_id: dto.district_id,
+            zipcode: dto.zipcode,
             latitude: dto.lantitude,
             longitude: dto.longitude
         })
         return location
+    }
+
+    async get() {
+        let location = await this.model.find()
+        if(!location)
+        throw new ForbiddenException('not found')
+        
+        return location 
+    }
+
+    async getByDiscrict(id:string) {
+        let location = await this.model.find().where('district_id').equals(id)
+        if(!location)
+        throw new ForbiddenException('not found')
+        return location
+        
     }
 }

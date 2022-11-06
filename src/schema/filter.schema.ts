@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
+import { Type } from "./type.schema";
 
 export type FilterDocument = Document & Filter
 
@@ -9,15 +10,16 @@ export class Filter {
     name: string
 
     @Prop()
-    choices: []
-    // @Prop()
-    // type: Types
+    choices: [{
+        id: number,
+        value: string,
+        other: boolean
+    }]
+    @Prop({required: true, type: mongoose.Schema.Types.String, ref: 'Types'})
+    type: string
+
+    @Prop()
+    value: string
 }
 export const FilterSchema = SchemaFactory.createForClass(Filter)
 
-export enum Types {
-    Textarea = "Textarea",
-    Dropdown = 'Dropdown',
-    InputText = 'Inputtext',
-    InputFile = 'Inputfile'
-}

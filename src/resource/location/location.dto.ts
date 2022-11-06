@@ -6,12 +6,18 @@ export class LocationDto {
     @ApiProperty()
     name: string
     
+
     @IsString()
-    @IsNotEmpty()
     @ApiProperty()
-    committee_id: string
+    @IsNotEmpty()
+    district_id: string
     
 
+    @IsNumber()
+    @IsNotEmpty()
+    @ApiProperty()
+    zipcode: number
+    
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty()

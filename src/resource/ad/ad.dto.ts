@@ -1,6 +1,27 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNotEmpty, IsString } from "class-validator";
 
+
+
+export class AdPosition {
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    district_id: string
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    committee_id: string
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    town_id:string
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    location_id:string
+
+}
 export class CreateAdDto {
     @IsNotEmpty()
     @IsString()
@@ -13,8 +34,8 @@ export class CreateAdDto {
     
     @IsArray()
     @IsNotEmpty()
-    @ApiProperty()
-    positions: []
+    @ApiProperty({type: AdPosition})
+    positions: AdPosition
 
     @IsString()
     @ApiProperty()
@@ -40,3 +61,4 @@ export class CreateAdDto {
     subCategory: string
 
 }
+

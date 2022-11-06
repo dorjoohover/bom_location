@@ -1,5 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNotEmpty, IsString } from "class-validator";
+import { CreateFilterDto } from "../filter/filter.dto";
+import {CreateAdTypeDto} from '../adtype/ad_type.dto'
+
+
 
 export class createCategoryDto {
     @IsString()
@@ -13,11 +17,13 @@ export class createCategoryDto {
     parentId: string
 
     @IsArray()
-    @ApiProperty()
-    filters: []
+    @ApiProperty({type: CreateFilterDto})
+    filters: CreateFilterDto[]
 
     @IsArray()
-    @ApiProperty()
-    types: []
+    @ApiProperty({type: CreateAdTypeDto})
+    types: CreateAdTypeDto[]
 }
+
+
 

@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Filter, FilterDocument } from 'src/schema';
-import { CreateFilterDto } from './filter.dto';
+import { Filter, FilterDocument, Type, TypeDocument } from 'src/schema';
+import { CreateFilterDto, UpdateFilterDto } from './filter.dto';
 
 @Injectable()
 export class FilterService {
@@ -14,7 +14,8 @@ export class FilterService {
         throw new ForbiddenException('found')
         filter = await this.model.create({
             name: dto.name,
-            choices: dto.choices
+            choices: dto.choices,
+            type: dto.type
         })
         return filter
     }
@@ -32,5 +33,16 @@ export class FilterService {
         if(!filter)
         throw new ForbiddenException('not found')
         return filter
+    }
+
+    async updateFilterById(dto:UpdateFilterDto) {
+        let filter = await this.model.findById(dto.id)
+        if(!filter)
+        throw new ForbiddenException(dto)
+        filter = await this.model.findByIdAndUpdate( dto.id, {
+            name: dto.id,
+            choices: dto.choices,
+            type: dto.type
+        })
     }
 }

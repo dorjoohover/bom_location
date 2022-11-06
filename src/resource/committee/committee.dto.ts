@@ -12,6 +12,11 @@ export class CommitteeDto {
     discrict_id: string
     
     @IsNotEmpty()
+    @IsString()
+    @ApiProperty()
+    location_id: string
+    
+    @IsNotEmpty()
     @IsNumber()
     @ApiProperty()
     zipcode: string

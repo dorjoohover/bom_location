@@ -1,7 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get , Param} from '@nestjs/common';
 import { LocationDto } from './location.dto';
 import { LocationService } from './location.service';
-
 @Controller('location')
 export class LocationController {
     constructor(private service: LocationService){}
@@ -9,5 +8,15 @@ export class LocationController {
     @Post()
     create(@Body() dto: LocationDto) {
         return this.service.create(dto)
+    }
+
+    @Get()
+    get() {
+        return this.service.get()
+    }
+
+    @Get(':id')
+    getByDiscrict(@Param() params) {
+        return this.service.getByDiscrict(params.id);
     }
 }

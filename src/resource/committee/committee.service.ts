@@ -18,6 +18,7 @@ export class CommitteeService {
         committee = await this.model.create({
             name: dto.name, 
             zipcode: dto.zipcode,
+            location_id: dto.location_id,
             district_id: dto.discrict_id
         })
         return committee
