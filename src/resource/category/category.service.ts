@@ -28,7 +28,7 @@ export class CategoryService {
     }
 
     async getAllCategories() {
-        let categories = await this.model.find().where('parentId').equals(null).populate('filters', 'name choices type', this.filterModel).exec()
+        let categories = await this.model.find().where('parentId').equals(null).populate('filters', 'name choices type', this.filterModel).populate('createFilters', 'name choices type', this.filterModel).populate('viewFilters', 'name choices type', this.filterModel).exec()
         let discrict = await this.districtModel.find()
         let location = await this.locationModel.find()
         if(!categories)

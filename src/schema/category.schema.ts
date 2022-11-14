@@ -19,7 +19,7 @@ export class Category {
     filters: Filter[]
 
     @Prop({type: mongoose.Schema.Types.Array, ref: 'filters'})
-    createFilter: Filter[]
+    createFilters: Filter[]
 
     @Prop({type: mongoose.Schema.Types.Array, ref: 'filters'})
     viewFilters: Filter[]
