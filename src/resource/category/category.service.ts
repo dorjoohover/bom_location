@@ -28,7 +28,7 @@ export class CategoryService {
     }
 
     async getAllCategories() {
-        let categories = await this.model.find().where('parentId').equals(null).populate('filters', 'name choices type', this.filterModel).populate('createFilters', 'name choices type', this.filterModel).populate('viewFilters', 'name choices type', this.filterModel).exec()
+        let categories = await this.model.find().where('parentId').equals(null).populate('filters', 'name choices type', this.filterModel).exec()
         let discrict = await this.districtModel.find()
         let location = await this.locationModel.find()
         if(!categories)
@@ -38,7 +38,7 @@ export class CategoryService {
     }
 
     async getCategoryById(id: string) {
-        let category = await this.model.find().where('parentId').equals(id).populate('parentId', "name", this.model).populate('filters',"name choices type",  this.filterModel).populate('types', 'name', this.typeModel).exec()
+        let category = await this.model.find().where('parentId').equals(id).populate('parentId', "name", this.model).populate('filters',"name choices type",  this.filterModel).populate('types', 'name', this.typeModel).populate('createFilters', 'name choices type', this.filterModel).populate('viewFilters', 'name choices type', this.filterModel).exec()
         if(!category)
         throw new ForbiddenException('not found')
         return category
