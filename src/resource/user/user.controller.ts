@@ -18,6 +18,6 @@ export class UserController {
 
     @Get(':email')
     getUserByEmail(@Param() params) {
-        return this.service.getUserByEmail(params.email)
+        return this.service.getUserByEmailOrPhone(params.email)
     }
 }

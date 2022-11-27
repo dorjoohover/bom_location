@@ -45,7 +45,7 @@ export class Ad {
     @Prop()
     filters: [{
         id: Filter,
-        value: string
+        value: number
     }]
     
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'adtypes'})

@@ -16,16 +16,16 @@ export class createCategoryDto {
     parentId: string
 
     @IsArray()
-    @ApiProperty({isArray: true})
-    filters: []
+    @ApiProperty({isArray: true, type:CreateFilterDto})
+    filters: CreateFilterDto[]
 
     @IsArray()
-    @ApiProperty({isArray: true})
-    viewFilters: []
+    @ApiProperty({isArray: true, type: CreateFilterDto})
+    viewFilters: CreateFilterDto[]
 
     @IsArray()
-    @ApiProperty({isArray: true})
-    createFilters: []
+    @ApiProperty({isArray: true, type: CreateFilterDto})
+    createFilters: CreateFilterDto[]
 
     @IsArray()
     @ApiProperty({type: CreateAdTypeDto})

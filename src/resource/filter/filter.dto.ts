@@ -1,6 +1,6 @@
 
 import { ApiProperty, ApiQuery } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 
 export class Choices {
@@ -30,9 +30,18 @@ export class CreateFilterDto {
   @IsOptional()
   type: string
 
-  @IsString()
+  @IsNumber()
   @ApiProperty()
-  value: string
+  value: number
+  
+  @IsNumber()
+  @ApiProperty()
+  minValue: number
+
+  @IsNumber()
+  @ApiProperty()
+  maxValue: number
+
 }
 
 export class UpdateFilterDto {

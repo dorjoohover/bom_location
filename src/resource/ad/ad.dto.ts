@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 
 
@@ -61,4 +61,29 @@ export class CreateAdDto {
     subCategory: string
 
 }
+export class FilterDto {
+    
 
+    @IsNumber()
+    @ApiProperty()
+    value: number
+    
+    @IsNumber()
+    @ApiProperty()
+    maxValue: number
+    
+    @IsNumber()
+    @ApiProperty()
+    minValue: number
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    id: string
+}
+export class FilterAdDto {
+    
+    @IsArray()
+    @IsNotEmpty() 
+    @ApiProperty({isArray: true, type: FilterDto})
+    filters: FilterDto[]
+}

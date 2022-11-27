@@ -14,6 +14,9 @@ import { TownModule } from './resource/town/town.module';
 import { UserModule } from './resource/user/user.module';
 import { ZoneModule } from './resource/zone/zone.module';
 import { TypeModule } from './resource/type/type.module';
+import { AuthModule } from './resource/auth/auth.module';
+import { UserService } from './resource/user/user.service';
+import { UserController } from './resource/user/user.controller';
 
 @Module({
   imports: [
@@ -30,8 +33,6 @@ import { TypeModule } from './resource/type/type.module';
       dbName: 'zipcode'
     }),
     UserModule,
-    // ZoneModule,
-
     FilterModule,
     PositionModule,
     LocationModule,
@@ -42,9 +43,11 @@ import { TypeModule } from './resource/type/type.module';
     LocationModule,
     CommitteeModule,
     AdTypeModule,
-    TypeModule
+    AuthModule,
+    TypeModule,
+
   ],
-  controllers: [],
-  providers: [],
+  controllers: [ ],
+  providers: [ ],
 })
 export class AppModule {}

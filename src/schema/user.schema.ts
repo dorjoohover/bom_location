@@ -18,8 +18,11 @@ export class User  {
     @Prop({required: true})
     email: string
 
-    @Prop()
-    profileImg: string
+    @Prop({required: true})
+    password: string
+
+    @Prop({required: true, default: false})
+    isAdmin: boolean
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

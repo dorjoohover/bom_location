@@ -1,7 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema';
+import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from './user.dto';
 
 @Injectable()
@@ -14,7 +15,8 @@ export class UserService {
       username: dto.username,
       email: dto.email,
       phone: dto.phone,
-      profileImg: dto.profileImg,
+      password: dto.password,
+      isAdmin: dto.isAdmin
     });
     return user
   }
@@ -27,8 +29,12 @@ export class UserService {
     return users
   }
 
-  async getUserByEmail(email) {
-    let user = await this.model.findOne({email})
+  async findByPayload(payload: string) {
+    return await this.model.findOne({$or: [{email: payload}, {phone: payload}]})
+  }
+
+  async getUserByEmailOrPhone(email?: string, phone?: string) {
+    let user = await this.model.findOne({$or: [{email},{phone}]})
     if(!user)
     throw new ForbiddenException('not found ')
     return user

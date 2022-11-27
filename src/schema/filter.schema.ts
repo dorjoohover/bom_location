@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
-import { Type } from "./type.schema";
 
 export type FilterDocument = Document & Filter
 
@@ -19,7 +18,13 @@ export class Filter {
     type: string
 
     @Prop()
-    value: string
+    value: number
+
+    @Prop({default: 0})
+    minValue: number
+
+    @Prop({default: 999999999999})
+    maxValue: number
 }
 export const FilterSchema = SchemaFactory.createForClass(Filter)
 
