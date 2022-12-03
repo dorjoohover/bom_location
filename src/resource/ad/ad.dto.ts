@@ -20,6 +20,7 @@ export class AdPosition {
     @IsNotEmpty()
     @ApiProperty()
     location_id:string
+    
 
 }
 export class CreateAdDto {

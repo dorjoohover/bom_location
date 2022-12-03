@@ -50,6 +50,9 @@ export class Ad {
     
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'adtypes'})
     types: AdType[]
+
+    @Prop()
+    image: string
 }
 
 export const AdSchema = SchemaFactory.createForClass(Ad)

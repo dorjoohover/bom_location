@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Ad, AdDocument, Filter, FilterDocument, Location,Committee, CommitteeDocument, LocationDocument, Discrict, DistrictDocument, Town, TownDocument } from 'src/schema';
 import { CreateAdDto } from './ad.dto';
-
+const cloudinary  = require('cloudinary').v2
 @Injectable()
 export class AdService {
     constructor (
@@ -14,10 +14,24 @@ export class AdService {
          @InjectModel(Location.name) private locationModel: Model<LocationDocument>,
          @InjectModel(Town.name) private townModel: Model<TownDocument>,
          ) {}
+   
+    async createAd(dto: CreateAdDto, file) {
+        cloudinary.config({ 
+            cloud_name: 'dosvc4rce', 
+            api_key: '418226341632639', 
+            api_secret: 'RnQ2lcc8SA_UyM8jsq1VVOjfkiM' 
+          });
+        const options = {
+            use_filename: true,
+            unique_filename: false,
+            overwrite: true,
+          };
 
-    async createAd(dto: CreateAdDto) {
+            const result = await cloudinary.uploader.upload(file, options);
+
         let ad = await this.model.create({
             title: dto.title,
+            image: result.secure_url,
             description: dto.description,
             positions: dto.positions,
             location: dto.location,

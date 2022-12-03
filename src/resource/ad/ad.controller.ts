@@ -1,4 +1,5 @@
-import { Controller, Post, Get, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateAdDto } from './ad.dto';
 import { AdService } from './ad.service';
 
@@ -7,8 +8,9 @@ export class AdController {
     constructor(private readonly service:AdService) {}
 
     @Post()
-    createAd(@Body() dto: CreateAdDto) {
-        return this.service.createAd(dto)
+    @UseInterceptors(FileInterceptor('file'))
+    createAd(@Body() dto: CreateAdDto, @UploadedFile() file: Express.Multer.File) {
+        return this.service.createAd(dto, file)
     }
 
     @Get()
