@@ -1,8 +1,9 @@
-import { Controller, Post, Get, Body, Param, Request, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Request, UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
 import { AuthGuard } from '@nestjs/passport/dist';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Ads')
 @Controller('ad')
@@ -11,8 +12,9 @@ export class AdController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post()
-    createAd(@Body() dto: CreateAdDto) {
-        return this.service.createAd(dto)
+    @UseInterceptors(FileInterceptor('file'))
+    createAd(@Body() dto: CreateAdDto,  @UploadedFile() file: Express.Multer.File) {
+        return this.service.createAd(dto, file)
     }
 
     @Get()
