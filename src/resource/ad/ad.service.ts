@@ -14,8 +14,8 @@ export class AdService {
          @InjectModel(Location.name) private locationModel: Model<LocationDocument>,
          @InjectModel(Town.name) private townModel: Model<TownDocument>,
          ) {}
-
-    async createAd(dto: CreateAdDto, file:  Express.Multer.File) {
+   
+    async createAd(dto: CreateAdDto, file) {
         cloudinary.config({ 
             cloud_name: 'dosvc4rce', 
             api_key: '418226341632639', 
