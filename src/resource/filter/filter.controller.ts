@@ -1,7 +1,9 @@
 import { Controller, Post, Get, Param,Put, Body } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CreateFilterDto, UpdateFilterDto } from './filter.dto';
 import { FilterService } from './filter.service';
 
+@ApiTags('Filter')
 @Controller('filter')
 export class FilterController {
     constructor(private readonly service: FilterService) {}

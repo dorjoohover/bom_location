@@ -1,7 +1,8 @@
 import { Controller, Post, Get, Param, Body } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CreateTownDto } from './town.dto';
 import { TownService } from './town.service';
-
+@ApiTags('Town')
 @Controller('town')
 export class TownController {
     constructor( private readonly service: TownService){}

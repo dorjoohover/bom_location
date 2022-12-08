@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { User } from 'src/schema/user.schema';
 import { LoginUser, RegisterUser } from './auth.dto';
 import { AuthService } from './auth.service';
 
@@ -20,8 +21,9 @@ export class AuthController {
     @Post('login')
     async login(@Body() dto: LoginUser) {
         const user = await this.service.login(dto)
+        console.log(user)
         if(user) {
-            const token = await this.service.signPayload(user.email || user.phone)
+            const token = await this.service.signPayload(user.email )
             return {user, token}
         }
     }

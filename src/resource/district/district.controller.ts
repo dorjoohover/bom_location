@@ -1,8 +1,10 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { DiscoveryService } from '@nestjs/core';
+import { ApiTags } from '@nestjs/swagger';
 import { DiscrictDto } from './district.dto';
 import { DistrictService } from './district.service';
 
+@ApiTags('Disctrict')
 @Controller('district')
 export class DistrictController {
     constructor(private service: DistrictService) {}
