@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsArray,  IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { enumToArray } from "src/typeformat";
+import { CategorySuggestionTypes } from "../category/interface/categoryEnum";
 
 
 
@@ -23,45 +25,6 @@ export class AdPosition {
     
 
 }
-export class CreateAdDto {
-    @IsNotEmpty()
-    @IsString()
-    @ApiProperty()
-    title:string
-    
-    @IsString()
-    @ApiProperty()
-    description:string
-    
-    @IsArray()
-    @IsNotEmpty()
-    @ApiProperty({type: AdPosition})
-    positions: AdPosition
-
-    @IsString()
-    @ApiProperty()
-    location:string
-
-    @IsArray()
-    @IsNotEmpty()
-    @ApiProperty()
-    types: []
-
-
-    @IsNotEmpty()
-    @ApiProperty({isArray: true})
-    @IsArray()
-    filters: [{
-        id: string,
-        value: string
-    }]
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    subCategory: string
-
-}
 export class FilterDto {
     
 
@@ -81,10 +44,63 @@ export class FilterDto {
     @ApiProperty()
     id: string
 }
+export class CreateAdDto {
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty()
+    title:string
+    
+    @IsString()
+    @ApiProperty()
+    description:string
+    
+
+    @IsNotEmpty()
+    @ApiProperty({type: AdPosition,})
+    positions: AdPosition
+
+    @IsString()
+    @ApiProperty()
+    location:string
+
+
+    @ApiProperty()
+    types: []
+
+
+    @ApiProperty({isArray: true, type: FilterDto, })
+    filters: FilterDto[]
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    subCategory: string
+
+
+    @ApiProperty({ type: 'string', format: 'binary'})
+    file: any
+
+
+}
+
 export class FilterAdDto {
     
     @IsArray()
     @IsNotEmpty() 
     @ApiProperty({isArray: true, type: FilterDto})
     filters: FilterDto[]
+}
+
+export class SuggestionDto {
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    suggestion: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({enum: enumToArray(CategorySuggestionTypes), example: 'position'})
+    type: keyof typeof CategorySuggestionTypes
+
+
 }

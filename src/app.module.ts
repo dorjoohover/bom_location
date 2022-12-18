@@ -20,13 +20,13 @@ import { UserController } from './resource/user/user.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: [
-        process.env.NODE_ENV === 'development' ? '.env.development' : '.env.production',
-      ],
-      load: [configuration],
-      isGlobal: true
-    }),
+    // ConfigModule.forRoot({
+    //   envFilePath: [
+    //     process.env.NODE_ENV === 'development' ? '.env.development' : '.env.production',
+    //   ],
+    //   load: [configuration],
+    //   isGlobal: true
+    // }),
     MongooseModule.forRoot( 'mongodb+srv://dorjoo:dorjooX0@cluster0.adxdtn0.mongodb.net/?retryWrites=true&w=majority', {
       useNewUrlParser: true, 
       useUnifiedTopology: true, 
@@ -45,9 +45,6 @@ import { UserController } from './resource/user/user.controller';
     // AdTypeModule,
     AuthModule,
     // TypeModule,
-
   ],
-  controllers: [ ],
-  providers: [ ],
 })
 export class AppModule {}

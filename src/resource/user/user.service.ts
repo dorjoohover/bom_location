@@ -33,6 +33,10 @@ export class UserService {
     return await this.model.findOne({$or: [{email: payload}, {phone: payload}]})
   }
 
+  async getUserById(id: string) {
+    return await this.model.findById(id)
+  }
+
   async getUserByEmailOrPhone(email?: string, phone?: string) {
     let user = await this.model.findOne({$or: [{email},{phone}]})
     if(!user)

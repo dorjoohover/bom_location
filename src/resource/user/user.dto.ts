@@ -29,3 +29,15 @@ export class CreateUserDto {
 
 
 }
+
+export class AddBookmarkDto {
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    adId: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    userId: string
+}

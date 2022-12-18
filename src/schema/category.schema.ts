@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 import mongoose, { Document } from "mongoose"
+import { CategorySuggestionTypes } from "src/resource/category/interface/categoryEnum"
+import { enumToArray } from "src/typeformat"
 import { AdType } from "./ad_type.schema"
 import { Discrict } from "./district.schema"
 import { Filter } from "./filter.schema"
@@ -27,6 +29,8 @@ export class Category {
     @Prop({type: mongoose.Schema.Types.Array, })
     types: AdType[]
 
+    @Prop({type: String , enum: enumToArray(CategorySuggestionTypes), })
+    suggessionType: keyof typeof CategorySuggestionTypes[]
     @Prop()
     subCategory: boolean
 
