@@ -1,5 +1,5 @@
 import {Controller, Post, Body, Get} from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BookmarkService } from './bookmark.service';
 import { AddBookmarkDto } from './user.dto';
 
@@ -8,7 +8,8 @@ import { AddBookmarkDto } from './user.dto';
 export class BookmarkController {
     constructor(private service: BookmarkService, ) {}
 
-    @Post('add')
+    @Post('ad')
+    @ApiOperation({description: "Add bookmark to user"})
     addBookmark (@Body() data: AddBookmarkDto ) {
         return this.service.addBookmark(data)
     }

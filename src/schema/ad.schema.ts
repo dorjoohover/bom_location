@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
+import { AdTypes} from "src/config/enum";
 import { AdType } from "./ad_type.schema";
 import { Category } from "./category.schema";
 import { Committee } from "./committee.schema";
@@ -8,6 +9,7 @@ import { Filter } from "./filter.schema";
 import { Location } from "./location.schema";
 import { Position } from "./position.schema";
 import { Town } from "./town.schema";
+import { User } from "./user.schema";
 
 export type AdDocument = Document & Ad
 
@@ -48,11 +50,17 @@ export class Ad {
         value: number
     }]
     
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'adtypes'})
-    types: AdType[]
+    @Prop()
+    types: string[]
+
+    @Prop({type: String, enum: AdTypes, default: AdTypes.default })
+    adType: AdTypes
 
     @Prop()
     image: string
+
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'users'})
+    user: User
 }
 
 export const AdSchema = SchemaFactory.createForClass(Ad)

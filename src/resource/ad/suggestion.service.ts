@@ -8,7 +8,7 @@ export class SuggestionService {
     constructor(@InjectModel(Ad.name) private model: Model<AdDocument>) {}
 
     async getSuggestionAds(data: SuggestionDto) {
-        if(data.type == 'position') {
+        if(data.type == 'location') {
             let ads = await this.model.find({'position.district_id': data.suggestion})
             if(!ads) return {message: 'not found'}
             return ads

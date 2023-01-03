@@ -34,7 +34,4 @@ export class LoginUser {
     @IsEmail()
     email: string
     
-    @ApiProperty()
-    @IsString()
-    phone: string
 }

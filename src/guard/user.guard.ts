@@ -19,6 +19,7 @@ export class UserAccessGuard {
 
     const request = context.switchToHttp().getRequest();
     const header = request.headers.authorization;
+
     if (!header) return false;
 
     try {
@@ -27,7 +28,6 @@ export class UserAccessGuard {
       const decoded = jwt.verify(token, 'SECRET') as string ;
       const user = await this.userService.getUserByEmailOrPhone(decoded);
 
-      console.log(user)
 
       request.user = user;
       return true

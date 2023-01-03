@@ -13,26 +13,26 @@ export class Category {
     @Prop({required: true})
     name: string
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'categories'})
-    parentId: Category
+    @Prop({default: false})
+    isParent: boolean
 
 
     @Prop({type: mongoose.Schema.Types.Array, ref: 'filters'})
-    filters: Filter[]
+    filters: string[]
+
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'filters'})
+    createFilters: string[]
 
     @Prop({type: mongoose.Schema.Types.Array, ref: 'filters'})
-    createFilters: Filter[]
-
-    @Prop({type: mongoose.Schema.Types.Array, ref: 'filters'})
-    viewFilters: Filter[]
+    viewFilters: string[]
 
     @Prop({type: mongoose.Schema.Types.Array, })
     types: AdType[]
 
-    @Prop({type: String , enum: enumToArray(CategorySuggestionTypes), })
-    suggessionType: keyof typeof CategorySuggestionTypes[]
     @Prop()
-    subCategory: boolean
+    suggessionType: string[]
+    @Prop()
+    subCategory: string[]
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'locations'})
     location: Location

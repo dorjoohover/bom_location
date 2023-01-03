@@ -47,7 +47,7 @@ export class AuthService {
   
     async login(dto: LoginUser) {
         try {
-            if(dto.email != null && dto.password !=null || dto.phone !=null) {
+            if(dto.email != null && dto.password !=null) {
                 let user = await this.model.findOne({email: dto.email})
                 if(!user) throw new HttpException('wrong email or password', HttpStatus.BAD_REQUEST)
                 const checkPassword = this.checkPassword(dto.password, user.password)
@@ -56,7 +56,6 @@ export class AuthService {
                 } else {
                     return null
                 }
-               
                 
                 
             }
@@ -77,3 +76,4 @@ export class AuthService {
         })
     }
 }
+

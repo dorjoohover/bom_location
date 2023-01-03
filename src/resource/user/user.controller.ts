@@ -1,8 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Query, Req, Request, HttpException} from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+
 import { CreateUserDto } from './user.dto';
 import { UserService } from './user.service';
+import { UseGuards } from '@nestjs/common/decorators';
+import { UserAccessGuard } from 'src/guard/user.guard';
 @ApiTags('User')
+@UseGuards(UserAccessGuard)
+@ApiBearerAuth("access-token")
 @Controller('user')
 export class UserController {
     constructor(private readonly service: UserService) {}
@@ -17,8 +22,10 @@ export class UserController {
         return this.service.getAllUsers()
     }
 
-    @Get(':email')
-    getUserByEmail(@Param() params) {
-        return this.service.getUserByEmailOrPhone(params.email)
+    @Get('me')
+    async getUserByEmail(@Request() {user}) {
+        if (!user) return null
+    return user
+  
     }
 }

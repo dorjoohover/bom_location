@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray,  IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsArray,  IsEnum,  isNotEmpty,  IsNotEmpty, IsNumber, IsString } from "class-validator";
+import {AdType, AdTypes } from "src/config/enum";
 import { enumToArray } from "src/typeformat";
-import { CategorySuggestionTypes } from "../category/interface/categoryEnum";
+import {  CategorySuggestionTypes } from "../category/interface/categoryEnum";
 
 
 
@@ -24,6 +25,21 @@ export class AdPosition {
     location_id:string
     
 
+}
+
+export class CreateFilterDto {
+    @IsNumber()
+    @ApiProperty()
+    value: number
+    @IsArray()
+    @ApiProperty({isArray: true})
+    values: []
+    
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    name: string
 }
 export class FilterDto {
     
@@ -54,7 +70,6 @@ export class CreateAdDto {
     @ApiProperty()
     description:string
     
-
     @IsNotEmpty()
     @ApiProperty({type: AdPosition,})
     positions: AdPosition
@@ -63,13 +78,23 @@ export class CreateAdDto {
     @ApiProperty()
     location:string
 
+    @ApiProperty({
+        isArray: true,
 
-    @ApiProperty()
-    types: []
+    })
+
+    @IsArray()
+
+    types?: string[];
+
+    
+    @ApiProperty({enum: AdTypes, default: AdTypes.default})
+    @IsEnum(AdTypes)
+    adTypes: AdTypes
 
 
-    @ApiProperty({isArray: true, type: FilterDto, })
-    filters: FilterDto[]
+    @ApiProperty({isArray: true, type: CreateFilterDto, })
+    filters: CreateFilterDto[]
 
     @IsString()
     @IsNotEmpty()
@@ -78,7 +103,10 @@ export class CreateAdDto {
 
 
     @ApiProperty({ type: 'string', format: 'binary'})
-    file: any
+    background: any
+
+    @ApiProperty({ type: 'string', format: 'binary',isArray: true })
+    avatar: any
 
 
 }

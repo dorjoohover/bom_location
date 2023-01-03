@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Ad, AdDocument, Filter, FilterDocument, Location,Committee, CommitteeDocument, LocationDocument, Discrict, DistrictDocument, Town, TownDocument } from 'src/schema';
+import { Ad, AdDocument, Filter, FilterDocument, Location,Committee, CommitteeDocument, LocationDocument, Discrict, DistrictDocument, Town, TownDocument, User } from 'src/schema';
 import { CreateAdDto,  FilterDto } from './ad.dto';
 
 import toStream = require('buffer-to-stream');
@@ -30,21 +30,31 @@ export class AdService {
           }).then(r => r['secure_url'])
           return promise
     }
-    async createAd(dto: CreateAdDto, file) {
-
-        let img = await this.uploadImage(file)
-
-
-
+    async createAd(dto: CreateAdDto, file, user: any) {
+        let bg = await this.uploadImage(file["background"][0])
         let ad = await this.model.create({
-            image: img,
+            image: bg,
             title: dto.title,
             description: dto.description,
             positions: JSON.parse(`${dto.positions}`),
             location: dto.location,
             subCategory: dto.subCategory,
             filters: JSON.parse(`${dto.filters}`),
+            user: user['_id']
         })
+       
+        file["avatar"].map(async (e) => {
+            let avatar =  await this.uploadImage(e)
+            ad = await this.model.findByIdAndUpdate(ad._id, {$push: {images: avatar}})
+            })
+        
+
+
+
+
+        
+
+        
 
         return ad
     }
@@ -65,12 +75,12 @@ export class AdService {
     }
 
     
-    async getAdByFilter(filterAd: FilterDto) {
+    // async getAdByFilter(filterAd: FilterDto) {
 
 
-        let ad = await this.model.find({$and: [{'filters.id': filterAd.id, $or: [{'filters.value': {$gte: filterAd.minValue, $lte: filterAd.maxValue}}, {'filters.value': filterAd.value}]}]})
-        return ad
+    //     let ad = await this.model.find({$and: [{'filters.id': filterAd.id, $or: [{'filters.value': {$gte: filterAd.minValue, $lte: filterAd.maxValue}}, {'filters.value': filterAd.value}]}]})
+    //     return ad
 
     
-    }
+    // }
 }
