@@ -48,8 +48,57 @@ export class CreateSubCategory {
     @ApiProperty({default: false})
     isParent: boolean
 
+    @IsString()
+    @ApiProperty()
+    href: string
 
+}
+
+export class UpdateCategoryDto {
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    id: string
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    name: string
+
+    @ApiProperty({
+        isArray: true,
+        required: false,
+        enum: Filters,
+    })
+    @IsEnum(Filters, {each: true})
+    @IsArray()
+
+    filters?: Filters[];
+    @ApiProperty({
+        isArray: true,
+        required: false,
+        enum: Filters,
+    })
+    @IsEnum(Filters, {each: true})
+    @IsArray()
+
+    viewFilters?: Filters[];
+    @ApiProperty({
+        isArray: true,
+        required: false,
+        enum: CategorySuggestionTypes,
+    })
+    @IsEnum(CategorySuggestionTypes, {each: true})
+    @IsArray()
+
+    suggestionType?: CategorySuggestionTypes[];
     
+    @IsBoolean()
+    @ApiProperty({default: false})
+    isParent: boolean
+
+    @IsString()
+    @ApiProperty()
+    href: string
 }
 export class CreateCategoryDto {
     @IsString()
@@ -60,6 +109,10 @@ export class CreateCategoryDto {
     @IsBoolean()
     @ApiProperty({default: true})
     isParent: boolean
+
+    @IsString()
+    @ApiProperty()
+    href: string
 
 }
 

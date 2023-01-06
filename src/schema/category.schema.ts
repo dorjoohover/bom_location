@@ -39,6 +39,7 @@ export class Category {
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Discricts'})
     discrict: Discrict
-    
+    @Prop()
+    href: string
 }
 export const CategorySchema = SchemaFactory.createForClass(Category)

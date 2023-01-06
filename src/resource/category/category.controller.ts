@@ -1,8 +1,9 @@
 import { Controller, Post, Get, Param, Body, Delete } from '@nestjs/common';
-import { Query } from '@nestjs/common/decorators';
+import { Put, Query } from '@nestjs/common/decorators';
 import { ValidationPipe } from '@nestjs/common/pipes';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { CreateCategoryDto, CreateSubCategory } from './category.dto';
+import { domainToASCII } from 'url';
+import { CreateCategoryDto, CreateSubCategory, UpdateCategoryDto } from './category.dto';
 import { CategoryService } from './category.service';
 @ApiTags('Category')
 @Controller('category')
@@ -29,7 +30,19 @@ export class CategoryController {
         return   this.service.getCategoryById(params.id)
         
     }
-
+    @ApiQuery({name: 'id'})
+    @Get('filters/:id')
+    getFilterById(@Query('id') id) {
+        
+        return   this.service.getSubCategoryFiltersById(id)
+        
+    }
+    
+    @ApiQuery({name: 'id'})
+    @Put(':id')
+    updateCategoryId(@Body() dto: UpdateCategoryDto, @Query() id) {
+        return this.service.updateCategoryById( id, dto)
+    }
     @Delete()
     deleteAllCategory() {
         return this.service.deleteAllCategory()

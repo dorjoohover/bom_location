@@ -37,6 +37,7 @@ export function getFilter(filter: Filters): any {
   switch (filter) {
     case Filters.buildingFloor:
       return {
+        id: Filters.buildingFloor,
         name: 'Барилгын давхар',
         values: [
           'B1',
@@ -74,114 +75,131 @@ export function getFilter(filter: Filters): any {
         ],
         value: ''
       };
-    case Filters.room:
-      return {
-        name: 'Өрөөний тоо',
-        values: ['1', '2', '3', '4', '5', '5+'],
+      case Filters.room:
+        return {
+          id: Filters.room,
+          name: 'Өрөөний тоо',
+          values: ['1', '2', '3', '4', '5', '5+'],
         value: ''
       };
     case Filters.bathroom:
       return {
+        id: Filters.bathroom,
         name: 'Угаалгын өрөөний тоо',
         values: ['1', '2', '2+'],
         value: ''
       };
-    case Filters.masterBedroom:
-      return {
+      case Filters.masterBedroom:
+        return {
+        id: Filters.masterBedroom,
         name: 'Мастер өрөөний тоо',
         values: ['Байхгүй', '1', '2', '2+'],
         value: ''
       };
-    case Filters.window:
-      return {
+      case Filters.window:
+        return {
+        id: Filters.window,
         name: 'Цонх',
         values: ['Вакум', 'Модон', 'Төмөр вакум', 'Модон вакум'],
         value: ''
       };
-    case Filters.windowUnit:
-      return {
+      case Filters.windowUnit:
+        return {
+        id: Filters.windowUnit,
         name: 'Цонхны тоо',
         values: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '10+'],
         value: ''
       };
-    case Filters.door:
-      return {
+      case Filters.door:
+        return {
+        id: Filters.door,
         name: 'Хаалга',
         values: ['Бүргэд', 'Төмөр', 'Мод'],
         value: ''
       };
-    case Filters.balconyUnit:
-      return {
+      case Filters.balconyUnit:
+        return {
+        id: Filters.balconyUnit,
         name: 'Тагтны тоо',
         values: ['1', '2', '3', '4', '5', '5+'],
         value: ''
       };
-
-    case Filters.floor:
-      return {
-        name: 'Шал',
-        values: [
-          'Паркет',
-          'Ламинат',
-          'Плита',
-          'Мод',
-          'Чулуу',
-          'Бетон',
-          'Цемент',
-        ],
-        value: ''
-      };
-    case Filters.garage:
-      return {
+      
+      case Filters.floor:
+        return {
+          id: Filters.floor,
+          name: 'Шал',
+          values: [
+            'Паркет',
+            'Ламинат',
+            'Плита',
+            'Мод',
+            'Чулуу',
+            'Бетон',
+            'Цемент',
+          ],
+          value: ''
+        };
+        case Filters.garage:
+          return {
+        id: Filters.garage,
         name: 'Гараж',
         values: ['Байхгүй', 'Байгаа'],
         value: ''
       };
-
-    case Filters.paymentMethod:
-      return {
+      
+      case Filters.paymentMethod:
+        return {
+        id: Filters.paymentMethod,
         name: 'Төлбөрийн нөхцөл',
         values: ['Банкны лизингтэй', 'Хувь лизингтэй', 'Бэлэн'],
         value: ''
       };
-    case Filters.barter:
-      return {
+      case Filters.barter:
+        return {
+        id: Filters.barter,
         name: 'Бартер',
         values: ['Байгаа', 'Байхгүй'],
         value: ''
       };
-    case Filters.district:
-      return {
+      case Filters.district:
+        return {
+        id: Filters.district,
         name: 'Дүүрэг',
         values: [],
         value: ''
       };
-    case Filters.committee:
-      return {
+      case Filters.committee:
+        return {
+        id: Filters.committee,
         name: 'Хороо',
         values: [],
         value: ''
       };
-    case Filters.location:
-      return {
+      case Filters.location:
+        return {
+        id: Filters.location,
         name: 'Байршил',
         values: [],
         value: ''
       };
-    case Filters.town:
-      return {
+      case Filters.town:
+        return {
+        id: Filters.town,
         name: 'Хотхон',
         values: [],
         value: ''
       };
-    case Filters.howFloor:
-      return {
+      case Filters.howFloor:
+        return {
+        id: Filters.howFloor,
         name: 'Хэдэн давхар',
         values: [],
         value: ''
       };
-    case Filters.serviceType:
-      return {
+      case Filters.serviceType:
+        return {
+        id: Filters.serviceType,
         name: 'Үйлчилгээний төрөл',
         values: [
           'Зоогийн газар',
@@ -197,6 +215,7 @@ export function getFilter(filter: Filters): any {
       };
     case Filters.objectType:
       return {
+        id: Filters.objectType,
         name: 'Объектын төрөл',
         values: [
           'Агуулах',
@@ -210,50 +229,51 @@ export function getFilter(filter: Filters): any {
         ],
         value: ''
       };
-    case Filters.landLicense:
-      return {
-        name: 'Газар эзэмшлийн хэлбэр',
-        values: ['Өмчлөх', 'Эзэмших', 'Ашиглах'],
-        value: ''
-      };
-    case Filters.phone:
-      return {
+      case Filters.landLicense:
+        return {
+          id: Filters.landLicense,
+          name: 'Газар эзэмшлийн хэлбэр',
+          values: ['Өмчлөх', 'Эзэмших', 'Ашиглах'],
+          value: ''
+        };
+        case Filters.phone:
+          return {
+        id: Filters.phone,
         name: 'Утас',
         values: [],
         value: ''
       };
-    case Filters.area:
-      return {
-        name: 'Талбай',
-        values: [],
-        value: ''
-      };
-    case Filters.price:
-      return {
-        name: 'Талбай',
-        values: [],
-        value: ''
-      };
-    case Filters.price:
-      return {
+      case Filters.area:
+        return {
+          id: Filters.area,
+          name: 'Талбай',
+          values: [],
+          value: ''
+        };
+        case Filters.price:
+          return {
+        id: Filters.price,
         name: 'Үнэ',
         values: [],
         value: ''
       };
-    case Filters.unitPrice:
-      return {
+      case Filters.unitPrice:
+        return {
+        id: Filters.unitPrice,
         name: 'Нэгж талбайн үнэ',
         values: [],
         value: ''
       };
-    case Filters.operation:
-      return {
+      case Filters.operation:
+        return {
+        id: Filters.operation,
         name: 'Ашиглалтанд орсон он',
         values: [],
         value: ''
       };
-    case Filters.landUsage:
-      return {
+      case Filters.landUsage:
+        return {
+        id: Filters.landUsage,
         name: 'Газрын зориулалт',
         values: [
           '4 ба түүнээс доош давхар нийтийн орон сууц',

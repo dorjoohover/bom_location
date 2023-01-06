@@ -21,7 +21,7 @@ import {
   LocationDocument,
   Location,
 } from 'src/schema';
-import { CreateCategoryDto, CreateSubCategory } from './category.dto';
+import { CreateCategoryDto, CreateSubCategory, UpdateCategoryDto } from './category.dto';
 import { Filters, getFilter } from './interface/categoryEnum';
 
 @Injectable()
@@ -41,6 +41,7 @@ export class CategoryService {
     category = await this.model.create({
       name: dto.name,
       isParent: dto.isParent,
+      href: dto.href
     });
     return category;
   }
@@ -51,7 +52,7 @@ export class CategoryService {
       if (subCategory) throw new HttpException('found', HttpStatus.FOUND);
       subCategory = await this.model.create({
         name: dto.name,
-
+        href: dto.href,
         isParent: dto.isParent,
 
         filters: dto.filters,
@@ -97,17 +98,26 @@ export class CategoryService {
       )
       .exec();
       if (!category) throw new ForbiddenException('not found');
-    let filter =   category.subCategory?.map((s) => this.getSubCategoryFiltersById(s['id']))
-
-    return {category, filter};
+    let filter =  await category.subCategory?.map((s) => this.getSubCategoryFiltersById(s['id']))
+       
+    return filter;
   }
 
   async getSubCategoryFiltersById(id: string) {
     let subCategory  = await this.model.findById(id).exec()
     if(!subCategory) throw new HttpException('not found', HttpStatus.NOT_FOUND)
-    let filters = subCategory.viewFilters.map((f) => getFilter(f as Filters))
+
+    let filters = subCategory.viewFilters.map((f) => 
+
+       getFilter(f as Filters)
+    )
     return {subCategory, filters}
   }
+
+  async updateCategoryById(id: string, dto: UpdateCategoryDto) {
+
+  }
+
   async deleteAllCategory() {
     let category = this.model.deleteMany().then((d) => console.log(d));
     return category;
