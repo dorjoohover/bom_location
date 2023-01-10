@@ -6,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 
 import {
   AdType,
@@ -21,7 +21,11 @@ import {
   LocationDocument,
   Location,
 } from 'src/schema';
-import { CreateCategoryDto, CreateSubCategory, UpdateCategoryDto } from './category.dto';
+import {
+  CreateCategoryDto,
+  CreateSubCategory,
+  UpdateCategoryDto,
+} from './category.dto';
 import { Filters, getFilter } from './interface/categoryEnum';
 
 @Injectable()
@@ -41,7 +45,8 @@ export class CategoryService {
     category = await this.model.create({
       name: dto.name,
       isParent: dto.isParent,
-      href: dto.href
+      href: dto.href,
+      english: dto.english
     });
     return category;
   }
@@ -53,6 +58,7 @@ export class CategoryService {
       subCategory = await this.model.create({
         name: dto.name,
         href: dto.href,
+        english: dto.english,
         isParent: dto.isParent,
 
         filters: dto.filters,
@@ -64,7 +70,7 @@ export class CategoryService {
       let category = await this.model.findByIdAndUpdate(dto.id, {
         $push: { subCategory: subCategory._id },
       });
-      console.log(category)
+
       return subCategory;
     } catch (e) {
       console.log(e);
@@ -77,7 +83,7 @@ export class CategoryService {
       .equals(true)
       .populate(
         'subCategory',
-        'id name subCategory filters viewFilters',
+        'id name subCategory filters  href english viewFilters',
         this.model,
       )
       .exec();
@@ -87,36 +93,54 @@ export class CategoryService {
 
     return { categories, discrict, location };
   }
-  
+
   async getCategoryById(id: string) {
-    let category = await this.model
+    
+    let category
+    if(mongoose.Types.ObjectId.isValid(id))
+    {
+      category = await this.model
       .findById(id)
       .populate(
         'subCategory',
-        'id name subCategory filters viewFilters',
+        'id name subCategory href english filters viewFilters',
         this.model,
       )
       .exec();
-      if (!category) throw new ForbiddenException('not found');
-    let filter =  await category.subCategory?.map((s) => this.getSubCategoryFiltersById(s['id']))
-       
-    return filter;
+    } else {
+      category = await this.model
+      .findOne({href: id})
+      .populate(
+        'subCategory',
+        'id name subCategory href english filters viewFilters',
+        this.model,
+      )
+      .exec();
+    }
+    return category;
+  }
+  
+  async getSubCategoryFiltersById(id: string, isFilter: string) {
+    
+    let subCategory 
+    if(mongoose.Types.ObjectId.isValid(id))  {
+      subCategory = await this.model.findById(id).exec();
+    } else {
+      subCategory = await this.model.findOne({href: id}).exec();
+    }
+    if (!subCategory)
+      throw new HttpException('not found', HttpStatus.NOT_FOUND);
+
+    let filters = [];
+    if (isFilter == 'true') {
+      filters = subCategory.filters.map((f) => getFilter(f as Filters));
+    } else {
+      filters = subCategory.viewFilters.map((f) => getFilter(f as Filters));
+    }
+    return { subCategory, filters };
   }
 
-  async getSubCategoryFiltersById(id: string) {
-    let subCategory  = await this.model.findById(id).exec()
-    if(!subCategory) throw new HttpException('not found', HttpStatus.NOT_FOUND)
-
-    let filters = subCategory.viewFilters.map((f) => 
-
-       getFilter(f as Filters)
-    )
-    return {subCategory, filters}
-  }
-
-  async updateCategoryById(id: string, dto: UpdateCategoryDto) {
-
-  }
+  async updateCategoryById(id: string, dto: UpdateCategoryDto) {}
 
   async deleteAllCategory() {
     let category = this.model.deleteMany().then((d) => console.log(d));

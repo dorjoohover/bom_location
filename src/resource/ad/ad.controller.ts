@@ -18,15 +18,11 @@ export class AdController {
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth('access-token')
     @Post()
-    @ApiConsumes('multipart/form-data')
     @ApiOperation({description: "Create ad"})
-    @UseInterceptors(FileFieldsInterceptor([
-        { name: 'avatar', maxCount: 2 },
-  { name: 'background', maxCount:1 },
-      ]))
-    createAd(@Request() {user}, @Body() dto: CreateAdDto ,@UploadedFiles() file: {avatar?: Express.Multer.File[], background?: Express.Multer.File}) {
+
+    createAd(@Request() {user}, @Body() dto: CreateAdDto ) {
         if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
-        return this.service.createAd(dto, file, user)
+        return this.service.createAd(dto,  user)
     }
     
 
@@ -39,23 +35,25 @@ export class AdController {
     @ApiQuery({name: 'id', })
     @ApiOperation({description: "View ad by id"})
     @Get(':id')
-    getAdById(@Query('id') params) {
-        return this.service.getAdById(params.id)
+    getAdById(@Query('id') id) {
+        return this.service.getAdById(id)
+    }
+    
+    @ApiQuery({name: 'id', })
+    @ApiOperation({description: "View ad by category id"})
+    @Get('category/:id')
+    getAdByCategoryId(@Query('id') id) {
+        return this.service.getAdByCategoryId(id)
     }
     
     @ApiOperation({description: "Get ad by filters"})
     @Post('filter')
-    // getFilterAd(@Body() filterAd: FilterAdDto) {
+    getFilterAd(@Body() filterAd: FilterAdDto) {
         
-    //     let ads = filterAd.filters.map(async (f) => {
-    //         let ad = await this.service.getAdByFilter({id: f.id, maxValue: f.maxValue, minValue: f.minValue, value: f.value})
-    //         return ad
 
-    //     })
-        
-    //     return Promise.all(ads).then((r) => r[0])
+        return this.service.getAdByFilter(filterAd)
 
-    // }
+    }
     @ApiOperation({description: "Get suggesstion ad"})
     @Post('suggesstion')
     getSuggestion(@Body() data: SuggestionDto) {

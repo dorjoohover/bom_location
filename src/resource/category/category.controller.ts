@@ -30,11 +30,12 @@ export class CategoryController {
         return   this.service.getCategoryById(params.id)
         
     }
+
     @ApiQuery({name: 'id'})
-    @Get('filters/:id')
-    getFilterById(@Query('id') id) {
-        
-        return   this.service.getSubCategoryFiltersById(id)
+    @Get('filters/:id/:type')
+    getFilterById(@Query('id') id, @Param('type') type: string) {
+
+        return   this.service.getSubCategoryFiltersById(id, type)
         
     }
     

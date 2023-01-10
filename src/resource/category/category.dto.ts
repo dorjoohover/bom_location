@@ -51,6 +51,9 @@ export class CreateSubCategory {
     @IsString()
     @ApiProperty()
     href: string
+    @IsString()
+    @ApiProperty()
+    english: string
 
 }
 
@@ -63,6 +66,10 @@ export class UpdateCategoryDto {
     @IsNotEmpty()
     @ApiProperty()
     name: string
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    english: string
 
     @ApiProperty({
         isArray: true,
@@ -110,6 +117,9 @@ export class CreateCategoryDto {
     @ApiProperty({default: true})
     isParent: boolean
 
+    @IsString()
+    @ApiProperty()
+    english: string
     @IsString()
     @ApiProperty()
     href: string

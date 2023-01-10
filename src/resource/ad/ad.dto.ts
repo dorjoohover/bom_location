@@ -15,14 +15,15 @@ export class AdPosition {
     @IsNotEmpty()
     @ApiProperty()
     committee_id: string
+
     @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    town_id:string
-    @IsString()
-    @IsNotEmpty()
+
     @ApiProperty()
     location_id:string
+    @IsString()
+
+    @ApiProperty()
+    town_id:string
     
 
 }
@@ -52,9 +53,9 @@ export class FilterDto {
     @ApiProperty()
     maxValue: number
     
-    @IsNumber()
+    @IsString()
     @ApiProperty()
-    minValue: number
+    name: string
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
@@ -71,7 +72,7 @@ export class CreateAdDto {
     description:string
     
     @IsNotEmpty()
-    @ApiProperty({type: AdPosition,})
+    @ApiProperty({type: AdPosition})
     positions: AdPosition
 
     @IsString()
@@ -89,7 +90,6 @@ export class CreateAdDto {
 
     
     @ApiProperty({enum: AdTypes, default: AdTypes.default})
-    @IsEnum(AdTypes)
     adTypes: AdTypes
 
 
@@ -100,14 +100,14 @@ export class CreateAdDto {
     @IsNotEmpty()
     @ApiProperty()
     subCategory: string
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    category: string
 
 
-    @ApiProperty({ type: 'string', format: 'binary'})
-    background: any
-
-    @ApiProperty({ type: 'string', format: 'binary',isArray: true })
-    avatar: any
-
+    @ApiProperty({isArray: true})
+    images: string
 
 }
 
@@ -117,6 +117,19 @@ export class FilterAdDto {
     @IsNotEmpty() 
     @ApiProperty({isArray: true, type: FilterDto})
     filters: FilterDto[]
+
+    @IsArray()
+    @IsNotEmpty()
+    @ApiProperty({isArray: true, })
+    adTypes: []
+
+    @IsString()
+    @ApiProperty()
+    subCategory: string
+    @IsNotEmpty()
+    @ApiProperty()
+    positions: AdPosition
+
 }
 
 export class SuggestionDto {

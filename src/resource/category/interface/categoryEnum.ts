@@ -2,6 +2,8 @@ export enum CategorySuggestionTypes {
   'room',
   'location',
   'floor',
+  'usage',
+  'buildingFloor'
 }
 
 export enum Filters {
@@ -26,11 +28,16 @@ export enum Filters {
   unitPrice = 'unitPrice',
   area = 'area',
   operation = 'operation',
+  licenseOperation = 'licenseOperation',
+  validDate = 'validDate',
   district = 'district',
   committee = 'committee',
   location = 'location',
   town = 'town',
   howFloor = 'howFloor',
+  officeName = 'officeName',
+  buildingName = 'buildingName',
+  
 }
 
 export function getFilter(filter: Filters): any {
@@ -195,7 +202,8 @@ export function getFilter(filter: Filters): any {
         id: Filters.howFloor,
         name: 'Хэдэн давхар',
         values: [],
-        value: ''
+        value: '',
+        maxValue: '',
       };
       case Filters.serviceType:
         return {
@@ -241,21 +249,41 @@ export function getFilter(filter: Filters): any {
         id: Filters.phone,
         name: 'Утас',
         values: [],
-        value: ''
+        value: '',
+       
+        
       };
       case Filters.area:
         return {
           id: Filters.area,
           name: 'Талбай',
           values: [],
-          value: ''
+          value: '',
+          maxValue: '',
+        };
+      case Filters.officeName:
+        return {
+          id: Filters.officeName,
+          name: 'Оффисын нэр',
+          values: [],
+          value: '',
+          maxValue: '',
+        };
+      case Filters.buildingName:
+        return {
+          id: Filters.buildingName,
+          name: 'Барилгын нэр',
+          values: [],
+          value: '',
+          maxValue: '',
         };
         case Filters.price:
           return {
         id: Filters.price,
         name: 'Үнэ',
         values: [],
-        value: ''
+        value: '',
+        maxValue: '',
       };
       case Filters.unitPrice:
         return {
@@ -269,7 +297,24 @@ export function getFilter(filter: Filters): any {
         id: Filters.operation,
         name: 'Ашиглалтанд орсон он',
         values: [],
-        value: ''
+        value: '',
+        maxValue: '',
+      };
+      case Filters.licenseOperation:
+        return {
+        id: Filters.licenseOperation,
+        name: 'Гэрчилгээ олгосон он',
+        values: [],
+        value: '',
+        maxValue: '',
+      };
+      case Filters.validDate:
+        return {
+        id: Filters.validDate,
+        name: 'Хүчинтэй хугацаа',
+        values: [],
+        value: '',
+        maxValue: '',
       };
       case Filters.landUsage:
         return {

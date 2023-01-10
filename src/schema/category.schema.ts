@@ -13,17 +13,20 @@ export class Category {
     @Prop({required: true})
     name: string
 
+    @Prop()
+    english: string
+
     @Prop({default: false})
     isParent: boolean
 
 
-    @Prop({type: mongoose.Schema.Types.Array, ref: 'filters'})
+    @Prop({type: mongoose.Schema.Types.Array,})
     filters: string[]
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'filters'})
+    @Prop({type: mongoose.Schema.Types.Array, })
     createFilters: string[]
 
-    @Prop({type: mongoose.Schema.Types.Array, ref: 'filters'})
+    @Prop({type: mongoose.Schema.Types.Array, })
     viewFilters: string[]
 
     @Prop({type: mongoose.Schema.Types.Array, })
