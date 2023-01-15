@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 import mongoose, { Document } from "mongoose"
+import { CreateAdSteps } from "src/config/enum"
 import { CategorySuggestionTypes } from "src/resource/category/interface/categoryEnum"
 import { enumToArray } from "src/typeformat"
 import { AdType } from "./ad_type.schema"
@@ -24,7 +25,10 @@ export class Category {
     filters: string[]
 
     @Prop({type: mongoose.Schema.Types.Array, })
-    createFilters: string[]
+    steps: [{
+        step: CreateAdSteps,
+        values: []
+    }]
 
     @Prop({type: mongoose.Schema.Types.Array, })
     viewFilters: string[]

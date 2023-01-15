@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray,  IsEnum,  isNotEmpty,  IsNotEmpty, IsNumber, IsString } from "class-validator";
-import {AdType, AdTypes } from "src/config/enum";
+import {AdStatus, AdType, AdTypes } from "src/config/enum";
 import { enumToArray } from "src/typeformat";
 import {  CategorySuggestionTypes } from "../category/interface/categoryEnum";
 
@@ -92,6 +92,8 @@ export class CreateAdDto {
     @ApiProperty({enum: AdTypes, default: AdTypes.default})
     adTypes: AdTypes
 
+    @ApiProperty({enum: AdStatus, default: AdStatus.pending})
+    adStatus: AdStatus
 
     @ApiProperty({isArray: true, type: CreateFilterDto, })
     filters: CreateFilterDto[]

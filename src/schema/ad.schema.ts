@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { AdTypes } from 'src/config/enum';
+import { AdStatus, AdTypes } from 'src/config/enum';
 import { AdType } from './ad_type.schema';
 import { Category } from './category.schema';
 import { Committee } from './committee.schema';
@@ -61,6 +61,9 @@ export class Ad {
 
   @Prop({ type: String, enum: AdTypes, default: AdTypes.default })
   adType: AdTypes;
+
+  @Prop({ type: String, enum: AdStatus, default: AdStatus.pending })
+  adStatus: AdStatus;
 
   @Prop()
   image: string;

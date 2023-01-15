@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
+import { UserType } from "src/config/enum";
 import { Ad } from "./ad.schema";
 
 export type UserDocument = Document & User
@@ -14,6 +15,10 @@ export class User  {
 
     @Prop({required: true})
     phone: string
+
+    @Prop({ type: String, enum: UserType, default: UserType.default })
+    userType: UserType;
+  
 
     @Prop({required: true})
     email: string

@@ -4,6 +4,7 @@ import { CreateFilterDto } from "../filter/filter.dto";
 import {CreateAdTypeDto} from '../adtype/ad_type.dto'
 import { Transform } from "class-transformer";
 import { CategorySuggestionTypes, Filters } from "./interface/categoryEnum";
+import { CreateAdSteps } from "src/config/enum";
 
 
 export class CreateSubCategory {
@@ -32,8 +33,19 @@ export class CreateSubCategory {
     })
     @IsEnum(Filters, {each: true})
     @IsArray()
-
+    
     viewFilters?: Filters[];
+
+    @ApiProperty({
+        isArray: true,
+        required: true,
+      
+    })
+    @IsArray()
+    steps: [{
+        step: CreateAdSteps,
+        values: []
+    }];
     @ApiProperty({
         isArray: true,
         required: false,

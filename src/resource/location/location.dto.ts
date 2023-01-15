@@ -13,18 +13,12 @@ export class LocationDto {
     district_id: string
     
 
-    @IsNumber()
-    @IsNotEmpty()
     @ApiProperty()
     zipcode: number
     
-    @IsNumber()
-    @IsNotEmpty()
     @ApiProperty()
     lantitude: string
 
-    @IsNumber()
-    @IsNotEmpty()
     @ApiProperty()
     longitude: string
 

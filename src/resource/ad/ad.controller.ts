@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport/dist';
 import { FileFieldsInterceptor, FileInterceptor,  } from '@nestjs/platform-express';
 import { SuggestionService } from './suggestion.service';
 import { UserAccessGuard } from 'src/guard/user.guard';
-import { AdType } from 'src/config/enum';
+import { AdStatus, AdType } from 'src/config/enum';
 
 @ApiTags('Ads')
 @Controller('ad')
@@ -37,6 +37,33 @@ export class AdController {
     @Get(':id')
     getAdById(@Query('id') id) {
         return this.service.getAdById(id)
+    }
+
+    
+   
+    @Get('check')
+    getAdNotVerified() {
+        return this.service.getAdNotVerified()
+    }
+    
+    @Get('check/:id')
+    @ApiQuery({name: 'id', })
+    @ApiOperation({description: "Verify ad by id"})
+    verifyAd(@Query('id') id) {
+        return this.service.verifyAd(id)
+    }
+
+    @Get('sold/:id')
+    @ApiQuery({name: 'id', })
+    @ApiOperation({description: "Sold ad by id"})
+    soldAd(@Query('id') id) {
+        return this.service.updateStatusAd(id, AdStatus.sold)
+    }
+
+    @Get('timed')
+    @ApiOperation({description: "Update timed"})
+    updateStatisTimed() {
+        return this.service.updateStatusTimed()
     }
     
     @ApiQuery({name: 'id', })

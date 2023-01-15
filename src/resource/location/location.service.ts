@@ -10,14 +10,14 @@ export class LocationService {
     async create(dto: LocationDto) {
         let location = await this.model.findOne({name: dto.name})
         if(location) {
-            throw new ForbiddenException('founded that location')
+            throw new ForbiddenException('found that location')
         }
         location = await this.model.create({
             name: dto.name,
             district_id: dto.district_id,
-            zipcode: dto.zipcode,
-            latitude: dto.lantitude,
-            longitude: dto.longitude
+            // zipcode: dto.zipcode,
+            // latitude: dto.lantitude,
+            // longitude: dto.longitude
         })
         return location
     }
@@ -41,5 +41,10 @@ export class LocationService {
         let location = await this.model.findById(id).populate('district_id', 'name', this.discrictModel)
 
         return location
+    }
+
+    async deleteAllLocation() {
+        let locations = await this.model.deleteMany()
+        return locations
     }
 }

@@ -3,7 +3,7 @@ export enum CategorySuggestionTypes {
   'location',
   'floor',
   'usage',
-  'buildingFloor'
+  'buildingFloor',
 }
 
 export enum Filters {
@@ -37,7 +37,7 @@ export enum Filters {
   howFloor = 'howFloor',
   officeName = 'officeName',
   buildingName = 'buildingName',
-  
+  tradeService = 'tradeService',
 }
 
 export function getFilter(filter: Filters): any {
@@ -80,133 +80,287 @@ export function getFilter(filter: Filters): any {
           '29',
           '30',
         ],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.room:
-        return {
-          id: Filters.room,
-          name: 'Өрөөний тоо',
-          values: ['1', '2', '3', '4', '5', '5+'],
-        value: ''
+    case Filters.room:
+      return {
+        id: Filters.room,
+        name: 'Өрөөний тоо',
+        values: ['1', '2', '3', '4', '5', '5+'],
+        value: '',
+        type: 'dropdown',
       };
     case Filters.bathroom:
       return {
         id: Filters.bathroom,
         name: 'Угаалгын өрөөний тоо',
         values: ['1', '2', '2+'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.masterBedroom:
-        return {
+    case Filters.masterBedroom:
+      return {
         id: Filters.masterBedroom,
-        name: 'Мастер өрөөний тоо',
+        name: 'Мастер унтлагын өрөөний тоо',
         values: ['Байхгүй', '1', '2', '2+'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.window:
-        return {
+    case Filters.window:
+      return {
         id: Filters.window,
         name: 'Цонх',
         values: ['Вакум', 'Модон', 'Төмөр вакум', 'Модон вакум'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.windowUnit:
-        return {
+    case Filters.windowUnit:
+      return {
         id: Filters.windowUnit,
         name: 'Цонхны тоо',
         values: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '10+'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.door:
-        return {
+    case Filters.door:
+      return {
         id: Filters.door,
         name: 'Хаалга',
         values: ['Бүргэд', 'Төмөр', 'Мод'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.balconyUnit:
-        return {
+    case Filters.balconyUnit:
+      return {
         id: Filters.balconyUnit,
         name: 'Тагтны тоо',
         values: ['1', '2', '3', '4', '5', '5+'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      
-      case Filters.floor:
-        return {
-          id: Filters.floor,
-          name: 'Шал',
-          values: [
-            'Паркет',
-            'Ламинат',
-            'Плита',
-            'Мод',
-            'Чулуу',
-            'Бетон',
-            'Цемент',
-          ],
-          value: ''
-        };
-        case Filters.garage:
-          return {
+
+    case Filters.floor:
+      return {
+        id: Filters.floor,
+        name: 'Шал',
+        values: [
+          'Паркет',
+          'Ламинат',
+          'Плита',
+          'Мод',
+          'Чулуу',
+          'Бетон',
+          'Цемент',
+        ],
+        value: '',
+        type: 'dropdown',
+      };
+    case Filters.garage:
+      return {
         id: Filters.garage,
         name: 'Гараж',
         values: ['Байхгүй', 'Байгаа'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      
-      case Filters.paymentMethod:
-        return {
+
+    case Filters.paymentMethod:
+      return {
         id: Filters.paymentMethod,
         name: 'Төлбөрийн нөхцөл',
         values: ['Банкны лизингтэй', 'Хувь лизингтэй', 'Бэлэн'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.barter:
-        return {
+    case Filters.barter:
+      return {
         id: Filters.barter,
         name: 'Бартер',
         values: ['Байгаа', 'Байхгүй'],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.district:
-        return {
+    case Filters.district:
+      return {
         id: Filters.district,
         name: 'Дүүрэг',
         values: [],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.committee:
-        return {
+    case Filters.committee:
+      return {
         id: Filters.committee,
         name: 'Хороо',
         values: [],
-        value: ''
+        value: '',
+        type: 'text',
       };
-      case Filters.location:
-        return {
+    case Filters.location:
+      return {
         id: Filters.location,
         name: 'Байршил',
         values: [],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.town:
-        return {
+    case Filters.town:
+      return {
         id: Filters.town,
         name: 'Хотхон',
-        values: [],
-        value: ''
+        values: [
+          'Академи-1',
+          'Академи-2',
+          'Скай Смарт Апартмент',
+          'Цагаан орд',
+          'Дэлгэрнаран',
+          'Хөрш заан',
+          'Цэлмэг',
+          'Шинэ дүр төрх',
+          'Дөл хотхон',
+          'Зайсан Апартмент Z хотхон',
+          'Хавай',
+          'UB town',
+          'Зайсан Апартмент 2',
+          'Ивээл',
+          'Бумба гранд',
+          'Визард',
+          'Шинэ мөрөөдөл',
+          'Миний гэр',
+          'Ривэр сайд',
+          'Туул ван',
+          'Цэнгэг 3',
+          'Твин Парк',
+          'Скай Тауэр',
+          'Оргил',
+          'Оргил Стар апартмент',
+          'SS гарден',
+          'Гэгээнтэн',
+          'Парк гарден',
+          'Андууд',
+          'Алтай хаус',
+          'Агниста',
+          'Ривэр хилс',
+          'Хүннү 2222',
+          'Эрдэнийн төгөл',
+          'Дондогдулам',
+          'Хүннү Плас',
+          'Japan Town',
+          'Рояал гарден',
+          'Токио таун',
+          'Гэрлүг виста',
+          'Хурд',
+          'Цэнгэлдэх',
+          'KH апартмент',
+          'Романа резидэнс',
+          'Глобал таун',
+          'Жаргалан',
+          'Нархан',
+          'Бүти таун',
+          'Хансвилл',
+          'Акояа резидэнс',
+          'Кинг Тауэр',
+          'Ривэр гарден',
+          'Маршал таун',
+          'Туул гарден',
+          'Бусад',
+        ],
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.howFloor:
-        return {
+    case Filters.tradeService:
+      return {
+        id: Filters.tradeService,
+        name: 'Худалдаа үйлчилгээний газрууд',
+        values: [
+          'Жем палас',
+          'Жем молл',
+          'Максмолл',
+          'Минж плаза',
+          'Элбэг их дэлгүүр',
+          'Гурванбилэг их дэлгүүр',
+          'Алтантөгрөг худалдааны төв',
+          'Ачлал их дэлгүүр',
+          'Түмэн плаза ',
+          'Номин плаза',
+          'Авто плаза',
+          'Москва их дэлгүүр',
+          '1000-н нэрийн бараа',
+          'Билэг их дэлгүүр',
+          'Kорал центр',
+          'Баянгол их дэлгүүр',
+          'UK тауэр',
+          'Биг барилгын материалын төв',
+          'Гермес центр',
+          'Нью Сандэй Плаза',
+          'Хархорин зах',
+          'Ханбүргэдэй',
+          'Соло молл',
+          'Соманг плаза',
+          'Сандэй плаза',
+          'Энканто молл',
+          'Дүнжингарав худалдааны төв',
+          'Баялаг-Ундраа зах',
+          'Нарантуул зах',
+          'Түмэн молл',
+          'Баянзүрх их дэлгүүр',
+          'Сэнтралл молл',
+          'Натур худалдааны төв',
+          'Наран супермаркет',
+          'Cinema Next',
+          'Саппоро худалдааны төв',
+          'Гурвалжин барилгын материалын төв',
+          'Драгон молл',
+          'Улаанбаатар их дэлгүүр',
+          'Шангри-Ла молл',
+          'Сэнтрал тауэр',
+          'Метромолл',
+          'Бльюмон центр',
+          'Сөүл плаза',
+          'Наран молл',
+          'Наран плаза',
+          'Төгөлдөр төв',
+          'Галлерей Улаанбаатар',
+          'Авто плаза',
+          'UB март төв',
+          'Выставка',
+          'Хүннү молл',
+          'Наадам центр',
+          'Мишээл экспо',
+          'Зайсан Стар молл',
+          'Голден Будда Шоппинг молл',
+          'Зайсан Хилл',
+          'Зайсан Скуэр центр',
+          'Улсын их дэлгүүр',
+          'Пийс молл',
+          'Мөнгөн завьяа худалдааны төв',
+          'Алтай центр',
+          'Цэцэг төв',
+          'Монтел утасны дэлгүүр',
+          'Бөмбөгөр-1 худалдааны төв',
+          'Бөмбөгөр-2 худалдааны төв',
+          'Алтжин бөмбөгөр худалдааны төв',
+          'Тэди худалдааны төв',
+          'МН тауэр',
+
+          'Бусад',
+        ],
+        value: '',
+        type: 'dropdown',
+      };
+    case Filters.howFloor:
+      return {
         id: Filters.howFloor,
         name: 'Хэдэн давхар',
         values: [],
         value: '',
         maxValue: '',
+        type: 'dropdown',
+        parentId: Filters.buildingFloor,
       };
-      case Filters.serviceType:
-        return {
+    case Filters.serviceType:
+      return {
         id: Filters.serviceType,
         name: 'Үйлчилгээний төрөл',
         values: [
@@ -219,7 +373,8 @@ export function getFilter(filter: Filters): any {
           'Хүнсний дэлгүүр',
           'Бусад',
         ],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
     case Filters.objectType:
       return {
@@ -235,89 +390,169 @@ export function getFilter(filter: Filters): any {
           'Зочид буудал',
           'Бусад',
         ],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
-      case Filters.landLicense:
-        return {
-          id: Filters.landLicense,
-          name: 'Газар эзэмшлийн хэлбэр',
-          values: ['Өмчлөх', 'Эзэмших', 'Ашиглах'],
-          value: ''
-        };
-        case Filters.phone:
-          return {
+    case Filters.landLicense:
+      return {
+        id: Filters.landLicense,
+        name: 'Газар эзэмшлийн хэлбэр',
+        values: ['Өмчлөх', 'Эзэмших', 'Ашиглах'],
+        value: '',
+        type: 'dropdown',
+      };
+    case Filters.phone:
+      return {
         id: Filters.phone,
         name: 'Утас',
         values: [],
         value: '',
-       
-        
+        type: 'text',
       };
-      case Filters.area:
-        return {
-          id: Filters.area,
-          name: 'Талбай',
-          values: [],
-          value: '',
-          maxValue: '',
-        };
-      case Filters.officeName:
-        return {
-          id: Filters.officeName,
-          name: 'Оффисын нэр',
-          values: [],
-          value: '',
-          maxValue: '',
-        };
-      case Filters.buildingName:
-        return {
-          id: Filters.buildingName,
-          name: 'Барилгын нэр',
-          values: [],
-          value: '',
-          maxValue: '',
-        };
-        case Filters.price:
-          return {
+    case Filters.area:
+      return {
+        id: Filters.area,
+        name: 'Талбай',
+        values: [],
+        value: '',
+        maxValue: '',
+        mark: 'area',
+        type: 'text',
+      };
+    case Filters.officeName:
+      return {
+        id: Filters.officeName,
+        name: 'Оффисын нэр',
+        values: [
+          'MPM бюлдинг',
+          'Рокмон бюлдинг',
+          'Гранд плаза',
+          'МҮСТО',
+          'Эрхи төв',
+          'Жем палас',
+          'Соманг Плаза',
+          'Юу Би тауэр',
+          'Мандала тауэр',
+          'Сакура тауэр',
+          'Ворлд вайн центр',
+          'Эрхэт оффис',
+          'Блю Скай тауэр',
+          'Шангри-ла Улаанбаатар',
+          'Мерү тауэр',
+          'Даун Таун оффис',
+          'Аюуд тауэр',
+          'Гранд оффис центр',
+          'Юу Би Эйч центр',
+          'Мидтаун оффис',
+          'Шүрэн бюлдинг',
+          'Скай плаза',
+          'Далай тауэр',
+          'Юнион бюлдинг',
+          'Ай Си Си тауэр',
+          'Соёмбо тауэр',
+          'Гэрэгэ тауэр',
+          'Сэнтрум оффис',
+          'Про ван оффис',
+          'Туушин',
+          'Твин тауэр',
+          'Лагшин төв',
+          'Тайм Классик тауэр',
+          'Бльюмон центр',
+          'Сэнтрал тауэр',
+          'Сити тауэр',
+          'Cити центр',
+          'Эрдэм тауэр',
+          'Хоймор оффис',
+          'Компьютер молл',
+          'Мөнх тауэр',
+          'Ривер тауэр',
+          'Кэй Би тауэр',
+          'Галакси тауэр',
+          'Regis place',
+          'Хан-Уул тауэр',
+          'Бодь тауэр',
+          'Экспресс тауэр',
+          'Пийс тауэр',
+          'Пэрл тауэр',
+          'Капитал центр',
+          'Макс тауэр',
+          'МН тауэр',
+          'М плаза',
+          'Корпорейт тауэр',
+          'Бусад'
+        ],
+        value: '',
+        maxValue: '',
+        type: 'dropdown',
+      };
+    case Filters.buildingName:
+      return {
+        id: Filters.buildingName,
+        name: 'Барилгын нэр',
+        values: [
+          'Наадам центр',
+          'Хүннү молл',
+          "Мишээл экспо",
+          "Зайсан Стар молл",
+          "Голден Будда Шоппинг молл",
+          "Зайсан Хилл",
+          "Зайсан Скуэр центр",
+          "Бусад"
+        ],
+        value: '',
+        maxValue: '',
+        type: 'dropdown',
+      };
+    case Filters.price:
+      return {
         id: Filters.price,
         name: 'Үнэ',
         values: [],
         value: '',
         maxValue: '',
+        type: 'text',
       };
-      case Filters.unitPrice:
-        return {
+    case Filters.unitPrice:
+      return {
         id: Filters.unitPrice,
         name: 'Нэгж талбайн үнэ',
         values: [],
-        value: ''
+        value: '',
+        mark: 'price',
+        type: 'disabled',
+        condition: [Filters.price, Filters.area],
       };
-      case Filters.operation:
-        return {
+    case Filters.operation:
+      return {
         id: Filters.operation,
-        name: 'Ашиглалтанд орсон он',
+        name: 'Ашиглалтад орсон он',
         values: [],
         value: '',
         maxValue: '',
+        mark: 'year',
+        type: 'number',
       };
-      case Filters.licenseOperation:
-        return {
+    case Filters.licenseOperation:
+      return {
         id: Filters.licenseOperation,
         name: 'Гэрчилгээ олгосон он',
         values: [],
         value: '',
         maxValue: '',
+        mark: 'year',
+        type: 'number',
       };
-      case Filters.validDate:
-        return {
+    case Filters.validDate:
+      return {
         id: Filters.validDate,
         name: 'Хүчинтэй хугацаа',
         values: [],
         value: '',
         maxValue: '',
+        type: 'date',
       };
-      case Filters.landUsage:
-        return {
+    case Filters.landUsage:
+      return {
         id: Filters.landUsage,
         name: 'Газрын зориулалт',
         values: [
@@ -355,7 +590,8 @@ export function getFilter(filter: Filters): any {
           'Эмийн болон гоёлын ургамлын усалгаагүй тариалан',
           'Бусад',
         ],
-        value: ''
+        value: '',
+        type: 'dropdown',
       };
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get , Param} from '@nestjs/common';
+import { Body, Controller, Post, Get , Param, Delete} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LocationDto } from './location.dto';
 import { LocationService } from './location.service';
@@ -25,5 +25,10 @@ export class LocationController {
     @Get('byId/:id') 
     getByLocationId(@Param('id') id) {
         return this.service.getByLocationId(id)
+    }
+
+    @Delete()
+    deleteAllLocation() {
+        return this.service.deleteAllLocation()
     }
 }

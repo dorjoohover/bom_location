@@ -23,6 +23,7 @@ import { CreateAdDto, FilterAdDto, FilterDto } from './ad.dto';
 import toStream = require('buffer-to-stream');
 import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
 import { Filters, getFilter } from '../category/interface/categoryEnum';
+import { AdStatus } from 'src/config/enum';
 
 @Injectable()
 export class AdService {
@@ -56,7 +57,8 @@ export class AdService {
       subCategory: dto.subCategory,
       filters: dto.filters,
       user: user['_id'],
-      category: dto.category
+      category: dto.category,
+      adStatus: dto.adStatus
     });
 
 
@@ -65,11 +67,38 @@ export class AdService {
   }
 
   async getAllAds() {
-    let ads = await this.model.find().sort({ createdAt: 'desc' });
+    let ads = await this.model.find({adStatus: AdStatus.created}).sort({ createdAt: 'desc' });
+    if (!ads) throw new ForbiddenException('not found ads');
+    return ads;
+  }
+  
+  async getAdNotVerified() {
+    let ads = await this.model.find({adStatus: 'pending'}).sort({createdAt: 'desc'})
     if (!ads) throw new ForbiddenException('not found ads');
     return ads;
   }
 
+  async verifyAd(id: string) {
+    let ad = await this.model.findByIdAndUpdate(id, {
+      adStatus: AdStatus.created
+    })
+    return ad
+  }
+  async updateStatusTimed() {
+    const date = Number(Date.now())
+    const lateDate = new Date(date - 60)
+    let ads = await this.model.find({createdAt: {$lt: lateDate}})
+    ads.map(async (ad) => {
+      return await this.updateStatusAd(ad._id, AdStatus.timed )
+    })
+    return ads
+  }
+  async updateStatusAd(id: string, status: AdStatus) {
+    let ad = await this.model.findByIdAndUpdate(id, {
+      adStatus: status
+    })
+    return ad
+  }
   async getAdById(id: string) {
  
     let ad = await this.model
@@ -106,8 +135,5 @@ export class AdService {
       })
       
       return ads
-      // ,
-      // 
-      //
   }
 }

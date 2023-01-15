@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
+import { getStep } from 'src/config/enum';
 
 import {
   AdType,
@@ -60,11 +61,9 @@ export class CategoryService {
         href: dto.href,
         english: dto.english,
         isParent: dto.isParent,
-
         filters: dto.filters,
-
+        steps: dto.steps,
         viewFilters: dto.viewFilters,
-
         suggessionType: dto.suggestionType,
       });
       let category = await this.model.findByIdAndUpdate(dto.id, {
@@ -117,6 +116,7 @@ export class CategoryService {
       )
       .exec();
     }
+    
     return category;
   }
   
@@ -135,7 +135,7 @@ export class CategoryService {
     if (isFilter == 'true') {
       filters = subCategory.filters.map((f) => getFilter(f as Filters));
     } else {
-      filters = subCategory.viewFilters.map((f) => getFilter(f as Filters));
+      filters = subCategory.steps.map((f) => getStep(f.step, f.values ));
     }
     return { subCategory, filters };
   }

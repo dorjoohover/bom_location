@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { UserType } from "src/config/enum";
 
 export class CreateUserDto {
     @IsEmail()
@@ -27,6 +28,8 @@ export class CreateUserDto {
     @IsNotEmpty()
     isAdmin: boolean
 
+    @ApiProperty({enum: UserType, default: UserType.default})
+    userType: UserType
 
 }
 

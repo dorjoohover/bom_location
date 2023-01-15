@@ -16,7 +16,8 @@ export class UserService {
       email: dto.email,
       phone: dto.phone,
       password: dto.password,
-      isAdmin: dto.isAdmin
+      isAdmin: dto.isAdmin,
+      userType: dto.userType
     });
     return user
   }
