@@ -1,11 +1,11 @@
-import {Injectable,Inject,ForbiddenException, HttpException, HttpStatus, forwardRef} from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { LoginUser, RegisterUser } from './auth.dto';
-import * as bcrypt from 'bcrypt'
-import { sign } from 'jsonwebtoken';
 import { InjectModel } from '@nestjs/mongoose';
+import * as bcrypt from 'bcrypt';
+import { sign } from 'jsonwebtoken';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema';
+import { LoginUser, RegisterUser } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +35,7 @@ export class AuthService {
                     email: dto.email,
                     phone: dto.phone,
                     password: hashed,
-                    isAdmin: dto.isAdmin
+                    isAdmin: dto.isAdmin,
                   });
                 return createdUser
             }
@@ -51,6 +51,7 @@ export class AuthService {
                 let user = await this.model.findOne({email: dto.email})
                 if(!user) throw new HttpException('wrong email or password', HttpStatus.BAD_REQUEST)
                 const checkPassword = this.checkPassword(dto.password, user.password)
+                if(user.status != 'active') throw new HttpException('check your email', HttpStatus.FORBIDDEN)
                 if(checkPassword) {
                     return user
                 } else {

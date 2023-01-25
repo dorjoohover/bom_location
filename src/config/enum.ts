@@ -1,4 +1,4 @@
-import { Filters, getFilter } from "src/resource/category/interface/categoryEnum";
+import { getFilter } from "src/resource/category/interface/categoryEnum";
 
 
 
@@ -39,22 +39,27 @@ export enum UserType {
   agent = 'agent',
   orgazation = 'orgazation'
 }
+export enum UserStatus {
+  pending = 'pending',
+  active = 'active',
+  banned = 'banned'
+}
 
 export function getStep(step: CreateAdSteps, filters: any ):any {
   switch(step){
     case CreateAdSteps.type:
       return filters.map((f) => {
         if(f == 'AdType') {
-          return {
-            id: 'AdType',
-            name: 'Борлуулах төрөл',
-            values: [
-              AdType.rent,
-              AdType.sell
-            ],
-            value: '',
-            type: 'check',
-          };
+          return 
+            // id: 'AdType',
+            // name: 'Борлуулах төрөл',
+            // values: [
+            //   AdType.rent,
+            //   AdType.sell
+            // ],
+            // value: '',
+            // type: 'check',
+          
         }
         if(f == 'AdTypes') {
           return {
@@ -78,3 +83,4 @@ export function getStep(step: CreateAdSteps, filters: any ):any {
       return filters.map((f) => getFilter(f))
   }
 }
+

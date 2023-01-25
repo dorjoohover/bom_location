@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
-import { UserType } from "src/config/enum";
+import { UserStatus, UserType } from "src/config/enum";
 import { Ad } from "./ad.schema";
 
 export type UserDocument = Document & User
@@ -23,7 +23,7 @@ export class User  {
     @Prop({required: true})
     email: string
 
-    @Prop({required: true})
+    @Prop()
     password: string
 
     @Prop({required: true, default: 0})
@@ -34,6 +34,12 @@ export class User  {
 
     @Prop({required: true, default: false})
     isAdmin: boolean
+
+    @Prop()
+    code: string
+
+    @Prop({ type: String, enum: UserStatus, default: UserStatus.pending })
+    status: UserStatus;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
