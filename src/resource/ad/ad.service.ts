@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { AdStatus } from 'src/config/enum';
 import {
   Ad,
-  AdDocument, Category, CategoryDocument
+  AdDocument, Category, CategoryDocument, User, UserDocument
 } from 'src/schema';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 
@@ -15,6 +15,7 @@ export class AdService {
   constructor(
     @InjectModel(Ad.name) private model: Model<AdDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
     
   ) {}
   // async uploadImage(file: Express.Multer.File) {
@@ -46,7 +47,9 @@ export class AdService {
     });
 
 
-
+    await this.userModel.findByIdAndUpdate(user['_id'], {
+      $push: {ads: ad._id}
+    })
     return ad;
   }
 
@@ -76,6 +79,12 @@ export class AdService {
       return await this.updateStatusAd(ad._id, AdStatus.timed )
     })
     return ads
+  }
+
+  async getAdsByUserId(id: string) {
+    return await this.model.find({
+      user: id
+    })
   }
   async updateStatusAd(id: string, status: AdStatus) {
     let ad = await this.model.findByIdAndUpdate(id, {

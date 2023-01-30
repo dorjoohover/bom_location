@@ -62,6 +62,18 @@ export class AdController {
         return this.service.updateStatusAd(id, AdStatus.sold)
     }
 
+
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth('access-token')
+    @Post('user')
+    @ApiOperation({description: "zariig user id gaar ni awna"})
+    adByUser( @Request() {user}) {
+        if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
+        console.log(user, user._id)
+        let ads = this.service.getAdsByUserId(user._id)
+        return ads
+    }
+
     @Get('timed')
     @ApiOperation({description: "todorhoi hugatsaa heterwel status g ni timed bolgono"})
     updateStatisTimed() {

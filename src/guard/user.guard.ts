@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, Logger } from "@nestjs/common";
+import { ExecutionContext, Injectable, Logger } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import * as jwt from "jsonwebtoken";
 import { UserService } from "src/resource/user/user.service";
@@ -27,7 +27,6 @@ export class UserAccessGuard {
       
       const decoded = jwt.verify(token, 'SECRET') as string ;
       const user = await this.userService.getUserByEmailOrPhone(decoded);
-
 
       request.user = user;
       return true
