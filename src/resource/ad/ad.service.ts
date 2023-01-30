@@ -1,29 +1,14 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
+import { AdStatus } from 'src/config/enum';
 import {
   Ad,
-  AdDocument,
-  Filter,
-  FilterDocument,
-  Location,
-  Committee,
-  CommitteeDocument,
-  LocationDocument,
-  Discrict,
-  DistrictDocument,
-  Town,
-  TownDocument,
-  User,
-  CategoryDocument,
-  Category,
+  AdDocument, Category, CategoryDocument
 } from 'src/schema';
-import { CreateAdDto, FilterAdDto, FilterDto } from './ad.dto';
+import { CreateAdDto, FilterAdDto } from './ad.dto';
 
 import toStream = require('buffer-to-stream');
-import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
-import { Filters, getFilter } from '../category/interface/categoryEnum';
-import { AdStatus } from 'src/config/enum';
 
 @Injectable()
 export class AdService {
@@ -53,12 +38,11 @@ export class AdService {
       positions: dto.positions,
       description: dto.description,
       location: dto.location,
-      types: dto.types,
       subCategory: dto.subCategory,
       filters: dto.filters,
       user: user['_id'],
       category: dto.category,
-      adStatus: dto.adStatus
+      adStatus: dto.adStatus,
     });
 
 
@@ -67,7 +51,7 @@ export class AdService {
   }
 
   async getAllAds() {
-    let ads = await this.model.find({adStatus: AdStatus.created}).sort({ createdAt: 'desc' });
+    let ads = await this.model.find().sort({ createdAt: 'desc' });
     if (!ads) throw new ForbiddenException('not found ads');
     return ads;
   }
@@ -126,7 +110,7 @@ export class AdService {
         ad.filters.map((f) => {
           filterAd.filters.filter((fa) => {
             if(fa.maxValue) {
-              fa.name == f.name && fa.maxValue >= f.value && fa.value <= f.value
+              fa.name == f.name && fa.maxValue >= parseInt(f.value) && parseInt(fa.value) <= parseInt(f.value)
             } else {
               fa.name == f.name && fa.value == f.value
             }

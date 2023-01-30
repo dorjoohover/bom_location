@@ -1,18 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { AdStatus, AdTypes } from 'src/config/enum';
-import { AdType } from './ad_type.schema';
 import { Category } from './category.schema';
 import { Committee } from './committee.schema';
 import { Discrict } from './district.schema';
-import { Filter } from './filter.schema';
-import { Location } from './location.schema';
-import { Position } from './position.schema';
-import { Town } from './town.schema';
 import { User } from './user.schema';
 
 export type AdDocument = Document & Ad;
+export class AdTown {
+  
+  @Prop()
+  value: number;
 
+  @Prop()
+    values: [];
+  @Prop()
+    name: string;
+}
 export class AdPosition {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Discricts' })
   district_id: Discrict;
@@ -21,7 +25,15 @@ export class AdPosition {
   @Prop()
   location_id: string;
   @Prop()
-  town_id: string;
+  town: AdTown
+}
+
+export class AdLocation {
+  
+  @Prop()
+  lat: string;
+  @Prop()
+  lng: string;
 }
 @Schema({ timestamps: true })
 export class Ad {
@@ -38,7 +50,7 @@ export class Ad {
   description: string;
 
   @Prop()
-  location: string;
+  location: AdLocation
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'categories' })
   subCategory: Category;
@@ -48,7 +60,7 @@ export class Ad {
   @Prop()
   filters: [
     {
-      value: number;
+      value: string;
 
       values: [];
 
@@ -56,8 +68,6 @@ export class Ad {
     },
   ];
 
-  @Prop()
-  types: string[];
 
   @Prop({ type: String, enum: AdTypes, default: AdTypes.default })
   adType: AdTypes;

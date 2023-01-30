@@ -23,7 +23,7 @@ export class AuthController {
             html: `<h1>Email Confirmation</h1>
            
                 <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
-                <a href=http://localhost:5050/auth/confirm/${code}> Click here</a>
+                <a href=http://bom-location.herokuapp.com/auth/confirm/{code}?code=${code}> Click here</a>
                 </div>`,
         }).catch(err => console.log(err));
     

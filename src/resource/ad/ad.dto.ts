@@ -1,11 +1,53 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray,  IsEnum,  isNotEmpty,  IsNotEmpty, IsNumber, IsString } from "class-validator";
-import {AdStatus, AdType, AdTypes } from "src/config/enum";
+import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { AdStatus, AdTypes } from "src/config/enum";
 import { enumToArray } from "src/typeformat";
-import {  CategorySuggestionTypes } from "../category/interface/categoryEnum";
+import { CategorySuggestionTypes } from "../category/interface/categoryEnum";
 
 
 
+
+
+export class AdLocation {
+    @ApiProperty()
+    lng: string
+    @ApiProperty()
+    lat: string
+}
+
+export class CreateFilterDto {
+    @IsString()
+    @ApiProperty()
+    value: string
+    @IsArray()
+    @ApiProperty({isArray: true})
+    values: []
+    
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    name: string
+}
+export class FilterDto {
+    
+
+    @IsString()
+    @ApiProperty()
+    value: string
+    
+    @IsNumber()
+    @ApiProperty()
+    maxValue: number
+    
+    @IsString()
+    @ApiProperty()
+    name: string
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    id: string
+}
 export class AdPosition {
     @IsString()
     @IsNotEmpty()
@@ -22,44 +64,10 @@ export class AdPosition {
     location_id:string
     @IsString()
 
-    @ApiProperty()
-    town_id:string
+    @ApiProperty({type: CreateFilterDto, })
+    town: CreateFilterDto
     
 
-}
-
-export class CreateFilterDto {
-    @IsNumber()
-    @ApiProperty()
-    value: number
-    @IsArray()
-    @ApiProperty({isArray: true})
-    values: []
-    
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    name: string
-}
-export class FilterDto {
-    
-
-    @IsNumber()
-    @ApiProperty()
-    value: number
-    
-    @IsNumber()
-    @ApiProperty()
-    maxValue: number
-    
-    @IsString()
-    @ApiProperty()
-    name: string
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    id: string
 }
 export class CreateAdDto {
     @IsNotEmpty()
@@ -75,18 +83,8 @@ export class CreateAdDto {
     @ApiProperty({type: AdPosition})
     positions: AdPosition
 
-    @IsString()
-    @ApiProperty()
-    location:string
-
-    @ApiProperty({
-        isArray: true,
-
-    })
-
-    @IsArray()
-
-    types?: string[];
+    @ApiProperty({type: AdLocation})
+    location: AdLocation
 
     
     @ApiProperty({enum: AdTypes, default: AdTypes.default})
