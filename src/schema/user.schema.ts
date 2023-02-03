@@ -10,6 +10,8 @@ export class User  {
     @Prop({required: true})
     username: string
 
+
+
     @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Ad'}]})
     ads: Ad[]
 

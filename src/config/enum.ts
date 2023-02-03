@@ -16,11 +16,14 @@ export enum AdTypes {
   poster = 'poster'
 }
 
+
+
 export enum AdStatus {
   sold = 'sold',
   pending = 'pending',
   timed = 'timed',
-  created = 'created'
+  created = 'created',
+  deleted = 'deleted'
 }
 
 export enum AdType {
@@ -37,7 +40,9 @@ export enum CreateAdSteps {
 export enum UserType {
   default = 'default',
   agent = 'agent',
-  orgazation = 'orgazation'
+  orgazation = 'orgazation',
+  admin = 'admin',
+  system = 'system'
 }
 export enum UserStatus {
   pending = 'pending',

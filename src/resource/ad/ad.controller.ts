@@ -38,6 +38,7 @@ export class AdController {
         // }
         dto.positions = JSON.parse(dto.positions)
         dto.filters = JSON.parse(dto.filters)
+        dto.location = JSON.parse(dto.location)
        
         return this.service.createAd(dto, user,  imagesUrl)
         
@@ -50,16 +51,13 @@ export class AdController {
     getAllAds() {
         return this.service.getAllAds()
     }
-    @ApiQuery({name: 'id', })
-    @ApiOperation({description: "zariig id gaar ni awna"})
-    @Get(':id')
-    getAdById(@Query('id') id) {
-        return this.service.getAdById(id)
-    }
 
     
    
-    @Get('check')
+
+    
+   
+    @Get('notVerify')
     @ApiOperation({description: "adminaas verify daagui zariig harna"})
     getAdNotVerified() {
         return this.service.getAdNotVerified()
@@ -70,6 +68,13 @@ export class AdController {
     @ApiOperation({description: "admin aas zar id gaar verify hiine"})
     verifyAd(@Query('id') id) {
         return this.service.verifyAd(id)
+    }
+
+    @Get('delete/:id')
+    @ApiQuery({name: 'id', })
+    @ApiOperation({description: "admin aas zar id gaar delete hiine"})
+    deleteAd(@Query('id') id) {
+        return this.service.deleteAd(id)
     }
 
     @Get('sold/:id')
@@ -117,9 +122,14 @@ export class AdController {
     getSuggestion(@Body() data: SuggestionDto) {
         return this.suggestionService.getSuggestionAds(data)
     }
-
+    @Get('/:id')
+    @ApiQuery({name: 'id', })
+    @ApiOperation({description: "zariig id gaar ni awna"})
+    getAdById(@Query('id') id) {
+        return this.service.getAdById(id)
+    }
     @Delete()
-    async deleteAd() 
+    async deleteAds() 
     {
         return await this.model.deleteMany()
     }

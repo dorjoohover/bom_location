@@ -83,8 +83,8 @@ export class CreateAdDto {
     @ApiProperty()
     positions: string
 
-    @ApiProperty({type: AdLocation})
-    location: AdLocation
+    @ApiProperty()
+    location: string
 
     
     @ApiProperty({enum: AdTypes, default: AdTypes.default})

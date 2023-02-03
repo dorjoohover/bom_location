@@ -46,13 +46,13 @@ export class AdService {
   }
 
   async getAllAds() {
-    let ads = await this.model.find().sort({ createdAt: 'desc' });
+    let ads = await this.model.find({adStatus: 'created'}).sort({ createdAt: 'desc' });
     if (!ads) throw new ForbiddenException('not found ads');
     return ads;
   }
   
   async getAdNotVerified() {
-    let ads = await this.model.find({adStatus: 'pending'}).sort({createdAt: 'desc'})
+    let ads = await this.model.find({adStatus: 'pending'}).sort({ createdAt: 'desc' });
     if (!ads) throw new ForbiddenException('not found ads');
     return ads;
   }
@@ -60,6 +60,12 @@ export class AdService {
   async verifyAd(id: string) {
     let ad = await this.model.findByIdAndUpdate(id, {
       adStatus: AdStatus.created
+    })
+    return ad
+  }
+  async deleteAd(id: string) {
+    let ad = await this.model.findByIdAndUpdate(id, {
+      adStatus: AdStatus.deleted
     })
     return ad
   }
@@ -75,7 +81,8 @@ export class AdService {
 
   async getAdsByUserId(id: string) {
     return await this.model.find({
-      user: id
+      user: id,
+      adStatus: 'created'
     })
   }
   async updateStatusAd(id: string, status: AdStatus) {
@@ -94,7 +101,7 @@ export class AdService {
   
   async getAdByCategoryId(id: string) {
     let ad = await this.model
-      .find({subCategory: id})
+      .find({subCategory: id, adStatus: 'created'})
       
     if (!ad) throw new ForbiddenException('not found ad');
     
@@ -105,7 +112,7 @@ export class AdService {
 
   async getAdByFilter(filterAd: FilterAdDto) {
 
-      let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id,'positions.location_id' : filterAd.positions.location_id, 'subCategory': filterAd.subCategory})
+      let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id,'positions.location_id' : filterAd.positions.location_id, 'subCategory': filterAd.subCategory, adStatus: 'created'})
       ads.map((ad) => {
         ad.filters.map((f) => {
           filterAd.filters.filter((fa) => {
