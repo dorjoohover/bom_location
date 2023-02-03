@@ -1,5 +1,6 @@
-import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Post, Query, Request, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Model } from 'mongoose';
 import { AdStatus } from 'src/config/enum';
@@ -7,6 +8,7 @@ import { UserAccessGuard } from 'src/guard/user.guard';
 import { Ad, AdDocument } from 'src/schema';
 import { CreateAdDto, FilterAdDto, SuggestionDto } from './ad.dto';
 import { AdService } from './ad.service';
+import { S3Service } from './s3.service';
 import { SuggestionService } from './suggestion.service';
 
 @ApiTags('Ads')
@@ -14,16 +16,31 @@ import { SuggestionService } from './suggestion.service';
 // @UseGuards(UserAccessGuard)
 // @ApiBearerAuth("access-token")
 export class AdController {
-    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>) {}
+    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service) {}
 
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth('access-token')
     @Post()
     @ApiOperation({description: "zar create leh"})
-
-    createAd(@Request() {user}, @Body() dto: CreateAdDto ) {
+    @UseInterceptors(FileFieldsInterceptor([{
+        name: 'images', maxCount: 20
+      }]))
+    async createAd( @Request() {user}, @Body() dto: CreateAdDto, @UploadedFiles() files: {images?: Express.Multer.File[] }) {
+        
+        // return dto
         if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
-        return this.service.createAd(dto,  user)
+        let imagesUrl = []
+        // for(let i = 0; i < files.images.length / 2; i++ ){
+        //     // fieldname shalgah
+        //     const key = `${files.images[i].fieldname}${Date.now()}`
+        //     const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
+        //     await imagesUrl.push(imageUrl)
+        // }
+        dto.positions = JSON.parse(dto.positions)
+        dto.filters = JSON.parse(dto.filters)
+       
+        return this.service.createAd(dto, user,  imagesUrl)
+        
     }
     
 
@@ -101,10 +118,10 @@ export class AdController {
         return this.suggestionService.getSuggestionAds(data)
     }
 
-    // @Delete()
-    // async deleteAd() 
-    // {
-    //     return await this.model.deleteMany()
-    // }
+    @Delete()
+    async deleteAd() 
+    {
+        return await this.model.deleteMany()
+    }
     
 }

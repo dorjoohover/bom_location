@@ -37,6 +37,9 @@ export class AdLocation {
 }
 @Schema({ timestamps: true })
 export class Ad {
+
+  @Prop({default: 1})
+  num: number
   @Prop({ required: true })
   title: string;
 
@@ -56,6 +59,9 @@ export class Ad {
   subCategory: Category;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'categories' })
   category: Category;
+
+  @Prop()
+  types: []
 
   @Prop()
   filters: [

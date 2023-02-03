@@ -80,8 +80,8 @@ export class CreateAdDto {
     description:string
     
     @IsNotEmpty()
-    @ApiProperty({type: AdPosition})
-    positions: AdPosition
+    @ApiProperty()
+    positions: string
 
     @ApiProperty({type: AdLocation})
     location: AdLocation
@@ -93,8 +93,8 @@ export class CreateAdDto {
     @ApiProperty({enum: AdStatus, default: AdStatus.pending})
     adStatus: AdStatus
 
-    @ApiProperty({isArray: true, type: CreateFilterDto, })
-    filters: CreateFilterDto[]
+    @ApiProperty()
+    filters: string
 
     @IsString()
     @IsNotEmpty()
@@ -105,9 +105,12 @@ export class CreateAdDto {
     @ApiProperty()
     category: string
 
-
     @ApiProperty({isArray: true})
-    images: string
+    types: string[]
+
+
+    // @ApiProperty({isArray: true})
+    // images: string
 
 }
 

@@ -8,7 +8,6 @@ import {
 } from 'src/schema';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 
-import toStream = require('buffer-to-stream');
 
 @Injectable()
 export class AdService {
@@ -18,25 +17,17 @@ export class AdService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     
   ) {}
-  // async uploadImage(file: Express.Multer.File) {
-  //   const promise = await new Promise((resolve, reject) => {
-  //     const upload = v2.uploader.upload_stream((error, result) => {
-  //       if (error) return reject(error);
-  //       resolve(result);
-  //     });
 
-  //     toStream(file.buffer).pipe(upload);
-  //   }).then((r) => r['secure_url']);
-  //   return promise;
-  // }
-  async createAd(dto: CreateAdDto,  user: any) {
-    
- 
+  async createAd(dto: CreateAdDto, user: any ,  images: any) {
+   
+    let prevAd = await this.model.findOne().sort({createdAt: 'desc'})
+    let adNum = 1
+    if(prevAd) adNum = prevAd?.num+1
     let ad = await this.model.create({
-      images: dto.images,
-      image: dto.images[0],
+      num: adNum ,
+      images: images,
       title: dto.title,
-      positions: dto.positions,
+      positions:dto.positions,
       description: dto.description,
       location: dto.location,
       subCategory: dto.subCategory,
@@ -44,13 +35,14 @@ export class AdService {
       user: user['_id'],
       category: dto.category,
       adStatus: dto.adStatus,
+      types: dto.types
     });
 
 
     await this.userModel.findByIdAndUpdate(user['_id'], {
       $push: {ads: ad._id}
     })
-    return ad;
+    return dto;
   }
 
   async getAllAds() {
@@ -95,9 +87,8 @@ export class AdService {
   async getAdById(id: string) {
  
     let ad = await this.model
-      .findById(id)
+      .findOne({num: id})
       if (!ad) throw new ForbiddenException('not found ad');
-   
     return ad;
   }
   
