@@ -1,8 +1,6 @@
-import { Controller, Post, Get, Param, Body, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { Put, Query } from '@nestjs/common/decorators';
-import { ValidationPipe } from '@nestjs/common/pipes';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { domainToASCII } from 'url';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateCategoryDto, CreateSubCategory, UpdateCategoryDto } from './category.dto';
 import { CategoryService } from './category.service';
 @ApiTags('Category')
@@ -27,27 +25,27 @@ export class CategoryController {
     getAllCategories() {
         return this.service.getAllCategories()
     }
-    @ApiQuery({name: 'id'})
+    @ApiParam({name: 'id'})
     @Get(':id')
     @ApiOperation({description: "category g id gaar ni awah "})
-    getCategoryById(@Query() params) {
+    getCategoryById(@Param() params) {
         return   this.service.getCategoryById(params.id)
         
     }
 
-    @ApiQuery({name: 'id'})
+    @ApiParam({name: 'id'})
     @Get('filters/:id/:type')
     @ApiOperation({description: "zariin filter g awah isFilter field g true = filter false = create ad  "})
-    getFilterById(@Query('id') id, @Param('type') type: string) {
+    getFilterById(@Param('id') id:string, @Param('type') type: string) {
 
         return   this.service.getSubCategoryFiltersById(id, type)
         
     }
     
-    @ApiQuery({name: 'id'})
+    @ApiParam({name: 'id'})
     @Put(':id')
     @ApiOperation({description: "category update hiih "})
-    updateCategoryId(@Body() dto: UpdateCategoryDto, @Query() id) {
+    updateCategoryId(@Body() dto: UpdateCategoryDto, @Param() id) {
         return this.service.updateCategoryById( id, dto)
     }
     // @Delete()

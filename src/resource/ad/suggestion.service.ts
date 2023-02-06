@@ -1,7 +1,7 @@
-import {Injectable} from '@nestjs/common'
-import { Ad, AdDocument } from 'src/schema';
-import {Model} from 'mongoose'
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Ad, AdDocument } from 'src/schema';
 import { SuggestionDto } from './ad.dto';
 @Injectable()
 export class SuggestionService {
@@ -14,7 +14,7 @@ export class SuggestionService {
             return ads
         }
         if(data.type == 'room') {
-            let ads = await this.model.find({$and: [{'filters.id': '635e91e21c1c755b91c2e0a2'},{'filters.value' : data.suggestion}]})
+            let ads = await this.model.find({$and: [{'filters.id': 'room'},{'filters.value' : data.suggestion}]})
             if(!ads) return {message: 'not found'}
             return ads
         }

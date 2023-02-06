@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer/dist';
-import { Body, Controller, Get, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post , Param} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam,  ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 
@@ -55,9 +55,9 @@ export class AuthController {
     }
 
     @Get('confirm/:code')
-    @ApiQuery({name: 'code'})
+    @ApiParam({name: 'code'})
     @ApiOperation({description: "confirm code awah "})
-    async confirmCode(@Query('code') code: string) {
+    async confirmCode(@Param('code') code: string) {
         let user = await this.model.findOne({code})
         if(!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND)
         user.status = UserStatus.active

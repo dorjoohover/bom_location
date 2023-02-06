@@ -1,7 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { CreateFilterDto } from "../filter/filter.dto";
-import {CreateAdTypeDto} from '../adtype/ad_type.dto'
 import { Transform } from "class-transformer";
 import { CategorySuggestionTypes, Filters } from "./interface/categoryEnum";
 import { CreateAdSteps } from "src/config/enum";

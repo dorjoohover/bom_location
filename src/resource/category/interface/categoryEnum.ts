@@ -95,7 +95,7 @@ export function getFilter(filter: Filters): any {
       return {
         id: Filters.bathroom,
         name: 'Угаалгын өрөөний тоо',
-        values: ['1', '2', '2+'],
+        values: ['Байхгүй', '1', '2', '2+'],
         value: '',
         type: 'dropdown',
       };
@@ -135,7 +135,7 @@ export function getFilter(filter: Filters): any {
       return {
         id: Filters.balconyUnit,
         name: 'Тагтны тоо',
-        values: ['1', '2', '3', '4', '5', '5+'],
+        values: ["Байхгүй", '1', '2', '3', '4', '5', '5+'],
         value: '',
         type: 'dropdown',
       };

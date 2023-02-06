@@ -1,5 +1,5 @@
-import { Body, Controller, Post, Get , Param, Delete} from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { LocationDto } from './location.dto';
 import { LocationService } from './location.service';
 @ApiTags('Location')
@@ -23,6 +23,7 @@ export class LocationController {
     }
 
     @Get('byId/:id') 
+    @ApiParam({name: 'id'})
     getByLocationId(@Param('id') id) {
         return this.service.getByLocationId(id)
     }

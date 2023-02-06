@@ -1,31 +1,23 @@
-import { setByPath } from '@casl/ability/dist/types/utils';
 import {
   ForbiddenException,
   HttpException,
   HttpStatus,
-  Injectable,
+  Injectable
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { getStep } from 'src/config/enum';
 
 import {
-  AdType,
-  AdTypeDocument,
   Category,
-  CategoryDocument,
-  CategorySchema,
-  Discrict,
+  CategoryDocument, Discrict,
   DistrictDocument,
-  Filter,
-  FilterDocument,
-  LocationDocument,
-  Location,
+  Location, LocationDocument
 } from 'src/schema';
 import {
   CreateCategoryDto,
   CreateSubCategory,
-  UpdateCategoryDto,
+  UpdateCategoryDto
 } from './category.dto';
 import { Filters, getFilter } from './interface/categoryEnum';
 
@@ -33,8 +25,6 @@ import { Filters, getFilter } from './interface/categoryEnum';
 export class CategoryService {
   constructor(
     @InjectModel(Category.name) private model: Model<CategoryDocument>,
-    @InjectModel(Filter.name) private filterModel: Model<FilterDocument>,
-    @InjectModel(AdType.name) private typeModel: Model<AdTypeDocument>,
     @InjectModel(Location.name) private locationModel: Model<LocationDocument>,
     @InjectModel(Discrict.name) private districtModel: Model<DistrictDocument>,
   ) {}
@@ -94,7 +84,7 @@ export class CategoryService {
   }
 
   async getCategoryById(id: string) {
-    
+    console.log(id)
     let category
     if(mongoose.Types.ObjectId.isValid(id))
     {

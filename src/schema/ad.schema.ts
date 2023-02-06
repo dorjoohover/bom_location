@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { AdStatus, AdTypes } from 'src/config/enum';
 import { Category } from './category.schema';
-import { Committee } from './committee.schema';
 import { Discrict } from './district.schema';
 import { User } from './user.schema';
 
@@ -20,8 +19,8 @@ export class AdTown {
 export class AdPosition {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Discricts' })
   district_id: Discrict;
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Committees' })
-  committee_id: Committee;
+  @Prop()
+  committee_id: string;
   @Prop()
   location_id: string;
   @Prop()

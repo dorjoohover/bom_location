@@ -1,6 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { DiscoveryService } from '@nestjs/core';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { DiscrictDto } from './district.dto';
 import { DistrictService } from './district.service';
 
@@ -19,7 +18,8 @@ export class DistrictController {
     }
 
     @Get(':id')
-    getDataById(params) {
-        return this.service.getDataById(params.id)
+    @ApiParam({name: 'id'})
+    getDataById(@Param('id') id: string) {
+        return this.service.getDataById(id)
     }
 }

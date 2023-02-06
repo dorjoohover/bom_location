@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
-import { Committee } from "./committee.schema";
-import { Discrict } from './district.schema'
+import { Discrict } from './district.schema';
 export type LocationDocument = Location & Document
 
 @Schema()

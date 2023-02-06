@@ -23,7 +23,7 @@ export enum AdStatus {
   pending = 'pending',
   timed = 'timed',
   created = 'created',
-  deleted = 'deleted'
+deleted = 'deleted'
 }
 
 export enum AdType {

@@ -5,7 +5,6 @@ import { AuthModule } from './resource/auth/auth.module';
 import { CategoryModule } from './resource/category/category.module';
 import { DistrictModule } from './resource/district/district.module';
 import { LocationModule } from './resource/location/location.module';
-import { TownModule } from './resource/town/town.module';
 import { UserModule } from './resource/user/user.module';
 
 @Module({
@@ -23,18 +22,12 @@ import { UserModule } from './resource/user/user.module';
       dbName: 'zipcode'
     }),
     UserModule,
-    // FilterModule,
-    // PositionModule,
-    // LocationModule,
-    TownModule,
     AdModule,
     CategoryModule,
     DistrictModule,
     LocationModule,
-    // CommitteeModule,
-    // // AdTypeModule,
     AuthModule,
-    // TypeModule,
+
   ],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AdStatus } from 'src/config/enum';
@@ -6,6 +6,7 @@ import {
   Ad,
   AdDocument, Category, CategoryDocument, User, UserDocument
 } from 'src/schema';
+import { CategoryService } from '../category/category.service';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 
 
@@ -15,7 +16,7 @@ export class AdService {
     @InjectModel(Ad.name) private model: Model<AdDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    
+    private categoryService: CategoryService
   ) {}
 
   async createAd(dto: CreateAdDto, user: any ,  images: any) {
@@ -23,26 +24,29 @@ export class AdService {
     let prevAd = await this.model.findOne().sort({createdAt: 'desc'})
     let adNum = 1
     if(prevAd) adNum = prevAd?.num+1
-    let ad = await this.model.create({
-      num: adNum ,
-      images: images,
-      title: dto.title,
-      positions:dto.positions,
-      description: dto.description,
-      location: dto.location,
-      subCategory: dto.subCategory,
-      filters: dto.filters,
-      user: user['_id'],
-      category: dto.category,
-      adStatus: dto.adStatus,
-      types: dto.types
-    });
-
-
-    await this.userModel.findByIdAndUpdate(user['_id'], {
-      $push: {ads: ad._id}
-    })
-    return dto;
+  
+    try {
+       let ad = await this.model.create({
+        num: adNum ,
+        images: images,
+        title: dto.title,
+        positions:dto.positions,
+        description: dto.description,
+        location: dto.location,
+        subCategory: dto.subCategory,
+        filters: dto.filters,
+        user: user['_id'],
+        category: dto.category,
+        adStatus: dto.adStatus,
+        types: dto.types
+      });
+      await this.userModel.findByIdAndUpdate(user['_id'], {
+        $push: {ads: ad._id}
+      })
+    } catch (error) {
+      throw new HttpException('Server error', 500)
+    }
+    return true;
   }
 
   async getAllAds() {
@@ -100,8 +104,10 @@ export class AdService {
   }
   
   async getAdByCategoryId(id: string) {
+    console.log(id)
+    let category = await this.categoryService.getCategoryById(id)
     let ad = await this.model
-      .find({subCategory: id, adStatus: 'created'})
+      .find({subCategory: category._id, adStatus: 'created'})
       
     if (!ad) throw new ForbiddenException('not found ad');
     
