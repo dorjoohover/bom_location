@@ -118,14 +118,16 @@ export class AdService {
 
   async getAdByFilter(filterAd: FilterAdDto) {
 
-      let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id,'positions.location_id' : filterAd.positions.location_id, 'subCategory': filterAd.subCategory, adStatus: 'created'})
+      let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id != '' ? filterAd.positions.district_id : {$ne: ''},'positions.location_id' : filterAd.positions.location_id != '' ? filterAd.positions.location_id : {$ne: ''}, 'subCategory': filterAd.subCategory, adStatus: 'created'})
       ads.map((ad) => {
         ad.filters.map((f) => {
           filterAd.filters.filter((fa) => {
             if(fa.maxValue) {
               fa.name == f.name && fa.maxValue >= parseInt(f.value) && parseInt(fa.value) <= parseInt(f.value)
             } else {
-              fa.name == f.name && fa.value == f.value
+              if(fa.value != '' ) {
+                fa.name == f.name && fa.value == f.value
+              }
             }
           })
         })

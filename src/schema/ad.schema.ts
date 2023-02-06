@@ -88,3 +88,4 @@ export class Ad {
 }
 
 export const AdSchema = SchemaFactory.createForClass(Ad);
+AdSchema.index({title: 'text', tags: 'text'})

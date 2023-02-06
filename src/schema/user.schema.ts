@@ -31,8 +31,8 @@ export class User  {
     @Prop({required: true, default: 0})
     point: number
 
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Ad'}]})
-    bookmarks: Ad[]
+    @Prop()
+    bookmarks: number[]
 
     @Prop({required: true, default: false})
     isAdmin: boolean

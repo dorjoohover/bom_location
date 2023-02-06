@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, Post, Param, Request, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Param, Post, Query, Request, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -56,10 +56,7 @@ export class AdController {
 
     
    
-
-    
-   
-    @Get('notVerify')
+    @Get('/notVerify')
     @ApiOperation({description: "adminaas verify daagui zariig harna"})
     getAdNotVerified() {
         return this.service.getAdNotVerified()
@@ -77,6 +74,17 @@ export class AdController {
     @ApiOperation({description: "admin aas zar id gaar delete hiine"})
     deleteAd(@Param('id') id) {
         return this.service.deleteAd(id)
+    }
+    
+    @Get('search/:value')
+    @ApiQuery({name: 'value'})
+    @ApiOperation({description: "search ad"})
+    async searchAd(@Query('value') value: string) {
+        
+        let ad = await this.model.find( {$text: {$search: value}})
+      
+        if(!ad) throw new HttpException('not found', 403)
+        return ad
     }
 
     @Get('sold/:id')

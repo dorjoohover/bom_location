@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { UserType } from "src/config/enum";
 
 export class CreateUserDto {
@@ -34,13 +34,9 @@ export class CreateUserDto {
 }
 
 export class AddBookmarkDto {
-    @IsString()
+    @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
-    adId: string
+    adId: number
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    userId: string
 }
