@@ -21,6 +21,7 @@ import {
 } from './category.dto';
 import { Filters, getFilter } from './interface/categoryEnum';
 
+
 @Injectable()
 export class CategoryService {
   constructor(
@@ -92,7 +93,7 @@ export class CategoryService {
       .findById(id)
       .populate(
         'subCategory',
-        'id name subCategory href english filters viewFilters',
+        'id name subCategory href english filters viewFilters suggessionType',
         this.model,
       )
       .exec();
@@ -130,7 +131,25 @@ export class CategoryService {
     return { subCategory, filters };
   }
 
-  async updateCategoryById(id: string, dto: UpdateCategoryDto) {}
+  async updateCategoryById(id: string, dto: UpdateCategoryDto) {
+
+    let ad 
+    try {
+      ad = await this.model.findByIdAndUpdate(id, {
+        name: dto.name,
+          href: dto.href,
+          english: dto.english,
+          isParent: dto.isParent,
+          filters: dto.filters,
+          steps: dto.steps,
+          viewFilters: dto.viewFilters,
+          suggessionType: dto.suggestionType,
+      })
+    } catch (error) {
+      throw new HttpException(error.message, 500)
+    } 
+    return true
+  }
 
   async deleteAllCategory() {
     let category = this.model.deleteMany().then((d) => console.log(d));

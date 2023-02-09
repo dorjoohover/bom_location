@@ -98,7 +98,7 @@ export class AdService {
   async getAdById(id: string) {
  
     let ad = await this.model
-      .findOne({num: id})
+      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType', this.categoryModel)
       if (!ad) throw new ForbiddenException('not found ad');
     return ad;
   }

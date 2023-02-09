@@ -4,6 +4,7 @@ export enum CategorySuggestionTypes {
   'floor',
   'usage',
   'buildingFloor',
+  'map'
 }
 
 export enum Filters {

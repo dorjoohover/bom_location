@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { Put, Query } from '@nestjs/common/decorators';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Put } from '@nestjs/common/decorators';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateCategoryDto, CreateSubCategory, UpdateCategoryDto } from './category.dto';
 import { CategoryService } from './category.service';
 @ApiTags('Category')
@@ -45,7 +45,7 @@ export class CategoryController {
     @ApiParam({name: 'id'})
     @Put(':id')
     @ApiOperation({description: "category update hiih "})
-    updateCategoryId(@Body() dto: UpdateCategoryDto, @Param() id) {
+    updateCategoryId(@Body() dto: UpdateCategoryDto, @Param('id') id: string) {
         return this.service.updateCategoryById( id, dto)
     }
     // @Delete()

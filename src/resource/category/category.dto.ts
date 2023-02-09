@@ -68,16 +68,11 @@ export class CreateSubCategory {
 }
 
 export class UpdateCategoryDto {
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    id: string
-    @IsString()
-    @IsNotEmpty()
+    
+
     @ApiProperty()
     name: string
-    @IsString()
-    @IsNotEmpty()
+
     @ApiProperty()
     english: string
 
@@ -86,8 +81,6 @@ export class UpdateCategoryDto {
         required: false,
         enum: Filters,
     })
-    @IsEnum(Filters, {each: true})
-    @IsArray()
 
     filters?: Filters[];
     @ApiProperty({
@@ -95,25 +88,22 @@ export class UpdateCategoryDto {
         required: false,
         enum: Filters,
     })
-    @IsEnum(Filters, {each: true})
-    @IsArray()
 
+    @ApiProperty({isArray: true})
+    steps: []
     viewFilters?: Filters[];
     @ApiProperty({
         isArray: true,
         required: false,
         enum: CategorySuggestionTypes,
     })
-    @IsEnum(CategorySuggestionTypes, {each: true})
-    @IsArray()
+
 
     suggestionType?: CategorySuggestionTypes[];
-    
-    @IsBoolean()
-    @ApiProperty({default: false})
+
+    @ApiProperty()
     isParent: boolean
 
-    @IsString()
     @ApiProperty()
     href: string
 }
