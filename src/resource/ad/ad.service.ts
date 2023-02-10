@@ -38,41 +38,20 @@ export class AdService {
         user: user['_id'],
         category: dto.category,
         adStatus: dto.adStatus,
+        adType: dto.adTypes,
         types: dto.types
       });
       await this.userModel.findByIdAndUpdate(user['_id'], {
         $push: {ads: ad._id}
       })
     } catch (error) {
-      throw new HttpException('Server error', 500)
+      console.log(error)
+      throw new HttpException(error, 500)
     }
     return true;
   }
 
-  async getAllAds() {
-    let ads = await this.model.find({adStatus: 'created'}).sort({ createdAt: 'desc' });
-    if (!ads) throw new ForbiddenException('not found ads');
-    return ads;
-  }
-  
-  async getAdNotVerified() {
-    let ads = await this.model.find({adStatus: 'pending'}).sort({ createdAt: 'desc' });
-    if (!ads) throw new ForbiddenException('not found ads');
-    return ads;
-  }
 
-  async verifyAd(id: string) {
-    let ad = await this.model.findByIdAndUpdate(id, {
-      adStatus: AdStatus.created
-    })
-    return ad
-  }
-  async deleteAd(id: string) {
-    let ad = await this.model.findByIdAndUpdate(id, {
-      adStatus: AdStatus.deleted
-    })
-    return ad
-  }
   async updateStatusTimed() {
     const date = Number(Date.now())
     const lateDate = new Date(date - 60)
@@ -84,41 +63,57 @@ export class AdService {
   }
 
   async getAdsByUserId(id: string) {
-    return await this.model.find({
-      user: id,
-      adStatus: 'created'
-    })
+    try {
+      return await this.model.find({
+        user: id,
+        adStatus: 'created'
+      })
+    } catch (error) {
+      throw new HttpException('server error', 500)
+    }
   }
   async updateStatusAd(id: string, status: AdStatus) {
-    let ad = await this.model.findByIdAndUpdate(id, {
-      adStatus: status
-    })
-    return ad
+    try {
+      let ad = await this.model.findByIdAndUpdate(id, {
+        adStatus: status
+      })
+      return ad
+    } catch (error) {
+      throw new HttpException('server error', 500)
+    }
   }
   async getAdById(id: string) {
  
-    let ad = await this.model
+    try {
+      let ad = await this.model
       .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType', this.categoryModel)
       if (!ad) throw new ForbiddenException('not found ad');
     return ad;
+    } catch (error) {
+      throw new HttpException('server error', 500)
+    }
   }
   
   async getAdByCategoryId(id: string) {
-    console.log(id)
-    let category = await this.categoryService.getCategoryById(id)
+
+    try {
+      let category = await this.categoryService.getCategoryById(id)
     let ad = await this.model
       .find({subCategory: category._id, adStatus: 'created'})
       
     if (!ad) throw new ForbiddenException('not found ad');
     
-   
     return ad;
+    } catch (error) {
+      throw new HttpException('server error', 500)
+    }
 
   }
 
   async getAdByFilter(filterAd: FilterAdDto) {
 
-      let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id != '' ? filterAd.positions.district_id : {$ne: ''},'positions.location_id' : filterAd.positions.location_id != '' ? filterAd.positions.location_id : {$ne: ''}, 'subCategory': filterAd.subCategory, adStatus: 'created'})
+      try {
+        let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id != '' ? filterAd.positions.district_id : {$ne: ''},'positions.location_id' : filterAd.positions.location_id != '' ? filterAd.positions.location_id : {$ne: ''}, 'subCategory': filterAd.subCategory, adStatus: 'created'})
       ads.map((ad) => {
         ad.filters.map((f) => {
           filterAd.filters.filter((fa) => {
@@ -134,5 +129,8 @@ export class AdService {
       })
       
       return ads
+      } catch (error) {
+        throw new HttpException('server error', 500)
+      }
   }
 }

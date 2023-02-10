@@ -4,38 +4,34 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { Model } from 'mongoose';
+import appConfig from 'src/config/app.config';
 import { User, UserDocument } from 'src/schema';
+import { UserService } from '../user/user.service';
 import { LoginUser, RegisterUser } from './auth.dto';
 
 @Injectable()
 export class AuthService {
     
-    constructor(@InjectModel(User.name) private model: Model<UserDocument>) {}
+    constructor(@InjectModel(User.name) private model: Model<UserDocument>, private userService: UserService) {}
     async signPayload(payload: string) {
-        return sign(payload, 'SECRET',)
+        return sign(payload, appConfig().appSecret,)
     }  
-    async findByPayload(payload: string) {
-        return await this.model.findOne({$or: [{email: payload}, {phone: payload}]})
-    }
-    async getUserByEmailOrPhone(email: string,) {
-        let user = await this.model.findOne({email})
-        if(user) throw new HttpException('user already exists', HttpStatus.BAD_REQUEST)
-        return user
-      }
+
     async validateUser(payload: string) {
-        return await this.findByPayload(payload)
+        let user = await this.model.findOne({email: payload})
+        if(!user) throw new HttpException('user not found', HttpStatus.BAD_REQUEST)
+        return user
     }
     async register(dto: RegisterUser) {
         try {
             if(dto.email != null || dto.phone != null && dto.password != null) {
                 const hashed = await bcrypt.hash(dto.password, 10)
-                let user = await this.getUserByEmailOrPhone(dto.email)
+                let user = await this.userService.getUserByEmailOrPhone(dto.email)
                 const createdUser = await this.model.create({
                     username: dto.username,
                     email: dto.email,
                     phone: dto.phone,
                     password: hashed,
-                    isAdmin: dto.isAdmin,
                   });
                 return createdUser
             }

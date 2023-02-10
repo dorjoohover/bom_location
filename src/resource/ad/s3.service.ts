@@ -1,6 +1,7 @@
 import { PutObjectCommand, PutObjectCommandInput, PutObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
+import appConfig from 'src/config/app.config';
 
 @Injectable()
 export class S3Service {
@@ -8,18 +9,18 @@ export class S3Service {
   private logger = new Logger()
   private s3: S3Client;
   constructor() {
-    this.region = "us-east-1";
+    this.region = appConfig().s3region;
     this.s3 = new S3Client({
       region: this.region,
       credentials: {
-        accessKeyId: 'AKIA5QUH5LKTJSMWFULJ',
-        secretAccessKey: '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'
+        accessKeyId: appConfig().s3accessKeyId,
+        secretAccessKey: appConfig().s3secretAccessKey
       }
     })
   }
 
   async uploadFile(file: Express.Multer.File, key: string) {
-    const bucket = "bom-file"
+    const bucket = appConfig().s3bucket
     const input: PutObjectCommandInput = {
       Body: file.buffer,
       Bucket: bucket,

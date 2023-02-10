@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { UserType } from "src/config/enum";
 
 export class CreateUserDto {
@@ -24,12 +24,27 @@ export class CreateUserDto {
     @ApiProperty()
     password: string
 
-    @IsBoolean()
-    @IsNotEmpty()
-    isAdmin: boolean
-
     @ApiProperty({enum: UserType, default: UserType.default})
     userType: UserType
+
+}
+export class UpdateUserDto {
+
+
+    @ApiProperty()
+    username?: string
+
+    @ApiProperty()
+    phone?: string
+
+    @ApiProperty()
+    password?: string
+
+    @ApiProperty({enum: UserType, default: UserType.default})
+    userType?: UserType
+
+    @ApiProperty({isArray: true})
+    socials?: []
 
 }
 

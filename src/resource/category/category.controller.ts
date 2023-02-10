@@ -45,7 +45,7 @@ export class CategoryController {
     @ApiParam({name: 'id'})
     @Put(':id')
     @ApiOperation({description: "category update hiih "})
-    updateCategoryId(@Body() dto: UpdateCategoryDto, @Param('id') id: string) {
+    updateCategoryId( @Param('id') id: string, @Body() dto: UpdateCategoryDto,) {
         return this.service.updateCategoryById( id, dto)
     }
     // @Delete()

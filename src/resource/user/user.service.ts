@@ -1,26 +1,13 @@
-import { ForbiddenException, Inject, Injectable, forwardRef } from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema';
-import { AuthService } from '../auth/auth.service';
-import { CreateUserDto } from './user.dto';
+import { UpdateUserDto } from './user.dto';
 
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private model: Model<UserDocument>) {}
-  async createUser(dto: CreateUserDto) {
-    let user = await this.model.findOne({ email: dto.email });
-    if (user) throw new ForbiddenException('found this email');
-    user = await this.model.create({
-      username: dto.username,
-      email: dto.email,
-      phone: dto.phone,
-      password: dto.password,
-      isAdmin: dto.isAdmin,
-      userType: dto.userType
-    });
-    return user
-  }
+
 
   async getAllUsers() {
     let users = await this.model.find()
@@ -30,18 +17,31 @@ export class UserService {
     return users
   }
 
-  async findByPayload(payload: string) {
-    return await this.model.findOne({$or: [{email: payload}, {phone: payload}]})
-  }
-
   async getUserById(id: string) {
     return await this.model.findById(id)
   }
 
-  async getUserByEmailOrPhone(email?: string, phone?: string) {
-    let user = await this.model.findOne({$or: [{email},{phone}]})
-    if(!user)
-    throw new ForbiddenException('not found ')
-    return user
+  async getUserByEmailOrPhone(email: string,) {
+    try {
+      let user = await this.model.findOne({email})
+        return user
+    } catch (error) {
+      throw new HttpException('server error', 500)
+    }
+  }
+
+  async editUser(user: UserDocument, dto: UpdateUserDto) {
+    
+        try {
+            user.password = dto.password;
+            user.phone = dto.phone;
+            user.userType = dto.userType
+            user.username = dto.username
+            user.socials = dto.socials
+            user.save()
+            return user
+        } catch (error) {
+            throw new HttpException('server error', 500)
+        }
   }
 }

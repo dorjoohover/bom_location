@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import appConfig from './config/app.config';
 import { AdModule } from './resource/ad/ad.module';
 import { AuthModule } from './resource/auth/auth.module';
 import { CategoryModule } from './resource/category/category.module';
@@ -9,17 +11,14 @@ import { UserModule } from './resource/user/user.module';
 
 @Module({
   imports: [
-    // ConfigModule.forRoot({
-    //   envFilePath: [
-    //     process.env.NODE_ENV === 'development' ? '.env.development' : '.env.production',
-    //   ],
-    //   load: [configuration],
-    //   isGlobal: true
-    // }),
-    MongooseModule.forRoot( 'mongodb+srv://dorjoo:dorjooX0@cluster0.adxdtn0.mongodb.net/?retryWrites=true&w=majority', {
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath:'.env'
+    }),
+    MongooseModule.forRoot( appConfig().dbUrl, {
       useNewUrlParser: true, 
       useUnifiedTopology: true, 
-      dbName: 'zipcode'
+      dbName: appConfig().dbName
     }),
     UserModule,
     AdModule,

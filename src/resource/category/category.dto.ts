@@ -1,8 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Transform } from "class-transformer";
-import { CategorySuggestionTypes, Filters } from "./interface/categoryEnum";
+import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { CreateAdSteps } from "src/config/enum";
+import { CategorySuggestionTypes, Filters } from "./interface/categoryEnum";
 
 
 export class CreateSubCategory {
@@ -99,6 +98,7 @@ export class UpdateCategoryDto {
     })
 
 
+    @ApiProperty()
     suggestionType?: CategorySuggestionTypes[];
 
     @ApiProperty()

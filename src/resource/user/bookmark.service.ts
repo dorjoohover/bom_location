@@ -12,7 +12,8 @@ export class BookmarkService {
         @InjectModel(User.name)  private model: Model<UserDocument>
     ) {}
     async addBookmark(data: AddBookmarkDto, userId: string) {
-        let ad = await this.model.findOne({id: userId, bookmarks: data.adId})
+        try {
+            let ad = await this.model.findOne({id: userId, bookmarks: data.adId})
         if(ad)  
         {
             ad = await this.model.findByIdAndUpdate(userId, {$pull: {bookmarks: data.adId}});
@@ -25,6 +26,9 @@ export class BookmarkService {
            }
         
         if(!ad) throw new HttpException('error', HttpStatus.BAD_REQUEST)
+        } catch (error) {
+            throw new HttpException('server error', 500)
+        }
     
     }
 }

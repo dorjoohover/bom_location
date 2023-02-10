@@ -50,6 +50,12 @@ export enum UserStatus {
   banned = 'banned'
 }
 
+export enum Socials {
+  facebook,
+  instagram,
+  telegram
+}
+
 export function getStep(step: CreateAdSteps, filters: any ):any {
   switch(step){
     case CreateAdSteps.type:

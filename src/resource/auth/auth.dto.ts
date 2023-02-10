@@ -19,9 +19,6 @@ export class RegisterUser {
     @ApiProperty()
     // @IsString()
     phone: string
-
-    // @IsBoolean()
-    isAdmin: boolean
 }
 
 export class LoginUser {

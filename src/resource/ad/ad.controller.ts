@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, Param, Post, Query, Request, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Request, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -14,8 +14,7 @@ import { SuggestionService } from './suggestion.service';
 
 @ApiTags('Ads')
 @Controller('ad')
-// @UseGuards(UserAccessGuard)
-// @ApiBearerAuth("access-token")
+
 export class AdController {
     constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service) {}
 
@@ -32,7 +31,6 @@ export class AdController {
         if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
         let imagesUrl = []
         for(let i = 0; i < files.images.length / 2; i++ ){
-            // fieldname shalgah
             
             const key = `${files.images[i].originalname}${Date.now()}`
             const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
@@ -50,30 +48,34 @@ export class AdController {
     @Get()
     // @ApiCreatedResponse({ description: 'Created Succesfully' })
     @ApiOperation({description: "buh zariig harna"})
-    getAllAds() {
-        return this.service.getAllAds()
+    async getAllAds() {
+        let ads = await this.model.find({adStatus: 'created'}).sort({ createdAt: 'desc' });
+    if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+    return ads;
     }
 
     
    
     @Get('/notVerify')
     @ApiOperation({description: "adminaas verify daagui zariig harna"})
-    getAdNotVerified() {
-        return this.service.getAdNotVerified()
+    async getAdNotVerified() {
+        let ads = await this.model.find({adStatus: 'pending'}).sort({ createdAt: 'desc' });
+        if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+        return ads;
     }
     
     @Get('check/:id')
     @ApiParam({name: 'id', })
     @ApiOperation({description: "admin aas zar id gaar verify hiine"})
     verifyAd(@Param('id') id) {
-        return this.service.verifyAd(id)
+        return this.service.updateStatusAd(id, AdStatus.created)
     }
 
     @Get('delete/:id')
     @ApiParam({name: 'id', })
     @ApiOperation({description: "admin aas zar id gaar delete hiine"})
     deleteAd(@Param('id') id) {
-        return this.service.deleteAd(id)
+        return this.service.updateStatusAd(id, AdStatus.deleted)
     }
     
     @Get('search/:value')
@@ -101,7 +103,6 @@ export class AdController {
     @ApiOperation({description: "zariig user id gaar ni awna"})
     adByUser( @Request() {user}) {
         if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
-        console.log(user, user._id)
         let ads = this.service.getAdsByUserId(user._id)
         return ads
     }
@@ -138,6 +139,8 @@ export class AdController {
     getAdById(@Param('id') id:string) {
         return this.service.getAdById(id)
     }
+
+    
     @Delete()
     async deleteAds() 
     {
