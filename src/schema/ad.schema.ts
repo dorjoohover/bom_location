@@ -39,7 +39,7 @@ export class Ad {
 
   @Prop({default: 1})
   num: number
-  @Prop({ required: true })
+  @Prop({ required: true , max_length: 100})
   title: string;
 
   @Prop({ required: true })
@@ -48,7 +48,7 @@ export class Ad {
   @Prop()
   images: [];
 
-  @Prop()
+  @Prop({max_length: 10000})
   description: string;
 
   @Prop()

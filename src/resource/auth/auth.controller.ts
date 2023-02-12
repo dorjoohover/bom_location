@@ -2,7 +2,6 @@ import { MailerService } from '@nestjs-modules/mailer/dist';
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import appConfig from 'src/config/app.config';
 
@@ -34,7 +33,7 @@ export class AuthController {
         const user = await this.service.register(dto)
         if(user) {
             const token = await this.service.signPayload(user.email )
-            const code = await bcrypt.hash(user.email, 10)
+            const code = Math.round(Math.random() * 10000000000000000).toString()
             user.code = code
             user.save()
             await this.sendConfirmMail(user.email, code)

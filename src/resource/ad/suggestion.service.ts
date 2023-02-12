@@ -9,12 +9,12 @@ export class SuggestionService {
 
     async getSuggestionAds(data: SuggestionDto) {
         if(data.type == 'location') {
-            let ads = await this.model.find({'position.district_id': data.suggestion})
+            let ads = await this.model.find({'positions.district_id': data.suggestion}).sort({ createdAt: 'desc' });
             if(!ads) return {message: 'not found'}
             return ads
         }
         if(data.type == 'room') {
-            let ads = await this.model.find({$and: [{'filters.id': 'room'},{'filters.value' : data.suggestion}]})
+            let ads = await this.model.find({$and: [{'filters.id': 'room'},{'filters.value' : data.suggestion}]}).sort({ createdAt: 'desc' });
             if(!ads) return {message: 'not found'}
             return ads
         }

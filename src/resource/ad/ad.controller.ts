@@ -30,7 +30,7 @@ export class AdController {
         // return dto
         if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
         let imagesUrl = []
-        for(let i = 0; i < files.images.length / 2; i++ ){
+        for(let i = 0; i < (files.images?.length ?? 0) / 2; i++ ){
             
             const key = `${files.images[i].originalname}${Date.now()}`
             const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
@@ -45,21 +45,25 @@ export class AdController {
     }
     
 
-    @Get()
+    @Get(':num')
     // @ApiCreatedResponse({ description: 'Created Succesfully' })
     @ApiOperation({description: "buh zariig harna"})
-    async getAllAds() {
-        let ads = await this.model.find({adStatus: 'created'}).sort({ createdAt: 'desc' });
+    @ApiParam({name: 'num'})
+    async getAllAds(@Param('num') num: number) {
+
+        let ads = await this.model.find({adStatus: 'created'}).sort({ createdAt: 'desc' }).limit((num+1)*10)
     if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
     return ads;
     }
 
     
    
-    @Get('/notVerify')
+    @Get('/notVerify/:num')
     @ApiOperation({description: "adminaas verify daagui zariig harna"})
-    async getAdNotVerified() {
-        let ads = await this.model.find({adStatus: 'pending'}).sort({ createdAt: 'desc' });
+    @ApiParam({name: 'num'})
+    async getAdNotVerified(@Param('num') num: number) {
+        console.log(num)
+        let ads = await this.model.find({adStatus: 'pending'}).sort({ createdAt: 'desc' }).limit((num+1)*20);
         if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
         return ads;
     }
@@ -83,7 +87,7 @@ export class AdController {
     @ApiOperation({description: "search ad"})
     async searchAd(@Query('value') value: string) {
         
-        let ad = await this.model.find( {$text: {$search: value}})
+        let ad = await this.model.find( {$text: {$search: value}}).sort({ createdAt: 'desc' });
       
         if(!ad) throw new HttpException('not found', 403)
         return ad
@@ -97,13 +101,11 @@ export class AdController {
     }
 
 
-    @UseGuards(UserAccessGuard)
-    @ApiBearerAuth('access-token')
-    @Post('user')
-    @ApiOperation({description: "zariig user id gaar ni awna"})
-    adByUser( @Request() {user}) {
-        if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
-        let ads = this.service.getAdsByUserId(user._id)
+    @Post('many/:num')
+    @ApiParam({name: 'num'})
+    async manyAdById( @Body() dto: [], @Param('num') num: number) {
+        let ads = await this.model.find({'_id' : {$in: dto}}).sort({ createdAt: 'desc' }).limit((num+1) * 10).skip(num * 10);
+        if(!ads) throw new HttpException('not found', HttpStatus.NOT_FOUND) 
         return ads
     }
 
@@ -115,9 +117,9 @@ export class AdController {
     
     @ApiParam({name: 'id', })
     @ApiOperation({description: "zar g category id gaar awna"})
-    @Get('category/:id')
-    getAdByCategoryId(@Param('id') id: string) {
-        return this.service.getAdByCategoryId(id)
+    @Get('category/:id/:num')
+    getAdByCategoryId(@Param('id') id: string, @Param('num') num: number) {
+        return this.service.getAdByCategoryId(id, num)
     }
     
     @ApiOperation({description: "zar filterdene"})
@@ -133,7 +135,7 @@ export class AdController {
     getSuggestion(@Body() data: SuggestionDto) {
         return this.suggestionService.getSuggestionAds(data)
     }
-    @Get('/:id')
+    @Get('id/:id')
     @ApiParam({name: 'id', })
     @ApiOperation({description: "zariig id gaar ni awna"})
     getAdById(@Param('id') id:string) {

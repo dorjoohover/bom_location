@@ -67,7 +67,7 @@ export class AdService {
       return await this.model.find({
         user: id,
         adStatus: 'created'
-      })
+      }).sort({ createdAt: 'desc' });
     } catch (error) {
       throw new HttpException('server error', 500)
     }
@@ -94,12 +94,12 @@ export class AdService {
     }
   }
   
-  async getAdByCategoryId(id: string) {
+  async getAdByCategoryId(id: string, num: number) {
 
     try {
       let category = await this.categoryService.getCategoryById(id)
     let ad = await this.model
-      .find({subCategory: category._id, adStatus: 'created'})
+      .find({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'}).sort({ createdAt: 'desc' }).limit((num+1) * 20).skip(num * 20);
       
     if (!ad) throw new ForbiddenException('not found ad');
     
@@ -113,7 +113,7 @@ export class AdService {
   async getAdByFilter(filterAd: FilterAdDto) {
 
       try {
-        let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id != '' ? filterAd.positions.district_id : {$ne: ''},'positions.location_id' : filterAd.positions.location_id != '' ? filterAd.positions.location_id : {$ne: ''}, 'subCategory': filterAd.subCategory, adStatus: 'created'})
+        let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id != '' ? filterAd.positions.district_id : {$ne: ''},'positions.location_id' : filterAd.positions.location_id != '' ? filterAd.positions.location_id : {$ne: ''}, 'subCategory': filterAd.subCategory, adStatus: 'created'}).sort({ createdAt: 'desc' });
       ads.map((ad) => {
         ad.filters.map((f) => {
           filterAd.filters.filter((fa) => {

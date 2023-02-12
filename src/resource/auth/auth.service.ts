@@ -45,14 +45,17 @@ export class AuthService {
         try {
             if(dto.email != null && dto.password !=null) {
                 let user = await this.model.findOne({email: dto.email})
-                if(!user) throw new HttpException('wrong email or password', HttpStatus.BAD_REQUEST)
-                const checkPassword = this.checkPassword(dto.password, user.password)
+                if(!user) throw new HttpException('wrong email', HttpStatus.BAD_REQUEST)
                 if(user.status != 'active') throw new HttpException('check your email', HttpStatus.FORBIDDEN)
-                if(checkPassword) {
+               
+                const check = await bcrypt.compare(dto.password, user.password)
+                if(check) {
                     return user
                 } else {
-                    return null
+                    throw new HttpException('wrong password', HttpStatus.BAD_REQUEST)
                 }
+               
+             
                 
                 
             }
@@ -62,15 +65,6 @@ export class AuthService {
         }
     }
 
-    async checkPassword(password: string, checkPassword: string) {
-        bcrypt.compare(password, checkPassword, (err, result) => {
-            if(result) {
-                return true
-            }
-            else {
-               return false
-            }
-        })
-    }
+
 }
 
