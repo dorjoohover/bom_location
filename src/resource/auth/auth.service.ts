@@ -27,13 +27,17 @@ export class AuthService {
             if(dto.email != null || dto.phone != null && dto.password != null) {
                 const hashed = await bcrypt.hash(dto.password, 10)
                 let user = await this.userService.getUserByEmailOrPhone(dto.email)
-                const createdUser = await this.model.create({
-                    username: dto.username,
-                    email: dto.email,
-                    phone: dto.phone,
-                    password: hashed,
-                  });
-                return createdUser
+                if(hashed) {
+                    const createdUser = await this.model.create({
+                        username: dto.username,
+                        email: dto.email,
+                        phone: dto.phone,
+                        password: hashed,
+                      });
+                    return createdUser
+                } else {
+                    throw new HttpException('did not hash password', 500)
+                }
             }
         } catch (e) {
             throw new HttpException(e.message, HttpStatus.FORBIDDEN)
@@ -47,9 +51,12 @@ export class AuthService {
                 let user = await this.model.findOne({email: dto.email})
                 if(!user) throw new HttpException('wrong email', HttpStatus.BAD_REQUEST)
                 if(user.status != 'active') throw new HttpException('check your email', HttpStatus.FORBIDDEN)
-               
-                const check = await bcrypt.compare(dto.password, user.password)
+                let password = user.password
+                if(!user.password) throw new HttpException('system error', 500)
+              
+                const check = await bcrypt.compare(dto.password, password)
                 if(check) {
+                    
                     return user
                 } else {
                     throw new HttpException('wrong password', HttpStatus.BAD_REQUEST)

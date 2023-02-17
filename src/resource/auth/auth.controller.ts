@@ -33,7 +33,7 @@ export class AuthController {
         const user = await this.service.register(dto)
         if(user) {
             const token = await this.service.signPayload(user.email )
-            const code = Math.round(Math.random() * 10000000000000000).toString()
+            const code = Math.round(Math.random() * 10000000000).toString() + Date.now()
             user.code = code
             user.save()
             await this.sendConfirmMail(user.email, code)
@@ -46,6 +46,7 @@ export class AuthController {
     @ApiOperation({description: "login hiih"})
     async login(@Body() dto: LoginUser) {
         const user = await this.service.login(dto)
+        console.log(user)
         if(user) {
             const token = await this.service.signPayload(user.email )
             return {user, token}

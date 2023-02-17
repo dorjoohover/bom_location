@@ -51,9 +51,15 @@ export class AdController {
     @ApiParam({name: 'num'})
     async getAllAds(@Param('num') num: number) {
 
-        let ads = await this.model.find({adStatus: 'created'}).sort({ createdAt: 'desc' }).limit((num+1)*10)
+        let ads = await this.model.find({adStatus: 'created'}).sort({ createdAt: 'desc' }).limit(10).skip(num*10)
+        let limit = 0
+        limit = await this.model.count({adStatus: 'created'})
     if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
-    return ads;
+
+    return {
+        ads: ads, 
+        limit: limit
+    };
     }
 
     

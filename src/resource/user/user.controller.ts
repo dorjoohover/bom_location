@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpException, Put, Request } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 
-import { UseGuards } from '@nestjs/common/decorators';
+import { Param, UseGuards } from '@nestjs/common/decorators';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import { UpdateUserDto } from './user.dto';
 import { UserService } from './user.service';
@@ -23,6 +23,13 @@ export class UserController {
         return user
   
     }
+
+    @Get(':id')
+    @ApiParam({name: 'id'})
+    async getUserById(@Param('id') id:string) {
+        return this.service.getUserById(id)
+    }
+
 
     @Put()
      editUser(@Request() {user}, @Body() dto: UpdateUserDto) {
