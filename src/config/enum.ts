@@ -1,4 +1,3 @@
-import { getFilter } from "src/resource/category/interface/categoryEnum";
 
 
 
@@ -26,9 +25,59 @@ export enum AdStatus {
 deleted = 'deleted'
 }
 
+export enum ItemTypes {
+  dropdown, 
+  text, 
+  date, 
+  year, 
+  committee, 
+}
+
+export enum ItemType {
+  floor = 'floor',
+  room = 'room',
+  bathroom = 'bathroom',
+  masterBedroom = 'masterBedroom',
+  window = 'window',
+  windowUnit = 'windowUnit',
+  door = 'door',
+  balconyUnit = 'balconyUnit',
+  buildingFloor = 'buildingFloor',
+  garage = 'garage',
+  paymentMethod = 'paymentMethod',
+  barter = 'barter',
+  landLicense = 'landLicense',
+  landUsage = 'landUsage',
+  objectType = 'objectType',
+  serviceType = 'serviceType',
+  phone = 'phone',
+  price = 'price',
+  unitPrice = 'unitPrice',
+  area = 'area',
+  operation = 'operation',
+  licenseOperation = 'licenseOperation',
+  validDate = 'validDate',
+  district = 'district',
+  committee = 'committee',
+  location = 'location',
+  town = 'town',
+  howFloor = 'howFloor',
+  officeName = 'officeName',
+  buildingName = 'buildingName',
+  tradeService = 'tradeService',
+}
+
 export enum AdType {
   sell = 'sell',
   rent = 'rent',
+}
+export enum CategorySuggestionTypes {
+  'room',
+  'location',
+  'floor',
+  'usage',
+  'buildingFloor',
+  'map'
 }
 export enum CreateAdSteps {
   type = 'type',
@@ -56,42 +105,30 @@ export enum Socials {
   telegram
 }
 
-export function getStep(step: CreateAdSteps, filters: any ):any {
-  switch(step){
-    case CreateAdSteps.type:
-      return filters.map((f) => {
-        if(f == 'AdType') {
-          return 
-            // id: 'AdType',
-            // name: 'Борлуулах төрөл',
-            // values: [
-            //   AdType.rent,
-            //   AdType.sell
-            // ],
-            // value: '',
-            // type: 'check',
-          
-        }
-        if(f == 'AdTypes') {
-          return {
-            id: 'AdTypes',
-            name: 'Зарын төрөл',
-            values: [
-              AdTypes.default,
-              AdTypes.poster,
-              AdTypes.special,
-            ],
-            value: '',
-            type: 'dropdown',
-          };
-        }
-      })
-    case CreateAdSteps.location:
-      return filters.map((f) => getFilter(f))
-    case CreateAdSteps.general:
-      return filters.map((f) => getFilter(f))
-    case CreateAdSteps.detail:
-      return filters.map((f) => getFilter(f))
-  }
-}
+// export function getStep(step: CreateAdSteps, filters: any ):any {
+//   switch(step){
+//     case CreateAdSteps.type:
+//       return filters.map((f) => {
+//         if(f == 'AdTypes') {
+//           return {
+//             id: 'AdTypes',
+//             name: 'Зарын төрөл',
+//             values: [
+//               AdTypes.default,
+//               AdTypes.poster,
+//               AdTypes.special,
+//             ],
+//             value: '',
+//             type: 'dropdown',
+//           };
+//         }
+//       })
+//     case CreateAdSteps.location:
+//       return filters.map((f) => getFilter(f))
+//     case CreateAdSteps.general:
+//       return filters.map((f) => getFilter(f))
+//     case CreateAdSteps.detail:
+//       return filters.map((f) => getFilter(f))
+//   }
+// }
 

@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { CreateAdSteps } from "src/config/enum";
-import { CategorySuggestionTypes, Filters } from "./interface/categoryEnum";
+import { CategorySuggestionTypes, CreateAdSteps, ItemType } from "src/config/enum";
 
 
 export class CreateSubCategory {
@@ -16,22 +15,12 @@ export class CreateSubCategory {
 
     @ApiProperty({
         isArray: true,
-        required: false,
-        enum: Filters,
+        
     })
-    @IsEnum(Filters, {each: true})
     @IsArray()
 
-    filters?: Filters[];
-    @ApiProperty({
-        isArray: true,
-        required: false,
-        enum: Filters,
-    })
-    @IsEnum(Filters, {each: true})
-    @IsArray()
-    
-    viewFilters?: Filters[];
+    filters?: string[];
+
 
     @ApiProperty({
         isArray: true,
@@ -41,7 +30,7 @@ export class CreateSubCategory {
     @IsArray()
     steps: [{
         step: CreateAdSteps,
-        values: []
+        values: string[]
     }];
     @ApiProperty({
         isArray: true,
@@ -78,19 +67,18 @@ export class UpdateCategoryDto {
     @ApiProperty({
         isArray: true,
         required: false,
-        enum: Filters,
+        enum: ItemType,
     })
 
-    filters?: Filters[];
+    filters?: ItemType[];
     @ApiProperty({
         isArray: true,
         required: false,
-        enum: Filters,
+        enum: ItemType,
     })
 
     @ApiProperty({isArray: true})
     steps: []
-    viewFilters?: Filters[];
     @ApiProperty({
         isArray: true,
         required: false,

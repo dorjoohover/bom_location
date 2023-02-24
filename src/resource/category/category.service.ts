@@ -6,28 +6,25 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { getStep } from 'src/config/enum';
 
 import {
   Category,
-  CategoryDocument, Discrict,
-  DistrictDocument,
-  Location, LocationDocument
+  CategoryDocument,
+  Item,
+  ItemDocument
 } from 'src/schema';
 import {
   CreateCategoryDto,
   CreateSubCategory,
   UpdateCategoryDto
 } from './category.dto';
-import { Filters, getFilter } from './interface/categoryEnum';
 
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectModel(Category.name) private model: Model<CategoryDocument>,
-    @InjectModel(Location.name) private locationModel: Model<LocationDocument>,
-    @InjectModel(Discrict.name) private districtModel: Model<DistrictDocument>,
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
   ) {}
 
   async createCategory(dto: CreateCategoryDto) {
@@ -58,7 +55,6 @@ export class CategoryService {
         isParent: dto.isParent,
         filters: dto.filters,
         steps: dto.steps,
-        viewFilters: dto.viewFilters,
         suggessionType: dto.suggestionType,
       });
       let category = await this.model.findByIdAndUpdate(dto.id, {
@@ -67,7 +63,7 @@ export class CategoryService {
 
       return subCategory;
     } catch (e) {
-      throw new HttpException('server error', 500)
+      throw new HttpException(e, 500)
     }
   }
   async getAllCategories() {
@@ -82,11 +78,9 @@ export class CategoryService {
         this.model,
       )
       .exec();
-    let discrict = await this.districtModel.find();
-    let location = await this.locationModel.find();
     if (!categories) throw new ForbiddenException('not found');
 
-    return { categories, discrict, location };
+    return  categories;
     } catch (error) {
       throw new HttpException('server error', 500)
     }
@@ -127,22 +121,22 @@ export class CategoryService {
     try {
       let subCategory 
     if(mongoose.Types.ObjectId.isValid(id))  {
-      subCategory = await this.model.findById(id).exec();
+      subCategory = await this.model.findById(id).populate(isFilter == 'true' ? 'filters' : 'steps.values', 'name value types type', this.itemModel).exec();
     } else {
-      subCategory = await this.model.findOne({href: id}).exec();
+      subCategory = await this.model.findOne({href: id}).populate(isFilter == 'true' ? 'filters' : 'steps.values', 'name value types type', this.itemModel).exec();
     }
     if (!subCategory)
       throw new HttpException('not found', HttpStatus.NOT_FOUND);
 
-    let filters = [];
-    if (isFilter == 'true') {
-      filters = subCategory.filters.map((f) => getFilter(f as Filters));
-    } else {
-      filters = subCategory.steps.map((f) => getStep(f.step, f.values ));
-    }
-    return { subCategory, filters };
+    // let filters = [];
+    // if (isFilter == 'true') {
+    //   filters = subCategory.filters.map((f) => getFilter(f as Filters));
+    // } else {
+    //   filters = subCategory.steps.map((f) => getStep(f.step, f.values ));
+    // }
+    return subCategory;
     } catch (error) {
-      throw new HttpException('server error', 500)
+      throw new HttpException(error, 500)
     }
   }
 
@@ -157,7 +151,6 @@ export class CategoryService {
           isParent: dto.isParent,
           filters: dto.filters,
           steps: dto.steps,
-          viewFilters: dto.viewFilters,
           suggessionType: dto.suggestionType,
       })
       return true

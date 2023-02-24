@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 import { AdStatus } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import { Ad, AdDocument } from 'src/schema';
-import { CreateAdDto, FilterAdDto, SuggestionDto } from './ad.dto';
+import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
 import { S3Service } from './s3.service';
 import { SuggestionService } from './suggestion.service';
@@ -30,7 +30,7 @@ export class AdController {
         // return dto
         if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
         let imagesUrl = []
-        for(let i = 0; i < (files.images?.length ?? 0) / 2; i++ ){
+        for(let i = 0; i < (files?.images?.length ?? 0) / 2; i++ ){
             
             const key = `${files.images[i].originalname}${Date.now()}`
             const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
@@ -68,10 +68,12 @@ export class AdController {
     @ApiOperation({description: "adminaas verify daagui zariig harna"})
     @ApiParam({name: 'num'})
     async getAdNotVerified(@Param('num') num: number) {
-        console.log(num)
+        
         let ads = await this.model.find({adStatus: 'pending'}).sort({ createdAt: 'desc' }).limit((num+1)*20);
+        let limit = 0
+        limit = await this.model.count({adStatus: 'pending'})
         if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
-        return ads;
+        return {ads, limit};
     }
     
     @Get('check/:id')
@@ -93,10 +95,12 @@ export class AdController {
     @ApiOperation({description: "search ad"})
     async searchAd(@Query('value') value: string) {
         
-        let ad = await this.model.find( {$text: {$search: value}}).sort({ createdAt: 'desc' });
+        let ads = await this.model.find( {$text: {$search: value}}).sort({ createdAt: 'desc' });
+        let limit = 0
+        limit = await this.model.count({$text: {$search: value}})
       
-        if(!ad) throw new HttpException('not found', 403)
-        return ad
+        if(!ads) throw new HttpException('not found', 403)
+        return {ads, limit, }
     }
 
     @Get('sold/:id')
@@ -111,8 +115,10 @@ export class AdController {
     @ApiParam({name: 'num'})
     async manyAdById( @Body() dto: [], @Param('num') num: number) {
         let ads = await this.model.find({'_id' : {$in: dto}}).sort({ createdAt: 'desc' }).limit((num+1) * 10).skip(num * 10);
+        let limit = 0
+        limit = await this.model.count({'_id' : {$in: dto}})
         if(!ads) throw new HttpException('not found', HttpStatus.NOT_FOUND) 
-        return ads
+        return {ads, limit}
     }
 
     @Get('timed')
@@ -136,11 +142,20 @@ export class AdController {
         return this.service.getAdByFilter(filterAd)
 
     }
-    @ApiOperation({description: "suggest zar enum aar awah  "})
-    @Post('suggesstion')
-    getSuggestion(@Body() data: SuggestionDto) {
-        return this.suggestionService.getSuggestionAds(data)
+
+
+    @ApiOperation({description: "zar value gaar filter"})
+    @Get('filter/:id/:value/:num')
+    getFilterByValueAd(@Param('id') id: string, @Param('value') value: string, @Param('num') num: number) {
+        
+        return this.service.getAdByFilterValue(id, value, num)
+
     }
+    // @ApiOperation({description: "suggest zar enum aar awah  "})
+    // @Get('suggesstion')
+    // getSuggestion(@Body() data: SuggestionDto) {
+    //     return this.service.getAdByFilterValue(data.)
+    // }
     @Get('id/:id')
     @ApiParam({name: 'id', })
     @ApiOperation({description: "zariig id gaar ni awna"})

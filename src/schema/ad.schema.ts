@@ -2,30 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { AdStatus, AdTypes } from 'src/config/enum';
 import { Category } from './category.schema';
-import { Discrict } from './district.schema';
 import { User } from './user.schema';
 
 export type AdDocument = Document & Ad;
-export class AdTown {
-  
-  @Prop()
-  value: number;
-
-  @Prop()
-    values: [];
-  @Prop()
-    name: string;
-}
-export class AdPosition {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Discricts' })
-  district_id: Discrict;
-  @Prop()
-  committee_id: string;
-  @Prop()
-  location_id: string;
-  @Prop()
-  town: AdTown
-}
 
 export class AdLocation {
   
@@ -41,9 +20,6 @@ export class Ad {
   num: number
   @Prop({ required: true , max_length: 100})
   title: string;
-
-  @Prop({ required: true })
-  positions: AdPosition;
 
   @Prop()
   images: [];
@@ -66,9 +42,7 @@ export class Ad {
   filters: [
     {
       value: string;
-
-      values: [];
-
+      id: string
       name: string;
     },
   ];

@@ -1,11 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { AdStatus, AdTypes } from "src/config/enum";
+import { AdStatus, AdTypes, CategorySuggestionTypes } from "src/config/enum";
 import { enumToArray } from "src/typeformat";
-import { CategorySuggestionTypes } from "../category/interface/categoryEnum";
-
-
-
 
 
 export class AdLocation {

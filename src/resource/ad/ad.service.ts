@@ -64,10 +64,11 @@ export class AdService {
 
   async getAdsByUserId(id: string) {
     try {
-      return await this.model.find({
+      let ads = await this.model.find({
         user: id,
         adStatus: 'created'
       }).sort({ createdAt: 'desc' });
+      return {ads}
     } catch (error) {
       throw new HttpException('server error', 500)
     }
@@ -98,16 +99,31 @@ export class AdService {
 
     try {
       let category = await this.categoryService.getCategoryById(id)
-    let ad = await this.model
+    let ads = await this.model
       .find({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'}).sort({ createdAt: 'desc' }).limit((num+1) * 20).skip(num * 20);
-      
-    if (!ad) throw new ForbiddenException('not found ad');
+      let limit = 0
+        limit = await this.model.count({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'})
+
+    if (!ads) throw new ForbiddenException('not found ad');
     
-    return ad;
+    return {ads, limit};
     } catch (error) {
       throw new HttpException('server error', 500)
     }
 
+  }
+
+  async getAdByFilterValue(id: string, value: string, num: number) {
+    try {
+      let ads = await this.model.find({$and: [{'filters.value': value}, {'filters.id': id}]}).limit((num + 1) * 10).skip(num * 10)
+      let limit = 0
+      limit = await this.model.count({$and: [{'filters.value': value}, {'filters.id': id}]})
+      return {ads, limit}
+    } catch (error) {
+      throw new HttpException(error, 500)
+    }
+    
+   
   }
 
   async getAdByFilter(filterAd: FilterAdDto) {

@@ -6,8 +6,7 @@ import appConfig from './config/app.config';
 import { AdModule } from './resource/ad/ad.module';
 import { AuthModule } from './resource/auth/auth.module';
 import { CategoryModule } from './resource/category/category.module';
-import { DistrictModule } from './resource/district/district.module';
-import { LocationModule } from './resource/location/location.module';
+import { ItemsModule } from './resource/items/items.module';
 import { UserModule } from './resource/user/user.module';
 
 @Module({
@@ -40,9 +39,8 @@ import { UserModule } from './resource/user/user.module';
     UserModule,
     AdModule,
     CategoryModule,
-    DistrictModule,
-    LocationModule,
     AuthModule,
+    ItemsModule
 
   ],
 })
