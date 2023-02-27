@@ -24,13 +24,11 @@ export class AdService {
     let prevAd = await this.model.findOne().sort({createdAt: 'desc'})
     let adNum = 1
     if(prevAd) adNum = prevAd?.num+1
-  
     try {
        let ad = await this.model.create({
         num: adNum ,
         images: images,
         title: dto.title,
-        positions:dto.positions,
         description: dto.description,
         location: dto.location,
         subCategory: dto.subCategory,
@@ -87,7 +85,7 @@ export class AdService {
  
     try {
       let ad = await this.model
-      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType', this.categoryModel)
+      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType', this.categoryModel).populate('user', 'phone username email', this.userModel)
       if (!ad) throw new ForbiddenException('not found ad');
     return ad;
     } catch (error) {
@@ -99,6 +97,7 @@ export class AdService {
 
     try {
       let category = await this.categoryService.getCategoryById(id)
+      
     let ads = await this.model
       .find({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'}).sort({ createdAt: 'desc' }).limit((num+1) * 20).skip(num * 20);
       let limit = 0
@@ -108,7 +107,8 @@ export class AdService {
     
     return {ads, limit};
     } catch (error) {
-      throw new HttpException('server error', 500)
+      console.log(error)
+      throw new HttpException(error, 500)
     }
 
   }
@@ -129,24 +129,38 @@ export class AdService {
   async getAdByFilter(filterAd: FilterAdDto) {
 
       try {
-        let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'positions.district_id': filterAd.positions.district_id != '' ? filterAd.positions.district_id : {$ne: ''},'positions.location_id' : filterAd.positions.location_id != '' ? filterAd.positions.location_id : {$ne: ''}, 'subCategory': filterAd.subCategory, adStatus: 'created'}).sort({ createdAt: 'desc' });
-      ads.map((ad) => {
-        ad.filters.map((f) => {
-          filterAd.filters.filter((fa) => {
-            if(fa.maxValue) {
-              fa.name == f.name && fa.maxValue >= parseInt(f.value) && parseInt(fa.value) <= parseInt(f.value)
+        
+        // 'filters': {$elemMatch: {'name': {$in: filtersValue}, 'value': {$in: filtersValue} }}, 
+        let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'subCategory': filterAd.subCategory, adStatus: 'created'}).sort({ createdAt: 'desc' });
+      let filteredAds = []
+      ads.forEach((ad) => {
+
+        let fad  = []
+        ad.filters.forEach(a => {
+          let add = filterAd.filters.find((f) => {
+            
+            if(f.max != "") {
+              if(f.input != '')
+              return (f.type == a.type && parseInt(f.max) >= parseInt(a.input) && parseInt(a.input) >= parseInt(f.input))
             } else {
-              if(fa.value != '' ) {
-                fa.name == f.name && fa.value == f.value
-              }
+              if(f.input != '') return (f.input == a.input && f.type == a.type)
             }
           })
+          if(add == undefined){
+            return
+          }
+          fad.push(a)
         })
+    
+   
+        if(fad.length == filterAd.filters.length)
+        filteredAds.push(ad)
       })
-      
-      return ads
+
+    
+      return filteredAds
       } catch (error) {
-        throw new HttpException('server error', 500)
+        throw new HttpException(error, 500)
       }
   }
 }

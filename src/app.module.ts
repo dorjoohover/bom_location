@@ -34,7 +34,8 @@ import { UserModule } from './resource/user/user.module';
     MongooseModule.forRoot( appConfig().dbUrl, {
       useNewUrlParser: true, 
       useUnifiedTopology: true, 
-      dbName: appConfig().dbName
+      dbName: appConfig().dbName,
+      
     }),
     UserModule,
     AdModule,

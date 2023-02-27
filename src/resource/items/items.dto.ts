@@ -34,6 +34,18 @@ export class CreateItemDto {
   @ApiProperty()
   parentId: string
 
-  @ApiProperty()
+  @ApiProperty({default: ''})
   input: string
+  @ApiProperty({default: ""})
+  max: string
+}
+
+export class updateItemDetail {
+  @ApiProperty()
+  @IsString()
+  id: string
+
+  @ApiProperty({isArray: true})
+  @IsArray()
+  value: ItemDetailDto[]
 }

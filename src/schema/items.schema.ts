@@ -11,6 +11,7 @@ export class ItemDetail {
   @Prop()
   value: string
 
+
   @Prop()
   parentId?: string
 
@@ -35,8 +36,11 @@ export class Item {
 
     @Prop()
     parentId?: string
+    
     @Prop()
     input?: string
+    @Prop()
+    max?: string
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item)

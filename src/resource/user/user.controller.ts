@@ -6,8 +6,7 @@ import { UserAccessGuard } from 'src/guard/user.guard';
 import { UpdateUserDto } from './user.dto';
 import { UserService } from './user.service';
 @ApiTags('User')
-@UseGuards(UserAccessGuard)
-@ApiBearerAuth("access-token")
+
 @Controller('user')
 export class UserController {
     constructor(private readonly service: UserService) {}
@@ -16,7 +15,8 @@ export class UserController {
     getAllUser() {
         return this.service.getAllUsers()
     }
-
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth("access-token")
     @Get('me')
     async getUserByEmail(@Request() {user}) {
         if (!user) return null
@@ -30,7 +30,8 @@ export class UserController {
         return this.service.getUserById(id)
     }
 
-
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth("access-token")
     @Put()
      editUser(@Request() {user}, @Body() dto: UpdateUserDto) {
         if(!user) throw new HttpException('user not found', 400)

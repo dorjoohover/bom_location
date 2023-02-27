@@ -30,14 +30,15 @@ export class AdController {
         // return dto
         if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
         let imagesUrl = []
-        for(let i = 0; i < (files?.images?.length ?? 0) / 2; i++ ){
+        for(let i = 0; i < (files?.images?.length ?? 0); i++ ){
             
             const key = `${files.images[i].originalname}${Date.now()}`
             const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
             await imagesUrl.push(imageUrl)
         }
-        dto.positions = JSON.parse(dto.positions)
+        
         dto.filters = JSON.parse(dto.filters)
+        if(dto.location)
         dto.location = JSON.parse(dto.location)
        
         return this.service.createAd(dto, user,  imagesUrl)

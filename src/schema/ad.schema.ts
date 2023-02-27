@@ -41,9 +41,10 @@ export class Ad {
   @Prop()
   filters: [
     {
-      value: string;
-      id: string
+      input: string;
+      type: string
       name: string;
+      max?: string
     },
   ];
 

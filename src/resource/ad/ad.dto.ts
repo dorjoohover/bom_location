@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsString } from "class-validator";
 import { AdStatus, AdTypes, CategorySuggestionTypes } from "src/config/enum";
 import { enumToArray } from "src/typeformat";
 
@@ -14,11 +14,8 @@ export class AdLocation {
 export class CreateFilterDto {
     @IsString()
     @ApiProperty()
-    value: string
-    @IsArray()
-    @ApiProperty({isArray: true})
-    values: []
-    
+    input: string
+
 
     @IsString()
     @IsNotEmpty()
@@ -30,11 +27,10 @@ export class FilterDto {
 
     @IsString()
     @ApiProperty()
-    value: string
+    input: string
     
-    @IsNumber()
     @ApiProperty()
-    maxValue: number
+    max: string
     
     @IsString()
     @ApiProperty()
@@ -42,7 +38,7 @@ export class FilterDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    id: string
+    type: string
 }
 export class AdPosition {
     @IsString()
@@ -75,9 +71,6 @@ export class CreateAdDto {
     @ApiProperty()
     description:string
     
-    @IsNotEmpty()
-    @ApiProperty()
-    positions: string
 
     @ApiProperty()
     location: string
@@ -125,9 +118,6 @@ export class FilterAdDto {
     @IsString()
     @ApiProperty()
     subCategory: string
-    @IsNotEmpty()
-    @ApiProperty()
-    positions: AdPosition
 
 }
 

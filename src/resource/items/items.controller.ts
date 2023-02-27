@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Put } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { ApiTags } from '@nestjs/swagger';
@@ -21,7 +21,9 @@ export class ItemsController {
         type: dto.type, 
         types: dto.types, 
         value: dto.value,
-        parentId: dto.parentId
+        parentId: dto.parentId,
+        input: dto.input, 
+        max: dto.max
       })
       return item 
     } catch (error) {
@@ -33,6 +35,16 @@ export class ItemsController {
   async getItems() {
     try {
       let items = await this.model.find()
+      return items
+    } catch (error) {
+      throw new HttpException(error, 500)
+    }
+  }
+
+  @Put()
+  async updateItems() {
+    try {
+      let items = await this.model.update({}, {$set: {'max': ''}})
       return items
     } catch (error) {
       throw new HttpException(error, 500)
