@@ -60,6 +60,9 @@ export class Ad {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'users' })
   user: User;
+
+  @Prop({type: mongoose.Schema.Types.Array, ref: 'users'})
+  views?: User[]
 }
 
 export const AdSchema = SchemaFactory.createForClass(Ad);

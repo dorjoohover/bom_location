@@ -15,6 +15,6 @@ import { SuggestionService } from './suggestion.service';
 ],
   controllers: [AdController, ],
   providers: [AdService, SuggestionService, S3Service, CategoryService  ],
-  exports: []
+  exports: [S3Service]
 })
 export class AdModule {}

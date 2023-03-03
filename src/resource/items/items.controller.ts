@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, Put } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { ApiTags } from '@nestjs/swagger';
 import { Model } from 'mongoose';
 import { Item, ItemDocument } from 'src/schema';
-import { CreateItemDto } from './items.dto';
+import { CreateItemDto, updateItemDetail } from './items.dto';
 import { ItemsService } from './items.service';
 @Controller('items')
 @ApiTags('Items')
@@ -46,6 +46,18 @@ export class ItemsController {
     try {
       let items = await this.model.update({}, {$set: {'max': ''}})
       return items
+    } catch (error) {
+      throw new HttpException(error, 500)
+    }
+  }
+
+  @Patch()
+  async updateItemById(@Body() dto: updateItemDetail,) {
+    try {
+      let item = await this.model.findByIdAndUpdate(dto.id, {
+        value : dto.value
+      })
+      return item
     } catch (error) {
       throw new HttpException(error, 500)
     }

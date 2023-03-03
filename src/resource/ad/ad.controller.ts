@@ -91,6 +91,19 @@ export class AdController {
         return this.service.updateStatusAd(id, AdStatus.deleted)
     }
     
+    @Get('view/:id/:userId')
+    @ApiParam({name: 'id'})
+    async viewAd(@Param('id') id: string, @Param('userId') userId: string)  {
+        let ad = await this.service.getAdById(id)
+        if(ad.views.find(a => a.toString() == userId) == undefined && ad.user.toString() != userId) {
+             await this.model.findByIdAndUpdate(ad._id, {
+                $push: { views: userId },
+              });
+              console.log(ad.views.length)
+              return ad.views.length + 1
+        }
+    }
+
     @Get('search/:value')
     @ApiQuery({name: 'value'})
     @ApiOperation({description: "search ad"})
@@ -164,8 +177,17 @@ export class AdController {
         return this.service.getAdById(id)
     }
 
-    
-    @Delete()
+    @Delete('/:id')
+    @ApiParam({name: 'id'})
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth('access-token')
+    @ApiOperation({description: "zar create leh"})
+    @UseInterceptors(FileFieldsInterceptor([{
+        name: 'images', maxCount: 20
+      }]))
+    deleteAdById(@Request() {user}, @Param('id') id: string) {
+        return  this.service.deleteAdByUserId(id, user)
+    }
     async deleteAds() 
     {
         return await this.model.deleteMany()

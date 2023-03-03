@@ -70,6 +70,7 @@ export enum ItemType {
 export enum AdType {
   sell = 'sell',
   rent = 'rent',
+  sellRent = 'sellRent'
 }
 export enum CategorySuggestionTypes {
   'room',
