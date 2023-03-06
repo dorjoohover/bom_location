@@ -181,10 +181,8 @@ export class AdController {
     @ApiParam({name: 'id'})
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth('access-token')
-    @ApiOperation({description: "zar create leh"})
-    @UseInterceptors(FileFieldsInterceptor([{
-        name: 'images', maxCount: 20
-      }]))
+    @ApiOperation({description: "zar ustgah leh"})
+
     deleteAdById(@Request() {user}, @Param('id') id: string) {
         return  this.service.deleteAdByUserId(id, user)
     }

@@ -41,6 +41,8 @@ export class Item {
     input?: string
     @Prop()
     max?: string
+    @Prop()
+    other: boolean
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item)

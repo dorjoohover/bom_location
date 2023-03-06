@@ -165,7 +165,7 @@ export class AdService {
   }
   async deleteAdByUserId(id: string,  user: any ,) {
     try {
-      let ad = await this.model.deleteOne({_id: id})
+      let ad = await this.updateStatusAd( id, AdStatus.deleted)
     await this.userModel.findByIdAndUpdate(user['_id'], {
       $pull: {ads: id}
     })

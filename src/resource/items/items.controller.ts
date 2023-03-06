@@ -1,7 +1,8 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, Put } from '@nestjs/common';
+import { Param } from '@nestjs/common/decorators';
 
 import { InjectModel } from '@nestjs/mongoose';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { Model } from 'mongoose';
 import { Item, ItemDocument } from 'src/schema';
 import { CreateItemDto, updateItemDetail } from './items.dto';
@@ -41,10 +42,11 @@ export class ItemsController {
     }
   }
 
-  @Put()
-  async updateItems() {
+  @Put('/:id')
+  @ApiParam({name: 'id'})
+  async updateItems(@Param('id') id: string) {
     try {
-      let items = await this.model.update({}, {$set: {'max': ''}})
+      let items = await this.model.updateOne({_id: id}, {$set: {'other': true}})
       return items
     } catch (error) {
       throw new HttpException(error, 500)
