@@ -36,6 +36,8 @@ export class UpdateUserDto {
 
     @ApiProperty()
     phone?: string
+    @ApiProperty()
+    birthday?: string
 
     @ApiProperty()
     password?: string
@@ -43,8 +45,8 @@ export class UpdateUserDto {
     @ApiProperty({enum: UserType, default: UserType.default})
     userType?: UserType
 
-    @ApiProperty({isArray: true})
-    socials?: []
+    @ApiProperty()
+    socials?: any
 
 }
 

@@ -17,7 +17,8 @@ export class User  {
     @Prop()
     username: string
 
-
+    @Prop()
+    profileImg?: string
 
     @Prop()
     ads: string[]
@@ -40,6 +41,8 @@ socials: Social[]
     @Prop({required: true, default: 0})
     point: number
 
+    @Prop()
+    birthday?: string
     @Prop()
     bookmarks: number[]
 

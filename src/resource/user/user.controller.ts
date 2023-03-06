@@ -2,11 +2,11 @@ import { Body, Controller, Get, HttpException, Put, Request } from '@nestjs/comm
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { Param, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserAccessGuard } from 'src/guard/user.guard';
+import { S3Service } from '../ad/s3.service';
 import { UpdateUserDto } from './user.dto';
 import { UserService } from './user.service';
-import { S3Service } from '../ad/s3.service';
-import { FileInterceptor } from '@nestjs/platform-express';
 @ApiTags('User')
 
 @Controller('user')
@@ -36,10 +36,17 @@ export class UserController {
     @ApiBearerAuth("access-token")
     @UseInterceptors(FileInterceptor('file'))
     @Put()
-     editUser(@Request() {user}, @Body() dto: UpdateUserDto, @UploadedFile() file: Express.Multer.File) {
+    async  editUser(@Request() {user}, @Body() dto: UpdateUserDto, @UploadedFile() file: Express.Multer.File) {
+       
         if(!user) throw new HttpException('user not found', 400)
-        console.log(file)
-        return this.service.editUser(user, dto)    
+        dto.socials = JSON.parse(dto.socials)
+        let imageUrl , key
+        if(file) {
+             key = `${file.originalname}${Date.now()}`
+             imageUrl = await this.s3Service.uploadFile(file, key)
+        }
+
+        return this.service.editUser(user, dto, imageUrl ?? '')    
     }
 
 
