@@ -85,7 +85,7 @@ export class AdService {
  
     try {
       let ad = await this.model
-      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType', this.categoryModel).populate('user', 'phone username email', this.userModel)
+      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType', this.categoryModel).populate('user', 'phone username email profileImg', this.userModel)
       if (!ad) throw new ForbiddenException('not found ad');
     return ad;
     } catch (error) {
