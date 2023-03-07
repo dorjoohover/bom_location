@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestj
 import { Model } from 'mongoose';
 import { AdStatus } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
-import { Ad, AdDocument } from 'src/schema';
+import { Ad, AdDocument, Category, CategoryDocument } from 'src/schema';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
 import { S3Service } from './s3.service';
@@ -16,7 +16,7 @@ import { SuggestionService } from './suggestion.service';
 @Controller('ad')
 
 export class AdController {
-    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service) {}
+    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service, @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>) {}
 
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth('access-token')
@@ -125,12 +125,14 @@ export class AdController {
     }
 
 
-    @Post('many/:num')
+    @Post('many/:num/:self')
     @ApiParam({name: 'num'})
-    async manyAdById( @Body() dto: [], @Param('num') num: number) {
-        let ads = await this.model.find({'_id' : {$in: dto}}).sort({ createdAt: 'desc' }).limit((num+1) * 10).skip(num * 10);
+    @ApiParam({name: 'self'})
+    async manyAdById( @Body() dto: [], @Param('num') num: number, @Param('self') self: string) {
+        let ads = await this.model.find({$and: [{'_id' : {$in: dto},}, self == 'true' ? {$or: [{'adStatus': 'created'}, {'adStatus': 'pending'}]} : {'adStatus': 'created'}]}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit((num+1) * 10).skip(num * 10);
+        
         let limit = 0
-        limit = await this.model.count({'_id' : {$in: dto}})
+        limit = await this.model.count({$and: [{'_id' : {$in: dto},}, self == 'true' ? {$or: [{'adStatus': 'created'}, {'adStatus': 'pending'}]} : {'adStatus': 'created'}]})
         if(!ads) throw new HttpException('not found', HttpStatus.NOT_FOUND) 
         return {ads, limit}
     }
@@ -160,16 +162,21 @@ export class AdController {
 
     @ApiOperation({description: "zar value gaar filter"})
     @Get('filter/:id/:value/:num')
+    @ApiParam({name: 'id'})
+    @ApiParam({name: 'num'})
+    @ApiParam({name: 'value'})
     getFilterByValueAd(@Param('id') id: string, @Param('value') value: string, @Param('num') num: number) {
-        
-        return this.service.getAdByFilterValue(id, value, num)
+        let input = Buffer.from(value, 'utf-8').toString()
+        return this.service.getAdByFilterValue(id, input, num)
 
     }
-    // @ApiOperation({description: "suggest zar enum aar awah  "})
-    // @Get('suggesstion')
-    // getSuggestion(@Body() data: SuggestionDto) {
-    //     return this.service.getAdByFilterValue(data.)
-    // }
+    @ApiOperation({description: "suggest zar enum aar awah  "})
+    @Get('suggesstion/:type/:value/:num')
+
+    getSuggestion(@Param('type') type: string, @Param('value') value: string, num: number) {
+        let input = Buffer.from(value, 'utf-8').toString()
+        return this.service.getAdByFilterValue(type, input, num)
+    }
     @Get('id/:id')
     @ApiParam({name: 'id', })
     @ApiOperation({description: "zariig id gaar ni awna"})
@@ -186,9 +193,9 @@ export class AdController {
     deleteAdById(@Request() {user}, @Param('id') id: string) {
         return  this.service.deleteAdByUserId(id, user)
     }
-    async deleteAds() 
-    {
-        return await this.model.deleteMany()
-    }
+    // async deleteAds() 
+    // {
+    //     return await this.model.deleteMany()
+    // }
     
 }
