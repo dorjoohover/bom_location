@@ -152,7 +152,8 @@ export class AdController {
     
     @ApiOperation({description: "zar filterdene"})
     @Post('filter')
-    getFilterAd(@Body() filterAd: FilterAdDto) {
+
+    getFilterAd(@Body() filterAd: FilterAdDto ) {
         
 
         return this.service.getAdByFilter(filterAd)

@@ -126,7 +126,7 @@ export class AdService {
    
   }
 
-  async getAdByFilter(filterAd: FilterAdDto) {
+  async getAdByFilter(filterAd: FilterAdDto,) {
 
       try {
         
@@ -138,7 +138,7 @@ export class AdService {
         let fad  = []
         ad.filters.forEach(a => {
           let add = filterAd.filters.find((f) => {
-            
+
             if(f.max != "") {
               if(f.input != '')
               return (f.type == a.type && parseInt(f.max) >= parseInt(a.input) && parseInt(a.input) >= parseInt(f.input))
@@ -158,7 +158,10 @@ export class AdService {
       })
 
     
-      return filteredAds
+      return {
+        ads: filteredAds,
+        limit: filteredAds.length
+      }
       } catch (error) {
         throw new HttpException(error, 500)
       }
