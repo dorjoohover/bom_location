@@ -132,9 +132,11 @@ export class AdService {
         
         // 'filters': {$elemMatch: {'name': {$in: filtersValue}, 'value': {$in: filtersValue} }}, 
         let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'subCategory': filterAd.subCategory, adStatus: 'created'}).sort({ createdAt: 'desc' });
+   
+   
       let filteredAds = []
       ads.forEach((ad) => {
-
+ 
         let fad  = []
         ad.filters.forEach(a => {
           let add = filterAd.filters.find((f) => {

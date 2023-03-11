@@ -99,7 +99,6 @@ export class AdController {
              await this.model.findByIdAndUpdate(ad._id, {
                 $push: { views: userId },
               });
-              console.log(ad.views.length)
               return ad.views.length + 1
         }
     }
