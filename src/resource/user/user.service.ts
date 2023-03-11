@@ -33,13 +33,15 @@ export class UserService {
   async editUser(user: UserDocument, dto: UpdateUserDto, image?: string) {
     
         try {
-            user.password = dto.password;
-            user.phone = dto.phone;
-            user.userType = dto.userType
-            user.username = dto.username
-            user.birthday = dto.birthday
-            user.socials = dto.socials
-            user.profileImg = image
+
+          let img = image != "" ? image : user.profileImg
+
+            user.phone = dto.phone ?? user.phone;
+            user.userType = dto.userType ?? user.userType
+            user.username = dto.username ?? user.username
+            user.birthday = dto.birthday ??  user.birthday
+            user.socials = dto.socials ?? user.socials
+            user.profileImg = img
             user.save()
             return user
         } catch (error) {

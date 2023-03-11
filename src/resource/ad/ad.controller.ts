@@ -129,10 +129,14 @@ export class AdController {
     @ApiParam({name: 'num'})
     @ApiParam({name: 'self'})
     async manyAdById( @Body() dto: [], @Param('num') num: number, @Param('self') self: string) {
-        let ads = await this.model.find({$and: [{'_id' : {$in: dto},}, self == 'true' ? {$or: [{'adStatus': 'created'}, {'adStatus': 'pending'}]} : {'adStatus': 'created'}]}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit((num+1) * 10).skip(num * 10);
-        
-        let limit = 0
-        limit = await this.model.count({$and: [{'_id' : {$in: dto},}, self == 'true' ? {$or: [{'adStatus': 'created'}, {'adStatus': 'pending'}]} : {'adStatus': 'created'}]})
+        let ads = [], limit = 0
+        try {
+           ads = await this.model.find({$and: [{'_id' : {$in: dto}, }, self == 'true' ? {} : {'adStatus': 'created'}]}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit((num+1) * 10).skip(num * 10);
+           limit =  await this.model.count({$and: [{'_id' : {$in: dto}, }, self == 'true' ? {} : {'adStatus': 'created'}]})
+        } catch (error) {
+            throw new HttpException(error, 500)
+        }
+
         if(!ads) throw new HttpException('not found', HttpStatus.NOT_FOUND) 
         return {ads, limit}
     }
@@ -191,8 +195,14 @@ export class AdController {
     @ApiBearerAuth('access-token')
     @ApiOperation({description: "zar ustgah leh"})
 
-    deleteAdById(@Request() {user}, @Param('id') id: string) {
-        return  this.service.deleteAdByUserId(id, user)
+    async deleteAdById(@Request() {user}, @Param('id') id: string) {
+        try {
+            let ad = await this.service.updateStatusAd(user['_id'], AdStatus.deleted)
+            if(ad) return true
+            throw new HttpException('can not delete ad', 400)
+        } catch (error) {
+            throw new HttpException(error, 500)
+        }
     }
     // async deleteAds() 
     // {

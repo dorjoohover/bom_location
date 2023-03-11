@@ -166,15 +166,5 @@ export class AdService {
         throw new HttpException(error, 500)
       }
   }
-  async deleteAdByUserId(id: string,  user: any ,) {
-    try {
-      let ad = await this.updateStatusAd( id, AdStatus.deleted)
-    await this.userModel.findByIdAndUpdate(user['_id'], {
-      $pull: {ads: id}
-    })
-    return true
-    } catch (error) {
-      throw new HttpException(error, 500)
-    }
-  }
+
 }

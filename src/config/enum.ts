@@ -90,7 +90,7 @@ export enum CreateAdSteps {
 export enum UserType {
   default = 'default',
   agent = 'agent',
-  orgazation = 'orgazation',
+  organization = 'organization',
   admin = 'admin',
   system = 'system'
 }
