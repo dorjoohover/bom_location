@@ -45,9 +45,11 @@ export class AuthController {
     @ApiOperation({description: "login hiih"})
     async login(@Body() dto: LoginUser) {
         const user = await this.service.login(dto)
-        if(user && user.status == 'active') {
-            const token = await this.service.signPayload(user.email )
+        if(user ) {
+            
+                const token = await this.service.signPayload(user.email )
             return {user, token}
+            
         } else {
             return false
         }

@@ -51,7 +51,7 @@ export class AuthService {
             
             if(dto.email != null && dto.password != null && dto.password != "") {
                 let user = await this.model.findOne({email: dto.email})
-                if(!user) return {message: 'И-майл хаяг буруу байна.'}
+                if(!user) return false
                 let password = user.password
                 if(!user.password) throw new HttpException('system error', 500)
               
@@ -60,7 +60,7 @@ export class AuthService {
                     
                     return user
                 } else {
-                    return {message: 'Нууц үг буруу байна.'}
+                    return false
                 }
                
              
