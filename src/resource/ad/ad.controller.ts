@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Request, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Put } from '@nestjs/common/decorators';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -186,6 +187,22 @@ export class AdController {
     @ApiOperation({description: "zariig id gaar ni awna"})
     getAdById(@Param('id') id:string) {
         return this.service.getAdById(id)
+    }
+
+
+    @Put('/:id')
+    @ApiParam({name: 'id'})
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth('access-token')
+    @ApiOperation({description: "zar ustgah leh"})
+
+    async editAd(@Request() {user}, @Param('id') id: string, @Body() dto: any) {
+        try {
+            let ad = await this.model.updateOne({_id: id}, dto)
+            return ad
+        } catch (error) {
+            throw new HttpException(error, 500)
+        }
     }
 
     @Delete('/:id')
