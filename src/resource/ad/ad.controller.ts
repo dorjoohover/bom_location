@@ -63,6 +63,22 @@ export class AdController {
         limit: limit
     };
     }
+    @Get('admin/:num')
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth('access-token')
+    @ApiParam({name: 'num'})
+    async getAll(@Request() {user}, @Param('num') num: number) {
+
+        let ads = await this.model.find().sort({ createdAt: 'desc' }).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit(20).skip(num*20)
+        let limit = 0
+        limit = await this.model.count()
+    if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+
+    return {
+        ads: ads, 
+        limit: limit
+    };
+    }
 
     
    
