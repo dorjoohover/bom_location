@@ -213,7 +213,7 @@ export class AdController {
 
     async deleteAdById(@Request() {user}, @Param('id') id: string) {
         try {
-            let ad = await this.service.updateStatusAd(user['_id'], AdStatus.deleted)
+            let ad = await this.service.updateStatusAd(id, AdStatus.deleted)
             if(ad) return true
             throw new HttpException('can not delete ad', 400)
         } catch (error) {
