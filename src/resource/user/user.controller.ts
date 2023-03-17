@@ -34,6 +34,26 @@ export class UserController {
 
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth("access-token")
+    @Get("point/:id/:point")
+    @ApiParam({name: 'id'})
+    @ApiParam({name: 'point'})
+    async sendPoint(@Request() {user} , @Param('id') id: string, @Param('point') point: number) {
+        if(!user) throw new HttpException('user not found', 400)
+        let receiver = await this.service.getUserById(id)
+        if(!receiver) return {message: 'not found receiver', status: 400}
+        if(user.point > point) {
+            user.point = user.point - point
+            await user.save()
+            receiver.point = receiver.point + point
+            await receiver.save()
+            return {message: 'success' , status: 200}
+        }
+        return {message: 'not enough points' , status: 400}
+       
+    }
+    
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth("access-token")
     @UseInterceptors(FileInterceptor('file'))
     @Put()
     async  editUser(@Request() {user}, @Body() dto: UpdateUserDto, @UploadedFile() file: Express.Multer.File) {

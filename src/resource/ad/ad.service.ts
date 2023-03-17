@@ -58,7 +58,7 @@ export class AdService {
     let ads = await this.model.find({$or: [{$and: [{createdAt: {$lt: lateDate}}, {adStatus: AdStatus.created}]}, {$and: [{updatedAt: {$lt: deletedDate}},{adStatus: AdStatus.deleted} ]}]})
  
     ads.map(async (ad) => {
-       return await this.updateStatusAd(ad._id, AdStatus.timed )
+       return await this.updateStatusAd(ad._id, AdStatus.timed, "", true )
     })
     return ads
   }
@@ -74,12 +74,20 @@ export class AdService {
       throw new HttpException('server error', 500)
     }
   }
-  async updateStatusAd(id: string, status: AdStatus) {
+  async updateStatusAd(id: string, status: AdStatus, user: string, isAdmin : boolean ) {
     try {
-      let ad = await this.model.findByIdAndUpdate(id, {
-        adStatus: status
-      })
-      return ad
+      if(isAdmin) {
+
+        let ad =  await this.model.findByIdAndUpdate(id, {
+          adStatus: status,
+        }) 
+        return ad
+      } else {
+       let ad = await this.model.findOne({_id: id, user: user})
+       ad.adStatus = status
+       ad.save()
+       return ad
+      }
     } catch (error) {
       throw new HttpException('server error', 500)
     }

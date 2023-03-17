@@ -88,9 +88,18 @@ export class AdController {
     
     @Get('update/:id/:status')
     @ApiParam({name: 'id', })
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth('access-token')
     @ApiOperation({description: "admin aas zar id gaar verify hiine"})
-    verifyAd(@Param('id') id: string, @Param('status') status) {
-        return this.service.updateStatusAd(id, status)
+    updateStatusAd(@Request() {user} , @Param('id') id: string, @Param('status') status) {
+        if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
+        if(user.userType == 'admin' || user.userType == 'system') {
+
+            return this.service.updateStatusAd(id, status, "", true)
+        } else {
+            return this.service.updateStatusAd(id, status, user['_id'], false)
+
+        }
     }
 
     @Get('view/:id/:userId')
@@ -190,11 +199,26 @@ export class AdController {
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth('access-token')
     @ApiOperation({description: "zar ustgah leh"})
-
-    async editAd(@Request() {user}, @Param('id') id: string, @Body() dto: any) {
+    @UseInterceptors(FileFieldsInterceptor([{
+        name: 'images', maxCount: 20
+      }]))
+    async editAd(@Request() {user}, @Param('id') id: string, @Body() dto: CreateAdDto, @UploadedFiles() files: {images?: Express.Multer.File[] }) {
         try {
-            let ad = await this.model.updateOne({_id: id}, dto)
-            return ad
+            if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
+            console.log(dto)
+            console.log(files?.images.length)
+            console.log(dto.images)
+            let imagesUrl = []
+        for(let i = 0; i < (files?.images?.length ?? 0); i++ ){
+            
+            const key = `${files.images[i].originalname}${Date.now()}`
+            const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
+            await imagesUrl.push(imageUrl)
+        }
+        console.log(imagesUrl)
+            // let ad = await this.model.updateOne({_id: id}, dto)
+            // return ad
+            return
         } catch (error) {
             throw new HttpException(error, 500)
         }
@@ -208,7 +232,7 @@ export class AdController {
 
     async deleteAdById(@Request() {user}, @Param('id') id: string) {
         try {
-            let ad = await this.service.updateStatusAd(user['_id'], AdStatus.deleted)
+            let ad = await this.service.updateStatusAd(id, AdStatus.deleted, user['_id'], false)
             if(ad) return true
             throw new HttpException('can not delete ad', 400)
         } catch (error) {

@@ -34,6 +34,7 @@ export class AuthService {
                         email: dto.email,
                         phone: dto.phone,
                         password: hashed,
+                        point: 1000
                       });
                     return createdUser
                 } else {

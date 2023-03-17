@@ -98,8 +98,8 @@ export class CreateAdDto {
     types: string[]
 
 
-    // @ApiProperty({isArray: true})
-    // images: string
+    @ApiProperty({isArray: true})
+    images: string
 
 }
 
