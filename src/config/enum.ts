@@ -65,6 +65,7 @@ export enum ItemType {
   officeName = 'officeName',
   buildingName = 'buildingName',
   tradeService = 'tradeService',
+  buildingProcess = 'buildingProcess'
 }
 
 export enum AdType {

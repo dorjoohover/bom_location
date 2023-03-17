@@ -51,11 +51,14 @@ export class AdService {
 
 
   async updateStatusTimed() {
-    const date = Number(Date.now())
-    const lateDate = new Date(date - 60)
-    let ads = await this.model.find({createdAt: {$lt: lateDate}})
+    const date =  Date.now()
+    const deletedDate = date - (3 * 24 * 60 * 60 * 1000)
+    const lateDate = date - (60 * 24 * 60 * 60 * 1000)
+  
+    let ads = await this.model.find({$or: [{$and: [{createdAt: {$lt: lateDate}}, {adStatus: AdStatus.created}]}, {$and: [{updatedAt: {$lt: deletedDate}},{adStatus: AdStatus.deleted} ]}]})
+ 
     ads.map(async (ad) => {
-      return await this.updateStatusAd(ad._id, AdStatus.timed )
+       return await this.updateStatusAd(ad._id, AdStatus.timed )
     })
     return ads
   }
@@ -85,7 +88,7 @@ export class AdService {
  
     try {
       let ad = await this.model
-      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType', this.categoryModel).populate('user', 'phone username email profileImg', this.userModel)
+      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType isSearch', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel)
       if (!ad) throw new ForbiddenException('not found ad');
     return ad;
     } catch (error) {

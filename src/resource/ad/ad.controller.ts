@@ -3,8 +3,10 @@ import { Put } from '@nestjs/common/decorators';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Cron } from '@nestjs/schedule/dist';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Model } from 'mongoose';
+
 import { AdStatus } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import { Ad, AdDocument, Category, CategoryDocument } from 'src/schema';
@@ -12,13 +14,15 @@ import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
 import { S3Service } from './s3.service';
 import { SuggestionService } from './suggestion.service';
-
 @ApiTags('Ads')
 @Controller('ad')
 
 export class AdController {
-    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service, @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>) {}
+    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service, @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>) {
 
+    }
+   
+   
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth('access-token')
     @Post()
@@ -37,7 +41,7 @@ export class AdController {
             const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
             await imagesUrl.push(imageUrl)
         }
-        
+
         dto.filters = JSON.parse(dto.filters)
         if(dto.location)
         dto.location = JSON.parse(dto.location)
@@ -53,7 +57,7 @@ export class AdController {
     @ApiParam({name: 'num'})
     async getAllAds(@Param('num') num: number) {
 
-        let ads = await this.model.find({adStatus: 'created'}).sort({ createdAt: 'desc' }).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit(10).skip(num*10)
+        let ads = await this.model.find({adStatus: 'created'}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit(10).skip(num*10)
         let limit = 0
         limit = await this.model.count({adStatus: 'created'})
     if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
@@ -69,7 +73,7 @@ export class AdController {
     @ApiParam({name: 'num'})
     async getAll(@Request() {user}, @Param('num') num: number) {
 
-        let ads = await this.model.find().sort({ createdAt: 'desc' }).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit(20).skip(num*20)
+        let ads = await this.model.find({adStatus: {$ne: AdStatus.timed}}).sort({ createdAt: 'desc' }).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit(20).skip(num*20)
         let limit = 0
         limit = await this.model.count()
     if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
@@ -81,33 +85,14 @@ export class AdController {
     }
 
     
-   
-    @Get('/notVerify/:num')
-    @ApiOperation({description: "adminaas verify daagui zariig harna"})
-    @ApiParam({name: 'num'})
-    async getAdNotVerified(@Param('num') num: number) {
-        
-        let ads = await this.model.find({adStatus: 'pending'}).sort({ createdAt: 'desc' }).limit((num+1)*20);
-        let limit = 0
-        limit = await this.model.count({adStatus: 'pending'})
-        if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
-        return {ads, limit};
-    }
     
-    @Get('check/:id')
+    @Get('update/:id/:status')
     @ApiParam({name: 'id', })
     @ApiOperation({description: "admin aas zar id gaar verify hiine"})
-    verifyAd(@Param('id') id) {
-        return this.service.updateStatusAd(id, AdStatus.created)
+    verifyAd(@Param('id') id: string, @Param('status') status) {
+        return this.service.updateStatusAd(id, status)
     }
 
-    @Get('delete/:id')
-    @ApiParam({name: 'id', })
-    @ApiOperation({description: "admin aas zar id gaar delete hiine"})
-    deleteAd(@Param('id') id) {
-        return this.service.updateStatusAd(id, AdStatus.deleted)
-    }
-    
     @Get('view/:id/:userId')
     @ApiParam({name: 'id'})
     async viewAd(@Param('id') id: string, @Param('userId') userId: string)  {
@@ -125,19 +110,12 @@ export class AdController {
     @ApiOperation({description: "search ad"})
     async searchAd(@Query('value') value: string) {
         
-        let ads = await this.model.find( {$text: {$search: value}}).sort({ createdAt: 'desc' });
+        let ads = await this.model.find( {$text: {$search: value}, adStatus: AdStatus.created});
         let limit = 0
         limit = await this.model.count({$text: {$search: value}})
       
         if(!ads) throw new HttpException('not found', 403)
         return {ads, limit, }
-    }
-
-    @Get('sold/:id')
-    @ApiParam({name: 'id', })
-    @ApiOperation({description: "zariig ig gaar ni status iig ni sold bolgono"})
-    soldAd(@Param('id') id) {
-        return this.service.updateStatusAd(id, AdStatus.sold)
     }
 
 
@@ -147,8 +125,8 @@ export class AdController {
     async manyAdById( @Body() dto: [], @Param('num') num: number, @Param('self') self: string) {
         let ads = [], limit = 0
         try {
-           ads = await this.model.find({$and: [{'_id' : {$in: dto}, }, self == 'true' ? {} : {'adStatus': 'created'}]}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit((num+1) * 10).skip(num * 10);
-           limit =  await this.model.count({$and: [{'_id' : {$in: dto}, }, self == 'true' ? {} : {'adStatus': 'created'}]})
+           ads = await this.model.find({$and: [{'_id' : {$in: dto}, }, self == 'true' ? {$ne: {adStatus: AdStatus.timed}} : {'adStatus': 'created'}]}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit((num+1) * 10).skip(num * 10);
+           limit =  await this.model.count({$and: [{'_id' : {$in: dto}, }, self == 'true' ? {$ne: {adStatus: AdStatus.timed}} : {'adStatus': 'created'}]})
         } catch (error) {
             throw new HttpException(error, 500)
         }
@@ -156,11 +134,12 @@ export class AdController {
         if(!ads) throw new HttpException('not found', HttpStatus.NOT_FOUND) 
         return {ads, limit}
     }
-
+    @Cron('* * * 1 * *')
     @Get('timed')
     @ApiOperation({description: "todorhoi hugatsaa heterwel status g ni timed bolgono"})
     updateStatisTimed() {
-        return this.service.updateStatusTimed()
+        let ad = this.service.updateStatusTimed()
+        return ad
     }
     
     @ApiParam({name: 'id', })
