@@ -68,6 +68,11 @@ export enum ItemType {
   buildingProcess = 'buildingProcess'
 }
 
+export enum PointSendType {
+  sender = 'sender',
+  receiver = 'receiver'
+}
+
 export enum AdType {
   sell = 'sell',
   rent = 'rent',
