@@ -1,6 +1,6 @@
 import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema';
 import { UpdateUserDto } from './user.dto';
 
@@ -18,7 +18,11 @@ export class UserService {
   }
 
   async getUserById(id: string) {
-    return await this.model.findById(id)
+    if(mongoose.Types.ObjectId.isValid(id)) {
+      return await this.model.findById(id)
+    }else {
+      return await this.model.findOne({email: id})
+    }
   }
 
   async getUserByEmailOrPhone(email: string,) {
