@@ -110,7 +110,7 @@ export class AdService {
       let category = await this.categoryService.getCategoryById(id)
       
     let ads = await this.model
-      .find({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'}).sort({ createdAt: 'desc' }).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit((num+1) * 20).skip(num * 20);
+      .find({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'}).sort({ createdAt: 'desc' }).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel).limit((num+1) * 20).skip(num * 20);
       let limit = 0
         limit = await this.model.count({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'})
 
