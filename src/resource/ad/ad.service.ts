@@ -19,7 +19,7 @@ export class AdService {
     private categoryService: CategoryService
   ) {}
 
-  async createAd(dto: CreateAdDto, user: any ,  images: any) {
+  async createAd(dto: CreateAdDto, user: any ) {
    
     let prevAd = await this.model.findOne().sort({createdAt: 'desc'})
     let adNum = 1
@@ -27,7 +27,7 @@ export class AdService {
     try {
        let ad = await this.model.create({
         num: adNum ,
-        images: images,
+        images: dto.images,
         title: dto.title,
         description: dto.description,
         location: dto.location,

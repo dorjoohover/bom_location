@@ -21,32 +21,46 @@ export class AdController {
     constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service, @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>) {
 
     }
-   
-   
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth('access-token')
-    @Post()
+    @Post('uploadFields')
     @ApiOperation({description: "zar create leh"})
     @UseInterceptors(FileFieldsInterceptor([{
         name: 'images', maxCount: 20
       }]))
-    async createAd( @Request() {user}, @Body() dto: CreateAdDto, @UploadedFiles() files: {images?: Express.Multer.File[] }) {
+  async uploadMultipleFiles(@Request() {user} , @UploadedFiles() files: {images?: Express.Multer.File[] }) {
+      let imagesUrl = []
+    for(let i = 0; i < (files?.images?.length ?? 0); i++ ){
+        const key = `${files.images[i].originalname}${Date.now()}`
+        const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
+        await imagesUrl.push(imageUrl)
+    }
+    return imagesUrl
+  }
+
+       
+        
+    
+    
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth('access-token')
+    @Post()
+
+    async createAd( @Request() {user}, @Body() dto: CreateAdDto,) {
         
         // return dto
         if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
-        let imagesUrl = []
-        for(let i = 0; i < (files?.images?.length ?? 0); i++ ){
-            
-            const key = `${files.images[i].originalname}${Date.now()}`
-            const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
-            await imagesUrl.push(imageUrl)
-        }
+
 
         dto.filters = JSON.parse(dto.filters)
         if(dto.location)
         dto.location = JSON.parse(dto.location)
-       
-        return this.service.createAd(dto, user,  imagesUrl)
+        if(dto.images) 
+        {
+            let image = dto.images.split(',')
+            dto.images = image
+        }
+        return this.service.createAd(dto, user)
         
     }
     
@@ -199,26 +213,33 @@ export class AdController {
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth('access-token')
     @ApiOperation({description: "zar ustgah leh"})
-    @UseInterceptors(FileFieldsInterceptor([{
-        name: 'images', maxCount: 20
-      }]))
-    async editAd(@Request() {user}, @Param('id') id: string, @Body() dto: CreateAdDto, @UploadedFiles() files: {images?: Express.Multer.File[] }) {
-        try {
-            if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
+    async editAd(@Request() {user}, @Param('id') id: string, @Body() dto: CreateAdDto) {
+        if (!user) throw new HttpException("UNAUTHORIZATION_ERROR", 403);
             console.log(dto)
-            console.log(files?.images.length)
-            console.log(dto.images)
-            let imagesUrl = []
-        for(let i = 0; i < (files?.images?.length ?? 0); i++ ){
-            
-            const key = `${files.images[i].originalname}${Date.now()}`
-            const imageUrl = await this.s3Service.uploadFile(files.images[i], key)
-            await imagesUrl.push(imageUrl)
-        }
-        console.log(imagesUrl)
-            // let ad = await this.model.updateOne({_id: id}, dto)
-            // return ad
-            return
+            console.log(id)
+            dto.filters = JSON.parse(dto.filters)
+            if(dto.location) {
+
+                dto.location = JSON.parse(dto.location)
+            }
+            if(dto.images) 
+            {
+                let image = dto.images.split(',')
+
+                dto.images = image
+            }
+            let ad = await this.model.findById(id)
+
+            try {
+            ad.filters = dto.filters
+            ad.location = dto.location
+            ad.images = dto.images
+            ad.title = dto.title
+            ad.description = dto.description,
+            ad.adType = dto.adTypes
+            ad.adStatus = AdStatus.pending
+            await ad.save()
+            return ad
         } catch (error) {
             throw new HttpException(error, 500)
         }
@@ -239,9 +260,10 @@ export class AdController {
             throw new HttpException(error, 500)
         }
     }
-    // async deleteAds() 
-    // {
-    //     return await this.model.deleteMany()
-    // }
+    @Delete()
+    async deleteAds() 
+    {
+        return await this.model.deleteMany()
+    }
     
 }
