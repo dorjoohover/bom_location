@@ -7,6 +7,7 @@ export default () => ({
   s3bucket: process.env.S3BUCKET,
   s3region: process.env.S3REGION,
   link: process.env.LINK,
+  forgotPassword: process.env.FORGOTPASSWORD,
   nodemailerPort: process.env.nodemailerPort,
   nodemailerUser: process.env.nodemailerUser,
   nodemailerPass: process.env.nodemailerPass,
