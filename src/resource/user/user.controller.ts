@@ -43,7 +43,7 @@ export class UserController {
         let receiver = await this.service.getUserById(id)
         if(!receiver) return {message: 'not found receiver', status: 400}
         if(user.point > point) {
-            user.point = user.point - point
+            user.point = Number.parseFloat(user.point.toString()) - Number.parseFloat(point.toString())
             user.pointHistory.push({
                 point: point,
                 sender: user['_id'],
@@ -51,7 +51,7 @@ export class UserController {
                 type: PointSendType.sender
             })
             await user.save()
-            receiver.point = receiver.point + point
+            receiver.point = Number.parseFloat(receiver.point.toString()) + Number.parseFloat(point.toString())
             receiver.pointHistory.push({
                 point: point,
                 sender: user['_id'],
