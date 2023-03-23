@@ -7,10 +7,11 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Res
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import appConfig from 'src/config/app.config';
@@ -41,7 +42,7 @@ export class AuthController {
       .catch((err) => console.log(err));
   }
 
-  async sendForgotPasswordMail(email: string, code: string) {
+  async sendForgetPasswordMail(email: string, code: string) {
     await this.mailservice
       .sendMail({
         to: email,
@@ -80,26 +81,26 @@ export class AuthController {
     }
   }
 
-  @Get('forgot/:email')
-  @ApiParam({name: 'email'})
-  async forgotSendEmail(@Param('email') email: string,) {
+  @Get('forget')
+  @ApiQuery({name: 'email'})
+  async forgetSendEmail(@Query('email') email: string,) {
     let user = await this.model.findOne({ email });
     if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
-    await this.sendForgotPasswordMail(email, user.code)
+    await this.sendForgetPasswordMail(email, user.code)
     return true;
   }
-  @Get('forgot/password/:code')
+  @Get('forget/password/:code')
   @ApiParam({name: 'code'})
-  async forgotSendPassword(@Param('code') code: string, @Res() res) {
+  async forgetSendPassword(@Param('code') code: string, @Res() res) {
     let user = await this.model.findOne({ code });
     if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
     return res.redirect(appConfig().forgotPassword);
   }
 
-  @Post('forgot/:code')
+  @Post('forget/:code')
   @ApiParam({name: 'code'})
-  async forgotEditPassword(@Param('code') code: string, @Body() dto: {password: string},) {
+  async forgetEditPassword(@Param('code') code: string, @Body() dto: {password: string},) {
     let user = await this.model.findOne({ code });
     if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
