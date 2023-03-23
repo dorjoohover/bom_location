@@ -50,7 +50,7 @@ export class AuthController {
         html: `<h1>Email Confirmation</h1>
            
                 <p>Forgot password</p>
-                <a href=http://bom-location.herokuapp.com/auth/forgot/password/${code}> Click here</a>
+                <a href=http://bom-location.herokuapp.com/auth/forget/password/${code}> Click here</a>
                 </div>`,
       })
       .catch((err) => console.log(err));
@@ -95,7 +95,7 @@ export class AuthController {
     let user = await this.model.findOne({ code });
     if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
-    return res.redirect(appConfig().forgotPassword);
+    return res.redirect(`https://bom-vv.vercel.app/forget/${code}`);
   }
 
   @Post('forget/:code')
