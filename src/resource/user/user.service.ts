@@ -1,6 +1,6 @@
 import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema';
 import { UpdateUserDto } from './user.dto';
 
@@ -18,7 +18,11 @@ export class UserService {
   }
 
   async getUserById(id: string) {
-    return await this.model.findById(id)
+    if(mongoose.Types.ObjectId.isValid(id)) {
+      return await this.model.findById(id)
+    }else {
+      return await this.model.findOne({email: id})
+    }
   }
 
   async getUserByEmailOrPhone(email: string,) {
@@ -33,13 +37,15 @@ export class UserService {
   async editUser(user: UserDocument, dto: UpdateUserDto, image?: string) {
     
         try {
-            user.password = dto.password;
-            user.phone = dto.phone;
-            user.userType = dto.userType
-            user.username = dto.username
-            user.birthday = dto.birthday
-            user.socials = dto.socials
-            user.profileImg = image
+
+          let img = image != "" ? image : user.profileImg
+
+            user.phone = dto.phone ?? user.phone;
+            user.userType = dto.userType ?? user.userType
+            user.username = dto.username ?? user.username
+            user.birthday = dto.birthday ??  user.birthday
+            user.socials = dto.socials ?? user.socials
+            user.profileImg = img
             user.save()
             return user
         } catch (error) {

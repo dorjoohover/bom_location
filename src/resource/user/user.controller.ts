@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { Param, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import { S3Service } from '../ad/s3.service';
 import { UpdateUserDto } from './user.dto';
@@ -32,6 +33,40 @@ export class UserController {
         return this.service.getUserById(id)
     }
 
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth("access-token")
+    @Get("point/:id/:point")
+    @ApiParam({name: 'id'})
+    @ApiParam({name: 'point'})
+    async sendPoint(@Request() {user} , @Param('id') id: string, @Param('point') point: number) {
+        if(!user) throw new HttpException('user not found', 400)
+        let receiver = await this.service.getUserById(id)
+        if(!receiver) return {message: 'not found receiver', status: 400}
+        if(user.point > point) {
+            user.point = user.point - point
+            user.pointHistory.push({
+                point: point,
+                sender: user['_id'],
+                receiver: receiver._id,
+                type: PointSendType.sender
+            })
+            await user.save()
+            receiver.point = receiver.point + point
+            receiver.pointHistory.push({
+                point: point,
+                sender: user['_id'],
+                receiver: receiver._id,
+                type: PointSendType.receiver
+            })
+            await receiver.save()
+            
+            
+            return {message: 'success' , status: 200}
+        }
+        return {message: 'not enough points' , status: 400}
+       
+    }
+    
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth("access-token")
     @UseInterceptors(FileInterceptor('file'))

@@ -65,6 +65,12 @@ export enum ItemType {
   officeName = 'officeName',
   buildingName = 'buildingName',
   tradeService = 'tradeService',
+  buildingProcess = 'buildingProcess'
+}
+
+export enum PointSendType {
+  sender = 'sender',
+  receiver = 'receiver'
 }
 
 export enum AdType {
@@ -90,7 +96,7 @@ export enum CreateAdSteps {
 export enum UserType {
   default = 'default',
   agent = 'agent',
-  orgazation = 'orgazation',
+  organization = 'organization',
   admin = 'admin',
   system = 'system'
 }

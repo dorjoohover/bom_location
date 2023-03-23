@@ -34,6 +34,7 @@ export class AuthService {
                         email: dto.email,
                         phone: dto.phone,
                         password: hashed,
+                        point: 1000
                       });
                     return createdUser
                 } else {
@@ -48,9 +49,10 @@ export class AuthService {
   
     async login(dto: LoginUser) {
         try {
-            if(dto.email != null && dto.password !=null) {
+            
+            if(dto.email != null && dto.password != null && dto.password != "") {
                 let user = await this.model.findOne({email: dto.email})
-                if(!user) throw new HttpException('wrong email', HttpStatus.BAD_REQUEST)
+                if(!user) return false
                 let password = user.password
                 if(!user.password) throw new HttpException('system error', 500)
               
@@ -59,7 +61,7 @@ export class AuthService {
                     
                     return user
                 } else {
-                    throw new HttpException('wrong password', HttpStatus.BAD_REQUEST)
+                    return false
                 }
                
              

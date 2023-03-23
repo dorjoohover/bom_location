@@ -19,7 +19,7 @@ export class AdService {
     private categoryService: CategoryService
   ) {}
 
-  async createAd(dto: CreateAdDto, user: any ,  images: any) {
+  async createAd(dto: CreateAdDto, user: any ) {
    
     let prevAd = await this.model.findOne().sort({createdAt: 'desc'})
     let adNum = 1
@@ -27,7 +27,7 @@ export class AdService {
     try {
        let ad = await this.model.create({
         num: adNum ,
-        images: images,
+        images: dto.images,
         title: dto.title,
         description: dto.description,
         location: dto.location,
@@ -51,11 +51,14 @@ export class AdService {
 
 
   async updateStatusTimed() {
-    const date = Number(Date.now())
-    const lateDate = new Date(date - 60)
-    let ads = await this.model.find({createdAt: {$lt: lateDate}})
+    const date =  Date.now()
+    const deletedDate = date - (3 * 24 * 60 * 60 * 1000)
+    const lateDate = date - (60 * 24 * 60 * 60 * 1000)
+  
+    let ads = await this.model.find({$or: [{$and: [{createdAt: {$lt: lateDate}}, {adStatus: AdStatus.created}]}, {$and: [{updatedAt: {$lt: deletedDate}},{adStatus: AdStatus.deleted} ]}]})
+ 
     ads.map(async (ad) => {
-      return await this.updateStatusAd(ad._id, AdStatus.timed )
+       return await this.updateStatusAd(ad._id, AdStatus.timed, "", true )
     })
     return ads
   }
@@ -71,12 +74,20 @@ export class AdService {
       throw new HttpException('server error', 500)
     }
   }
-  async updateStatusAd(id: string, status: AdStatus) {
+  async updateStatusAd(id: string, status: AdStatus, user: string, isAdmin : boolean ) {
     try {
-      let ad = await this.model.findByIdAndUpdate(id, {
-        adStatus: status
-      })
-      return ad
+      if(isAdmin) {
+
+        let ad =  await this.model.findByIdAndUpdate(id, {
+          adStatus: status,
+        }) 
+        return ad
+      } else {
+       let ad = await this.model.findOne({_id: id, user: user})
+       ad.adStatus = status
+       ad.save()
+       return ad
+      }
     } catch (error) {
       throw new HttpException('server error', 500)
     }
@@ -85,7 +96,7 @@ export class AdService {
  
     try {
       let ad = await this.model
-      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType', this.categoryModel).populate('user', 'phone username email profileImg', this.userModel)
+      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType isSearch', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel)
       if (!ad) throw new ForbiddenException('not found ad');
     return ad;
     } catch (error) {
@@ -99,7 +110,7 @@ export class AdService {
       let category = await this.categoryService.getCategoryById(id)
       
     let ads = await this.model
-      .find({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'}).sort({ createdAt: 'desc' }).limit((num+1) * 20).skip(num * 20);
+      .find({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'}).sort({ createdAt: 'desc' }).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel).limit((num+1) * 20).skip(num * 20);
       let limit = 0
         limit = await this.model.count({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'})
 
@@ -126,19 +137,21 @@ export class AdService {
    
   }
 
-  async getAdByFilter(filterAd: FilterAdDto) {
+  async getAdByFilter(filterAd: FilterAdDto,) {
 
       try {
         
         // 'filters': {$elemMatch: {'name': {$in: filtersValue}, 'value': {$in: filtersValue} }}, 
         let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'subCategory': filterAd.subCategory, adStatus: 'created'}).sort({ createdAt: 'desc' });
+   
+   
       let filteredAds = []
       ads.forEach((ad) => {
-
+ 
         let fad  = []
         ad.filters.forEach(a => {
           let add = filterAd.filters.find((f) => {
-            
+
             if(f.max != "") {
               if(f.input != '')
               return (f.type == a.type && parseInt(f.max) >= parseInt(a.input) && parseInt(a.input) >= parseInt(f.input))
@@ -158,20 +171,13 @@ export class AdService {
       })
 
     
-      return filteredAds
+      return {
+        ads: filteredAds,
+        limit: filteredAds.length
+      }
       } catch (error) {
         throw new HttpException(error, 500)
       }
   }
-  async deleteAdByUserId(id: string,  user: any ,) {
-    try {
-      let ad = await this.updateStatusAd( id, AdStatus.deleted)
-    await this.userModel.findByIdAndUpdate(user['_id'], {
-      $pull: {ads: id}
-    })
-    return true
-    } catch (error) {
-      throw new HttpException(error, 500)
-    }
-  }
+
 }

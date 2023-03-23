@@ -73,7 +73,7 @@ export class CreateAdDto {
     
 
     @ApiProperty()
-    location: string
+    location: any
 
     
     @ApiProperty({enum: AdTypes, default: AdTypes.default})
@@ -83,7 +83,7 @@ export class CreateAdDto {
     adStatus: AdStatus
 
     @ApiProperty()
-    filters: string
+    filters: any
 
     @IsString()
     @IsNotEmpty()
@@ -98,8 +98,8 @@ export class CreateAdDto {
     types: string[]
 
 
-    // @ApiProperty({isArray: true})
-    // images: string
+    @ApiProperty({isArray: true})
+    images: any
 
 }
 

@@ -43,6 +43,9 @@ export class Item {
     max?: string
     @Prop()
     other: boolean
+
+    @Prop({default: false})
+    isSearch: boolean
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item)

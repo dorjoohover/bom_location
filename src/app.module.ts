@@ -2,6 +2,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
 import appConfig from './config/app.config';
 import { AdModule } from './resource/ad/ad.module';
 import { AuthModule } from './resource/auth/auth.module';
@@ -11,6 +12,7 @@ import { UserModule } from './resource/user/user.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:'.env'

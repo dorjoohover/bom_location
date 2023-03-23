@@ -42,6 +42,18 @@ export class ItemsController {
     }
   }
 
+  @Get('/:type')
+  @ApiParam({name: 'type'})
+  async getByType(@Param('type') type: string) {
+    try {
+      let item = await this.model.findOne({type: type})
+      if(!item) throw new HttpException('not found', HttpStatus.NOT_FOUND)
+      return item
+    } catch (error) {
+      throw new HttpException(error, 500)
+    }
+  }
+
   @Put('/:id')
   @ApiParam({name: 'id'})
   async updateItems(@Param('id') id: string) {

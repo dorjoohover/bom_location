@@ -120,9 +120,9 @@ export class CategoryService {
     try {
       let subCategory 
     if(mongoose.Types.ObjectId.isValid(id))  {
-      subCategory = await this.model.findById(id).populate(isFilter == 'true' ? 'filters' : 'steps.values', 'name value types type input max parentId other', this.itemModel).populate('subCategory', 'name english href' ,this.model).exec();
+      subCategory = await this.model.findById(id).populate(isFilter == 'true' ? 'filters' : 'steps.values', 'name value types type input max parentId other isSearch', this.itemModel).populate('subCategory', 'name english href' ,this.model).exec();
     } else {
-      subCategory = await this.model.findOne({href: id}).populate(isFilter == 'true' ? 'filters' : 'steps.values', 'name value types type input max parentId other', this.itemModel).populate('subCategory', 'name english href' ,this.model).exec();
+      subCategory = await this.model.findOne({href: id}).populate(isFilter == 'true' ? 'filters' : 'steps.values', 'name value types type input max parentId other isSearch', this.itemModel).populate('subCategory', 'name english href' ,this.model).exec();
     }
     if (!subCategory)
       throw new HttpException('not found', HttpStatus.NOT_FOUND);
