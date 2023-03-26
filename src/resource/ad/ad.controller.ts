@@ -216,13 +216,13 @@ export class AdController {
 
 
     @ApiOperation({description: "zar value gaar filter"})
-    @Get('filter/:id/:value/:num')
+    @Get('filter/:cateId/:id/:value/:num')
     @ApiParam({name: 'id'})
     @ApiParam({name: 'num'})
     @ApiParam({name: 'value'})
-    getFilterByValueAd(@Param('id') id: string, @Param('value') value: string, @Param('num') num: number) {
+    getFilterByValueAd(@Param('cateId') cateId: string, @Param('id') id: string, @Param('value') value: string, @Param('num') num: number) {
         let input = Buffer.from(value, 'utf-8').toString()
-        return this.service.getAdByFilterValue(id, input, num)
+        return this.service.getAdByFilterValue(cateId, id, input, num)
 
     }
     @ApiOperation({description: "suggest zar enum aar awah  "})
