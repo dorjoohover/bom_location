@@ -2,9 +2,12 @@ import { Body, Controller, Get, HttpException, Put, Request } from '@nestjs/comm
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { Param, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
+import { InjectModel } from '@nestjs/mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Model } from 'mongoose';
 import { PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
+import { User, UserDocument } from 'src/schema';
 import { S3Service } from '../ad/s3.service';
 import { UpdateUserDto } from './user.dto';
 import { UserService } from './user.service';
@@ -12,7 +15,7 @@ import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly service: UserService, private s3Service: S3Service) {}
+    constructor(private readonly service: UserService, private s3Service: S3Service, @InjectModel(User.name) private model : Model<UserDocument>) {}
 
     @Get()
     getAllUser() {
@@ -23,7 +26,10 @@ export class UserController {
     @Get('me')
     async getUserByEmail(@Request() {user}) {
         if (!user) return null
-        return user
+        
+        let res = await this.model.findById(user._id).populate('pointHistory.sender','id username phone email', this.model).populate('pointHistory.receiver','id username phone email' ,this.model)
+        
+        return res
   
     }
 
