@@ -226,11 +226,11 @@ export class AdController {
 
     }
     @ApiOperation({description: "suggest zar enum aar awah  "})
-    @Get('suggesstion/:type/:value/:num')
+    @Get('suggesstion/:id/:type/:value/:num')
 
-    getSuggestion(@Param('type') type: string, @Param('value') value: string, num: number) {
+    getSuggestion(@Param('type') type: string, @Param('value') value: string, @Param('id') id: string,  num: number) {
         let input = Buffer.from(value, 'utf-8').toString()
-        return this.service.getAdByFilterValue(type, input, num)
+        return this.service.getAdByFilterValue(id, type, input, num)
     }
     @Get('id/:id')
     @ApiParam({name: 'id', })

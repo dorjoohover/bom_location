@@ -139,11 +139,11 @@ export class AdService {
 
   }
 
-  async getAdByFilterValue(id: string, value: string, num: number) {
+  async getAdByFilterValue(categoryId: string, id: string, value: string, num: number) {
     try {
-      let ads = await this.model.find({$and: [{'filters.input': value}, {'filters.type': id}, {'adStatus': 'created'}]}).limit((num + 1) * 10).skip(num * 10)
+      let ads = await this.model.find({$and: [{'filters.input': value}, {'filters.type': id}, {'adStatus': 'created'}, {'subCategory': categoryId}]}).limit((num + 1) * 10).skip(num * 10)
       let limit = 0
-      limit = await this.model.count({$and: [{'filters.input': value}, {'filters.type': id}, {'adStatus': 'created'}]})
+      limit = await this.model.count({$and: [{'filters.input': value}, {'filters.type': id}, {'adStatus': 'created'}, {'subCategory': categoryId}]})
       return {ads, limit}
     } catch (error) {
       throw new HttpException(error, 500)
