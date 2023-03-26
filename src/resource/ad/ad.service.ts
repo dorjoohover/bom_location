@@ -1,7 +1,7 @@
 import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AdStatus } from 'src/config/enum';
+import { AdStatus, AdTypes } from 'src/config/enum';
 import {
   Ad,
   AdDocument, Category, CategoryDocument, User, UserDocument
@@ -61,6 +61,21 @@ export class AdService {
        return await this.updateStatusAd(ad._id, AdStatus.timed, "", true )
     })
     return ads
+  }
+
+  async updateTypeAd(id:string, type: AdTypes, isTrue: boolean) {
+    try {
+      if(isTrue) {
+        let ad = await this.model.findByIdAndUpdate(id, {
+          adType: type
+        })
+        return true
+      } else {
+        return false
+      }
+    } catch(err) {
+      throw new HttpException(err, 500)
+    }
   }
 
   async getAdsByUserId(id: string) {

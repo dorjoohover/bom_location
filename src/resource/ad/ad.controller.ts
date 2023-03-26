@@ -5,15 +5,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Cron } from '@nestjs/schedule/dist';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 
-import { AdStatus } from 'src/config/enum';
+import { AdStatus, AdTypes, PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import { Ad, AdDocument, Category, CategoryDocument } from 'src/schema';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
 import { S3Service } from './s3.service';
 import { SuggestionService } from './suggestion.service';
+
 @ApiTags('Ads')
 @Controller('ad')
 
@@ -164,7 +165,38 @@ export class AdController {
         let ad = this.service.updateStatusTimed()
         return ad
     }
-    
+
+    @Get('adType/:id')
+    @ApiParam({name: 'id', })
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth('access-token')
+    async updateAdTypeSpecial(@Request() {user}, @Param('id') id: string, ) {
+        try {
+            if(user.point >= 10000) {
+                let receiver = new mongoose.mongo.ObjectId('641fc3b3bc1f3f56080e1f83')
+                let res = await this.service.updateTypeAd(id, AdTypes.special, true)
+                if(res) {
+
+                    user.point = Number.parseFloat(user.point.toString()) - 10000
+                    user.pointHistory.push({
+                        point: 10000,
+                        sender: user['_id'],
+                        receiver: receiver,
+                        type: PointSendType.sender
+                    })
+                    user.save()
+                    return true
+                } else {
+                    return false
+                }
+                
+            }
+        } catch (error) {
+            throw new HttpException(error, 500)
+        }
+    }
+
+
     @ApiParam({name: 'id', })
     @ApiOperation({description: "zar g category id gaar awna"})
     @Get('category/:id/:num')

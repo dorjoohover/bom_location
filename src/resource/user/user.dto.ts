@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
-import { UserType } from "src/config/enum";
+import { PointSendType, UserType } from "src/config/enum";
 
 export class CreateUserDto {
     @IsEmail()
@@ -55,5 +55,19 @@ export class AddBookmarkDto {
     @IsNotEmpty()
     @ApiProperty()
     adId: string
+
+}
+
+export class PointHistory {
+    @ApiProperty()
+    point?: number
+
+    @ApiProperty()
+    sender?: string
+    @ApiProperty()
+    receiver?: string
+
+    @ApiProperty({enum: PointSendType,})
+    type?: PointSendType
 
 }

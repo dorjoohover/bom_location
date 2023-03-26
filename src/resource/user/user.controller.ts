@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpException, Put, Request } from '@nestjs/common';
-import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-import { Param, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
+import { Param, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
@@ -35,20 +35,22 @@ export class UserController {
 
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth("access-token")
-    @Get("point/:id/:point")
+    @Get("point/:id/:point/:message")
     @ApiParam({name: 'id'})
     @ApiParam({name: 'point'})
-    async sendPoint(@Request() {user} , @Param('id') id: string, @Param('point') point: number) {
+    @ApiQuery({name: 'message'})
+    async sendPoint(@Request() {user} , @Param('id') id: string, @Param('point') point: number, @Query('message') message: string) {
         if(!user) throw new HttpException('user not found', 400)
         let receiver = await this.service.getUserById(id)
         if(!receiver) return {message: 'not found receiver', status: 400}
-        if(user.point > point) {
+        if(user.point >= point) {
             user.point = Number.parseFloat(user.point.toString()) - Number.parseFloat(point.toString())
             user.pointHistory.push({
                 point: point,
                 sender: user['_id'],
                 receiver: receiver._id,
-                type: PointSendType.sender
+                type: PointSendType.sender,
+                message: message ?? ""
             })
             await user.save()
             receiver.point = Number.parseFloat(receiver.point.toString()) + Number.parseFloat(point.toString())
@@ -56,7 +58,8 @@ export class UserController {
                 point: point,
                 sender: user['_id'],
                 receiver: receiver._id,
-                type: PointSendType.receiver
+                type: PointSendType.receiver,
+                message: message ?? ""
             })
             await receiver.save()
             

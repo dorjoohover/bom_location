@@ -25,6 +25,9 @@ export class PointHistory {
     @Prop({ type: String, enum: PointSendType,  })
     type: PointSendType;
 
+    @Prop()
+    message: string
+
 }
 @Schema({timestamps: true})
 export class User  {
