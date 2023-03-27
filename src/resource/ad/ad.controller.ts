@@ -19,7 +19,7 @@ import { SuggestionService } from './suggestion.service';
 @Controller('ad')
 
 export class AdController {
-    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service, @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>),@InjectModel(User.name) private userModel: Model<UserDocument> {
+    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service, @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>, @InjectModel(User.name) private userModel: Model<UserDocument>)  {
 
     }
     @UseGuards(UserAccessGuard)
