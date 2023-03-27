@@ -9,7 +9,7 @@ import mongoose, { Model } from 'mongoose';
 
 import { AdStatus, AdTypes, PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
-import { Ad, AdDocument, Category, CategoryDocument } from 'src/schema';
+import { Ad, AdDocument, Category, CategoryDocument, User, UserDocument } from 'src/schema';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
 import { S3Service } from './s3.service';
@@ -19,7 +19,7 @@ import { SuggestionService } from './suggestion.service';
 @Controller('ad')
 
 export class AdController {
-    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service, @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>) {
+    constructor(private readonly service:AdService, private suggestionService: SuggestionService, @InjectModel(Ad.name) private model: Model<AdDocument>, private s3Service: S3Service, @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>),@InjectModel(User.name) private userModel: Model<UserDocument> {
 
     }
     @UseGuards(UserAccessGuard)
@@ -72,7 +72,7 @@ export class AdController {
     @ApiParam({name: 'num'})
     async getAllAds(@Param('num') num: number) {
 
-        let ads = await this.model.find({adStatus: 'created'}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit(10).skip(num*10)
+        let ads = await this.model.find({adStatus: 'created'}).populate('user', 'id phone email username profileImg', this.userModel).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).limit(10).skip(num*10)
         let limit = 0
         limit = await this.model.count({adStatus: 'created'})
     if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
