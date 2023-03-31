@@ -134,7 +134,7 @@ export class AdController {
       .populate('subCategory', 'id name', this.categoryModel)
       .limit(10)
       .skip(num * 10);
-    let defaultLimit = 10;
+    let defaultLimit = defaultAds.length;
     if (!defaultAds) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
     let specialAds = await this.model
       .find({ isView: true, adType: AdTypes.special })
@@ -143,9 +143,10 @@ export class AdController {
       .populate('subCategory', 'id name', this.categoryModel)
       .limit(10)
       .skip(num * 4);
-    let specialLimit = 4;
+    let specialLimit = specialAds.length;
 
-    if (!specialAds) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+    if (!specialAds) throw new HttpException('not found special ad', HttpStatus.NOT_FOUND);
+    if (!specialAds) throw new HttpException('not found default ad', HttpStatus.NOT_FOUND);
 
     return {
         defaultAds: {
