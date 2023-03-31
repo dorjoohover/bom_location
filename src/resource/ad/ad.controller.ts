@@ -1,17 +1,17 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  Post,
-  Query,
-  Request,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Post,
+    Query,
+    Request,
+    UploadedFiles,
+    UseGuards,
+    UseInterceptors
 } from '@nestjs/common';
 import { Put } from '@nestjs/common/decorators';
 
@@ -19,11 +19,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Cron } from '@nestjs/schedule/dist';
 import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
+    ApiBearerAuth,
+    ApiOperation,
+    ApiParam,
+    ApiQuery,
+    ApiTags
 } from '@nestjs/swagger';
 import mongoose, { Model } from 'mongoose';
 import { S3Service } from 'src/aws/s3.service';
@@ -31,12 +31,12 @@ import { S3Service } from 'src/aws/s3.service';
 import { AdStatus, AdTypes, PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import {
-  Ad,
-  AdDocument,
-  Category,
-  CategoryDocument,
-  User,
-  UserDocument,
+    Ad,
+    AdDocument,
+    Category,
+    CategoryDocument,
+    User,
+    UserDocument
 } from 'src/schema';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
@@ -127,21 +127,36 @@ export class AdController {
   @ApiOperation({ description: 'buh zariig harna' })
   @ApiParam({ name: 'num' })
   async getAllAds(@Param('num') num: number) {
-    let ads = await this.model
-      .find({ isView: true })
+    let defaultAds = await this.model
+      .find({ isView: true, $or: [{adType: AdTypes.default}, {adType: AdTypes.sharing}] })
       .populate('user', 'id phone email username profileImg', this.userModel)
       .populate('category', 'id name', this.categoryModel)
       .populate('subCategory', 'id name', this.categoryModel)
       .limit(10)
       .skip(num * 10);
-    let limit = 0;
-    limit = await this.model.count({ isView: true });
-    if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+    let defaultLimit = 10;
+    if (!defaultAds) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+    let specialAds = await this.model
+      .find({ isView: true, adType: AdTypes.special })
+      .populate('user', 'id phone email username profileImg', this.userModel)
+      .populate('category', 'id name', this.categoryModel)
+      .populate('subCategory', 'id name', this.categoryModel)
+      .limit(10)
+      .skip(num * 4);
+    let specialLimit = 4;
+
+    if (!specialAds) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
 
     return {
-      ads: ads,
-      limit: limit,
-    };
+        defaultAds: {
+            ads: defaultAds,
+            limit: defaultLimit
+        },
+        specialAds: {
+            ads: specialAds,
+            limit: specialLimit
+        },
+    }
   }
   @Get('admin/:num')
   @UseGuards(UserAccessGuard)
@@ -257,14 +272,7 @@ export class AdController {
         .populate('subCategory', 'id name', this.categoryModel)
         .limit((num + 1) * 10)
         .skip(num * 10);
-      limit = await this.model.count({
-        $and: [
-          { _id: { $in: dto } },
-          self == 'true'
-            ? { $ne: { adStatus: AdStatus.timed } }
-            : { isView: true },
-        ],
-      });
+      limit = ads.length;
     } catch (error) {
       throw new HttpException(error, 500);
     }

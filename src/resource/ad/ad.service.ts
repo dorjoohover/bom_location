@@ -138,16 +138,29 @@ export class AdService {
     try {
       let category = await this.categoryService.getCategoryById(id)
       
-    let ads = await this.model
-      .find({$or: [{subCategory: category._id}, {category: category._id}] , isView: true}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel).limit((num+1) * 20).skip(num * 20);
-      let limit = 0
-        limit = await this.model.count({$or: [{subCategory: category._id}, {category: category._id}] ,isView: true})
+    let defaultAds = await this.model
+      .find({$or: [{subCategory: category._id}, {category: category._id}] , isView: true, $or: [{adType: AdTypes.default}, {adType: AdTypes.sharing}]}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel).limit((num+1) * 20).skip(num * 20);
+      let defaultLimit = 0
+      defaultLimit = defaultAds.length
+    let specialAds = await this.model
+      .find({$or: [{subCategory: category._id}, {category: category._id}] , isView: true, adType: AdTypes.special}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel).limit((num+1) * 20).skip(num * 20);
+      let specialLimit = 0
+      specialLimit = defaultAds.length
 
-    if (!ads) throw new ForbiddenException('not found ad');
+    if (!defaultAds) throw new ForbiddenException('not found default ad');
+    if (!specialAds) throw new ForbiddenException('not found special ad');
     
-    return {ads, limit};
+    return {
+      defaultAds: {
+          ads: defaultAds,
+          limit: defaultLimit
+      },
+      specialAds: {
+          ads: specialAds,
+          limit: specialLimit
+      },
+    }
     } catch (error) {
-      console.log(error)
       throw new HttpException(error, 500)
     }
 
