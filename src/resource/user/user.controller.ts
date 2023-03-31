@@ -56,6 +56,23 @@ export class UserController {
         }
     }
 
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth("access-token")
+    @Get("feedback")
+    async getFeedback(@Request() {user} , @Body() dto: FeedbackDto) {
+        try {
+            if(user.userType == 'admin' || user.userType == 'system') {
+                
+            let feedbacks = await this.feedbackModel.find().sort({createdAt: 'desc'})
+            if(!feedbacks) return false
+             return feedbacks
+            }
+            return false
+        } catch (error) {
+            throw new HttpException('error', 500)
+        }
+    }
+
 
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth("access-token")

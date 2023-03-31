@@ -1,17 +1,17 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpException,
-    HttpStatus,
-    Param,
-    Post,
-    Query,
-    Request,
-    UploadedFiles,
-    UseGuards,
-    UseInterceptors
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Request,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Put } from '@nestjs/common/decorators';
 
@@ -19,24 +19,24 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Cron } from '@nestjs/schedule/dist';
 import {
-    ApiBearerAuth,
-    ApiOperation,
-    ApiParam,
-    ApiQuery,
-    ApiTags
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
 } from '@nestjs/swagger';
 import mongoose, { Model } from 'mongoose';
 import { S3Service } from 'src/aws/s3.service';
 
-import { AdStatus, AdTypes, PointSendType } from 'src/config/enum';
+import { AdStatus, AdType, AdTypes, PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import {
-    Ad,
-    AdDocument,
-    Category,
-    CategoryDocument,
-    User,
-    UserDocument
+  Ad,
+  AdDocument,
+  Category,
+  CategoryDocument,
+  User,
+  UserDocument,
 } from 'src/schema';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
@@ -126,14 +126,18 @@ export class AdController {
   @ApiParam({ name: 'num' })
   async getAllAds(@Param('num') num: number) {
     let defaultAds = await this.model
-      .find({ isView: true, $or: [{adType: AdTypes.default}, {adType: AdTypes.sharing}] })
+      .find({
+        isView: true,
+        $or: [{ adType: AdTypes.default }, { adType: AdTypes.sharing }],
+      })
       .populate('user', 'id phone email username profileImg', this.userModel)
       .populate('category', 'id name', this.categoryModel)
       .populate('subCategory', 'id name', this.categoryModel)
       .limit(10)
       .skip(num * 10);
     let defaultLimit = defaultAds.length;
-    if (!defaultAds) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+    if (!defaultAds)
+      throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
     let specialAds = await this.model
       .find({ isView: true, adType: AdTypes.special })
       .populate('user', 'id phone email username profileImg', this.userModel)
@@ -143,39 +147,82 @@ export class AdController {
       .skip(num * 4);
     let specialLimit = specialAds.length;
 
-    if (!specialAds) throw new HttpException('not found special ad', HttpStatus.NOT_FOUND);
-    if (!specialAds) throw new HttpException('not found default ad', HttpStatus.NOT_FOUND);
+    if (!specialAds)
+      throw new HttpException('not found special ad', HttpStatus.NOT_FOUND);
+    if (!specialAds)
+      throw new HttpException('not found default ad', HttpStatus.NOT_FOUND);
 
     return {
-        defaultAds: {
-            ads: defaultAds,
-            limit: defaultLimit
-        },
-        specialAds: {
-            ads: specialAds,
-            limit: specialLimit
-        },
-    }
+      defaultAds: {
+        ads: defaultAds,
+        limit: defaultLimit,
+      },
+      specialAds: {
+        ads: specialAds,
+        limit: specialLimit,
+      },
+    };
   }
-  @Get('admin/:num')
+
+  @Get('admin/:type')
+  @UseGuards(UserAccessGuard)
+  @ApiBearerAuth('access-token')
+  @ApiParam({ name: 'type' })
+  async getAll(@Request() { user }, @Param('type') type) {
+    if (user.userType == 'admin' || user.userType == 'system') {
+      let ads =
+        type == AdTypes.sharing
+          ? await this.model
+              .find()
+              .populate('category', 'id name', this.categoryModel)
+              .populate('subCategory', 'id name', this.categoryModel)
+          : await this.model
+              .find()
+              .populate('category', 'id name', this.categoryModel)
+              .populate('subCategory', 'id name', this.categoryModel);
+
+      if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+
+      return ads;
+    }
+    return false;
+  }
+
+  @Get('admin/:type/:num')
   @UseGuards(UserAccessGuard)
   @ApiBearerAuth('access-token')
   @ApiParam({ name: 'num' })
-  async getAll(@Request() { user }, @Param('num') num: number) {
-    let ads = await this.model
-      .find()
-      .populate('category', 'id name', this.categoryModel)
-      .populate('subCategory', 'id name', this.categoryModel)
-      .limit(20)
-      .skip(num * 20);
-    let limit = 0;
-    limit = await this.model.count();
-    if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+  @ApiParam({ name: 'type' })
+  async getAllByNum(
+    @Request() { user },
+    @Param('type') type,
+    @Param('num') num: number,
+  ) {
+    if (user.userType == 'admin' || user.userType == 'system') {
+      let ads =
+        type == 'sharing'
+          ? await this.model
+              .find({ adType: AdTypes.sharing })
+              .populate('category', 'id name', this.categoryModel)
+              .populate('subCategory', 'id name', this.categoryModel)
+              .limit(20)
+              .skip(num * 20)
+          : await this.model
+              .find()
+              .populate('category', 'id name', this.categoryModel)
+              .populate('subCategory', 'id name', this.categoryModel)
+              .limit(20)
+              .skip(num * 20);
+      let limit = 0;
+      limit = ads.length;
+      if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
 
-    return {
-      ads: ads,
-      limit: limit,
-    };
+      return {
+        ads: ads,
+        limit: limit,
+      };
+    }
+    return false;
   }
 
   @Get('update/:id/:status/:isView/:message')
@@ -353,11 +400,16 @@ export class AdController {
     return this.service.getAdByFilterValue(cateId, id, input, num);
   }
 
-  @ApiOperation({description: "suggest ad by enum"})
+  @ApiOperation({ description: 'suggest ad by enum' })
   @Get('suggestion/:id/:type/:value/:num')
-  getSuggestion(@Param('type') type: string, @Param('value') value: string, @Param('id') id: string,  num: number) {
-      let input = Buffer.from(value, 'utf-8').toString()
-      return this.service.getAdByFilterValue(id, type, input, num)
+  getSuggestion(
+    @Param('type') type: string,
+    @Param('value') value: string,
+    @Param('id') id: string,
+    num: number,
+  ) {
+    let input = Buffer.from(value, 'utf-8').toString();
+    return this.service.getAdByFilterValue(id, type, input, num);
   }
 
   @Get('id/:id')

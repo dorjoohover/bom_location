@@ -1,6 +1,7 @@
 import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
+import { UserType } from 'src/config/enum';
 import { User, UserDocument } from 'src/schema';
 import { UpdateUserDto } from './user.dto';
 
@@ -46,6 +47,12 @@ export class UserService {
             user.birthday = dto.birthday ??  user.birthday
             user.socials = dto.socials ?? user.socials
             user.profileImg = img
+            if(dto.userType == UserType.agent) {
+              user.agentAddition = dto.agentAddition
+            }
+            if(dto.userType == UserType.organization) {
+              user.organizationAddition = dto.organizationAddition
+            }
             user.save()
             return user
         } catch (error) {

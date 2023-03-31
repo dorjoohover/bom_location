@@ -1,6 +1,38 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 import { PointSendType, UserType } from "src/config/enum";
+import { AdLocation } from "../ad/ad.dto";
+
+
+export class AgentAdditionDto {
+    @ApiProperty()
+    organizationName: string
+    @ApiProperty()
+    organizationContract: string
+    @ApiProperty()
+    identityCardFront: string
+    @ApiProperty()
+    identityCardBack: string
+    @ApiProperty()
+    location: AdLocation
+    @ApiProperty()
+    firstName: string
+    @ApiProperty()
+    lastName: string
+    @ApiProperty()
+    registerNumber: string
+
+}
+export class OrganizationAdditionDto {
+    @ApiProperty()
+    organizationName: string
+    @ApiProperty()
+    organizationCertificationCopy: string
+    @ApiProperty()
+    location: AdLocation
+    @ApiProperty()
+    organizationRegisterNumber: string
+}
 
 export class CreateUserDto {
     @IsEmail()
@@ -27,6 +59,7 @@ export class CreateUserDto {
     @ApiProperty({enum: UserType, default: UserType.default})
     userType: UserType
 
+
 }
 export class UpdateUserDto {
 
@@ -48,6 +81,12 @@ export class UpdateUserDto {
     @ApiProperty()
     socials?: any
 
+    
+    @ApiProperty({type: AgentAdditionDto})
+    agentAddition: AgentAdditionDto
+    @ApiProperty({type:  OrganizationAdditionDto })
+    organizationAddition:  OrganizationAdditionDto
+    
 }
 
 export class AddBookmarkDto {
