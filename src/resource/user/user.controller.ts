@@ -1,21 +1,21 @@
-import { Body, Controller, Get, HttpException, Put, Request } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { Param, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
 import { InjectModel } from '@nestjs/mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Model } from 'mongoose';
-import { PointSendType } from 'src/config/enum';
+import { PointSendType, PointTitle } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
-import { User, UserDocument } from 'src/schema';
+import { Feedback, FeedbackDocument, User, UserDocument } from 'src/schema';
 import { S3Service } from '../ad/s3.service';
-import { UpdateUserDto } from './user.dto';
+import { FeedbackDto, UpdateUserDto } from './user.dto';
 import { UserService } from './user.service';
 @ApiTags('User')
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly service: UserService, private s3Service: S3Service, @InjectModel(User.name) private model : Model<UserDocument>) {}
+    constructor(private readonly service: UserService, private s3Service: S3Service, @InjectModel(User.name) private model : Model<UserDocument>, @InjectModel(Feedback.name) private feedbackModel: Model<FeedbackDocument>) {}
 
     @Get()
     getAllUser() {
@@ -41,6 +41,24 @@ export class UserController {
 
     @UseGuards(UserAccessGuard)
     @ApiBearerAuth("access-token")
+    @Post("feedback")
+    async sendFeedback(@Request() {user} , @Body() dto: FeedbackDto) {
+        try {
+            let feedback = await this.feedbackModel.create({
+                user: user['_id'],
+                title: dto.title ?? "",
+                message: dto.message
+            })
+            if(feedback) return true
+            else return false
+        } catch (error) {
+            throw new HttpException('error', 500)
+        }
+    }
+
+
+    @UseGuards(UserAccessGuard)
+    @ApiBearerAuth("access-token")
     @Get("point/:id/:point/:message")
     @ApiParam({name: 'id'})
     @ApiParam({name: 'point'})
@@ -56,6 +74,7 @@ export class UserController {
                 sender: user['_id'],
                 receiver: receiver._id,
                 type: PointSendType.sender,
+                title: PointTitle.default ?? undefined,
                 message: message ?? ""
             })
             await user.save()
@@ -65,6 +84,7 @@ export class UserController {
                 sender: user['_id'],
                 receiver: receiver._id,
                 type: PointSendType.receiver,
+                title: PointTitle.default ?? undefined,
                 message: message ?? ""
             })
             await receiver.save()
@@ -87,7 +107,7 @@ export class UserController {
         let imageUrl , key
         if(file) {
              key = `${file.originalname}${Date.now()}`
-             imageUrl = await this.s3Service.uploadFile(file, key)
+             imageUrl = await this.s3Service.uploadFile(file, key) 
         }
 
         return this.service.editUser(user, dto, imageUrl ?? '')    

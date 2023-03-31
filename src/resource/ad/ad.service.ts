@@ -34,6 +34,8 @@ export class AdService {
         subCategory: dto.subCategory,
         filters: dto.filters,
         user: user['_id'],
+        file: dto.file,
+        isView: false,
         category: dto.category,
         adStatus: dto.adStatus,
         adType: dto.adTypes,
@@ -58,7 +60,7 @@ export class AdService {
     let ads = await this.model.find({$or: [{$and: [{createdAt: {$lt: lateDate}}, {adStatus: AdStatus.created}]}, {$and: [{updatedAt: {$lt: deletedDate}},{adStatus: AdStatus.deleted} ]}]})
  
     ads.map(async (ad) => {
-       return await this.updateStatusAd(ad._id, AdStatus.timed, "", true )
+       return await this.updateStatusAd(ad._id,  AdStatus.timed, false, "", true )
     })
     return ads
   }
@@ -89,14 +91,26 @@ export class AdService {
       throw new HttpException('server error', 500)
     }
   }
-  async updateStatusAd(id: string, status: AdStatus, user: string, isAdmin : boolean ) {
+  async updateStatusAd(id: string, status: AdStatus,isView: boolean, user: string, isAdmin : boolean, message?: string ) {
     try {
       if(isAdmin) {
 
-        let ad =  await this.model.findByIdAndUpdate(id, {
-          adStatus: status,
-        }) 
-        return ad
+        if(status == AdStatus.returned) {
+          let ad =  await this.model.findByIdAndUpdate(id, {
+            adStatus: status,
+            isView: isView,
+            returnMessage: message ?? ""
+          }) 
+          return ad
+        }
+        else {
+          let ad =  await this.model.findByIdAndUpdate(id, {
+            adStatus: status,
+            isView: isView
+            
+          }) 
+          return ad
+        }
       } else {
        let ad = await this.model.findOne({_id: id, user: user})
        ad.adStatus = status
@@ -107,11 +121,11 @@ export class AdService {
       throw new HttpException('server error', 500)
     }
   }
-  async getAdById(id: string) {
+  async getAdById(id: string, ) {
  
     try {
       let ad = await this.model
-      .findOne({num: id}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType isSearch', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel)
+      .findOne({num: id, isView: true}).populate('subCategory', 'id name subCategory href english filters viewFilters suggessionType isSearch', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel)
       if (!ad) throw new ForbiddenException('not found ad');
     return ad;
     } catch (error) {
@@ -125,9 +139,9 @@ export class AdService {
       let category = await this.categoryService.getCategoryById(id)
       
     let ads = await this.model
-      .find({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'}).sort({ createdAt: 'desc' }).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel).limit((num+1) * 20).skip(num * 20);
+      .find({$or: [{subCategory: category._id}, {category: category._id}] , isView: true}).populate('category', 'id name', this.categoryModel).populate('subCategory', 'id name', this.categoryModel).populate('user', 'phone username email profileImg userType', this.userModel).limit((num+1) * 20).skip(num * 20);
       let limit = 0
-        limit = await this.model.count({$or: [{subCategory: category._id}, {category: category._id}] , adStatus: 'created'})
+        limit = await this.model.count({$or: [{subCategory: category._id}, {category: category._id}] ,isView: true})
 
     if (!ads) throw new ForbiddenException('not found ad');
     
@@ -141,9 +155,9 @@ export class AdService {
 
   async getAdByFilterValue(categoryId: string, id: string, value: string, num: number) {
     try {
-      let ads = await this.model.find({$and: [{'filters.input': value}, {'filters.type': id}, {'adStatus': 'created'}, {'subCategory': categoryId}]}).limit((num + 1) * 10).skip(num * 10)
+      let ads = await this.model.find({$and: [{'filters.input': value}, {'filters.type': id}, {isView: true}, {'subCategory': categoryId}]}).limit((num + 1) * 10).skip(num * 10)
       let limit = 0
-      limit = await this.model.count({$and: [{'filters.input': value}, {'filters.type': id}, {'adStatus': 'created'}, {'subCategory': categoryId}]})
+      limit = await this.model.count({$and: [{'filters.input': value}, {'filters.type': id}, {isView: true}, {'subCategory': categoryId}]})
       return {ads, limit}
     } catch (error) {
       throw new HttpException(error, 500)
@@ -157,7 +171,7 @@ export class AdService {
       try {
         
         // 'filters': {$elemMatch: {'name': {$in: filtersValue}, 'value': {$in: filtersValue} }}, 
-        let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'subCategory': filterAd.subCategory, adStatus: 'created'}).sort({ createdAt: 'desc' });
+        let ads = await this.model.find({'types' : {$in: filterAd.adTypes}, 'subCategory': filterAd.subCategory,isView: true});
    
    
       let filteredAds = []

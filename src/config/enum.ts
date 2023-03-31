@@ -11,6 +11,7 @@ export enum Action {
 
 export enum AdTypes {
   special = 'special',
+  sharing = 'sharing',
   default = 'default',
   poster = 'poster'
 }
@@ -20,9 +21,11 @@ export enum AdTypes {
 export enum AdStatus {
   sold = 'sold',
   pending = 'pending',
+  checking = 'checking',
   timed = 'timed',
   created = 'created',
-deleted = 'deleted'
+  deleted = 'deleted',
+  returned = 'returned'
 }
 
 export enum ItemTypes {
@@ -73,9 +76,17 @@ export enum PointSendType {
   receiver = 'receiver'
 }
 
+export enum PointTitle {
+  bonus = 'bonus',
+  default = "default"
+
+}
+
 export enum AdType {
   sell = 'sell',
+  sold = 'sold',
   rent = 'rent',
+  rented = 'rented',
   sellRent = 'sellRent'
 }
 export enum CategorySuggestionTypes {

@@ -69,5 +69,18 @@ export class PointHistory {
 
     @ApiProperty({enum: PointSendType,})
     type?: PointSendType
+    
+   
+
+}
+
+
+export class FeedbackDto {
+    
+    @ApiProperty()
+    title: string
+    @ApiProperty()
+    @IsString()
+    message: string
 
 }

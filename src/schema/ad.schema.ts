@@ -24,7 +24,7 @@ export class Ad {
   @Prop()
   images: [];
 
-  @Prop({max_length: 10000})
+  @Prop({max_length: 1000})
   description: string;
 
   @Prop()
@@ -58,11 +58,20 @@ export class Ad {
   @Prop()
   image: string;
 
+  @Prop()
+  file?: string
+
+  @Prop({default: true})
+  isView: boolean
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'users' })
   user: User;
 
   @Prop({type: mongoose.Schema.Types.Array, ref: 'users'})
   views?: User[]
+  
+  @Prop({max_length: 1000})
+  returnMessage?: string
 }
 
 export const AdSchema = SchemaFactory.createForClass(Ad);

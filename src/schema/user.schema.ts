@@ -1,9 +1,46 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
-import { PointSendType, Socials, UserStatus, UserType } from "src/config/enum";
+import { PointSendType, PointTitle, Socials, UserStatus, UserType } from "src/config/enum";
 
 export type UserDocument = Document & User
+export class UserLocation {
+  
+    @Prop()
+    lat: string;
+    @Prop()
+    lng: string;
+  }
 
+export class AgentAddition {
+    @Prop()
+    organizationName: string
+    @Prop()
+    organizationContract: string
+    @Prop()
+    identityCardFront: string
+    @Prop()
+    identityCardBack: string
+    @Prop()
+    location: UserLocation
+    @Prop()
+    firstName: string
+    @Prop()
+    lastName: string
+    @Prop()
+    registerNumber: string
+
+}
+export class OrganizationAddition {
+    @Prop()
+    organizationName: string
+    @Prop()
+    organizationCertificationCopy: string
+    @Prop()
+    location: UserLocation
+    @Prop()
+    organizationRegisterNumber: string
+
+}
 
 export class Social {
     @Prop()
@@ -24,6 +61,9 @@ export class PointHistory {
 
     @Prop({ type: String, enum: PointSendType,  })
     type: PointSendType;
+
+    @Prop({ type: String, enum: PointTitle,  })
+    title: PointTitle | undefined;
 
     @Prop()
     message: string
@@ -63,6 +103,10 @@ socials: Social[]
     @Prop()
     bookmarks: number[]
 
+    @Prop({type: AgentAddition  })
+    agentAddition: AgentAddition 
+    @Prop({type:  OrganizationAddition })
+    organizationAddition:  OrganizationAddition
     
     @Prop()
     pointHistory : PointHistory[]

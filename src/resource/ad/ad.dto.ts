@@ -101,6 +101,9 @@ export class CreateAdDto {
     @ApiProperty({isArray: true})
     images: any
 
+    @ApiProperty({isArray: true})
+    file: string[]
+
 }
 
 export class FilterAdDto {
