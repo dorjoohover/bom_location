@@ -107,8 +107,6 @@ export class AdController {
           };
         case 'special': {
           if (user.point >= 10000) {
-            user.point = Number.parseFloat(user.point.toString()) - 10000;
-            user.save();
             return this.service.createAd(dto, user);
           } else {
             return {
