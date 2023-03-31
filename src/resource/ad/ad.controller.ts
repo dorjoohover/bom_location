@@ -353,12 +353,12 @@ export class AdController {
     return this.service.getAdByFilterValue(cateId, id, input, num);
   }
 
-  // @ApiOperation({description: "suggest ad by enum"})
-  // @Get('suggestion/:id/:type/:value/:num')
-  // getSuggestion(@Param('type') type: string, @Param('value') value: string, @Param('id') id: string,  num: number) {
-  //     let input = Buffer.from(value, 'utf-8').toString()
-  //     return this.service.getAdByFilterValue(id, type, input, num)
-  // }
+  @ApiOperation({description: "suggest ad by enum"})
+  @Get('suggestion/:id/:type/:value/:num')
+  getSuggestion(@Param('type') type: string, @Param('value') value: string, @Param('id') id: string,  num: number) {
+      let input = Buffer.from(value, 'utf-8').toString()
+      return this.service.getAdByFilterValue(id, type, input, num)
+  }
 
   @Get('id/:id')
   @ApiParam({ name: 'id' })

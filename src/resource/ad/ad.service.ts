@@ -8,7 +8,7 @@ import {
   Category,
   CategoryDocument,
   User,
-  UserDocument,
+  UserDocument
 } from 'src/schema';
 import { CategoryService } from '../category/category.service';
 import { CreateAdDto, FilterAdDto } from './ad.dto';
@@ -232,6 +232,7 @@ export class AdService {
     num: number,
   ) {
     try {
+ 
       let ads = await this.model
         .find({
           $and: [
