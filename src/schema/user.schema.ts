@@ -13,21 +13,21 @@ export class UserLocation {
 
 export class AgentAddition {
     @Prop()
-    organizationName: string
+    organizationName?: string
     @Prop()
-    organizationContract: string
+    organizationContract?: string
     @Prop()
-    identityCardFront: string
+    identityCardFront?: string
     @Prop()
-    identityCardBack: string
+    identityCardBack?: string
     @Prop()
-    location: UserLocation
+    location?: UserLocation
     @Prop()
-    firstName: string
+    firstName?: string
     @Prop()
-    lastName: string
+    lastName?: string
     @Prop()
-    registerNumber: string
+    registerNumber?: string
 
 }
 export class OrganizationAddition {
@@ -87,7 +87,7 @@ export class User  {
     userType: UserType;
     
     @Prop()
-socials: Social[]
+    socials: Social[]
 
     @Prop({required: true})
     email: string
@@ -115,6 +115,8 @@ socials: Social[]
 
     @Prop({ type: String, enum: UserStatus, default: UserStatus.pending })
     status: UserStatus;
+    @Prop()
+    message: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

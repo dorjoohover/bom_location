@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
-import { PointSendType, UserType } from "src/config/enum";
+import { PointSendType, UserStatus, UserType } from "src/config/enum";
 import { AdLocation } from "../ad/ad.dto";
 
 
@@ -77,15 +77,19 @@ export class UpdateUserDto {
 
     @ApiProperty({enum: UserType, default: UserType.default})
     userType?: UserType
+    @ApiProperty({enum: UserStatus, default: UserStatus.active})
+    status?: UserStatus
 
     @ApiProperty()
     socials?: any
 
+    @ApiProperty()
+    profileImg?: string
     
-    @ApiProperty({type: AgentAdditionDto})
-    agentAddition: AgentAdditionDto
-    @ApiProperty({type:  OrganizationAdditionDto })
-    organizationAddition:  OrganizationAdditionDto
+    @ApiProperty()
+    agentAddition?: any
+    @ApiProperty()
+    organizationAddition?:  any
     
 }
 

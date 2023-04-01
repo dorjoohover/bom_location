@@ -35,23 +35,25 @@ export class UserService {
     }
   }
 
-  async editUser(user: UserDocument, dto: UpdateUserDto, image?: string) {
+  async editUser(user: UserDocument, dto: UpdateUserDto, ) {
     
         try {
 
-          let img = image != "" ? image : user.profileImg
+         
 
             user.phone = dto.phone ?? user.phone;
             user.userType = dto.userType ?? user.userType
             user.username = dto.username ?? user.username
             user.birthday = dto.birthday ??  user.birthday
             user.socials = dto.socials ?? user.socials
-            user.profileImg = img
+            user.profileImg = dto.profileImg
+            user.status = dto.status
             if(dto.userType == UserType.agent) {
-              user.agentAddition = dto.agentAddition
+              console.log(dto.agentAddition)
+              user.agentAddition = dto.agentAddition[0]
             }
             if(dto.userType == UserType.organization) {
-              user.organizationAddition = dto.organizationAddition
+              user.organizationAddition = dto.organizationAddition[0]
             }
             user.save()
             return user

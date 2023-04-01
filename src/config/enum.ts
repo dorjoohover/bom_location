@@ -114,7 +114,8 @@ export enum UserType {
 export enum UserStatus {
   pending = 'pending',
   active = 'active',
-  banned = 'banned'
+  banned = 'banned',
+  returned = 'returned'
 }
 
 export enum Socials {

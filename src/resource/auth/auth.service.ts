@@ -8,6 +8,7 @@ import appConfig from 'src/config/app.config';
 import { User, UserDocument } from 'src/schema';
 import { UserService } from '../user/user.service';
 import { LoginUser, RegisterUser } from './auth.dto';
+import { UserStatus, UserType } from 'src/config/enum';
 
 @Injectable()
 export class AuthService {
@@ -52,17 +53,19 @@ export class AuthService {
             
             if(dto.email != null && dto.password != null && dto.password != "") {
                 let user = await this.model.findOne({email: dto.email})
-                if(!user) return false
+                
+                if(!user) return {status: false, message: 'not found user'}
+                if(user.status == UserStatus.banned) return {status: false, message: 'banned'}
                 let password = user.password
                 if(!user.password) throw new HttpException('system error', 500)
               
                 const check = await bcrypt.compare(dto.password, password)
                 if(check) {
                     
-                    return user
+                    return {status: false, user: user}
                 } else {
                  
-                    return false
+                    return {status: false, message: 'password not match'}
                 }
                
              
