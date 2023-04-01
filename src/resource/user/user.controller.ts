@@ -91,8 +91,9 @@ export class UserController {
         message: dto.message,
       });
       if (feedback) return true;
-      else return false;
+       return false;
     } catch (error) {
+      console.log(error)
       throw new HttpException('error', 500);
     }
   }
