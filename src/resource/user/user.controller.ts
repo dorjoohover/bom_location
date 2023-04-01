@@ -12,12 +12,9 @@ import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   Param,
   Query,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
+  UseGuards
 } from '@nestjs/common/decorators';
 import { InjectModel } from '@nestjs/mongoose';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { Model } from 'mongoose';
 import { PointSendType, PointTitle } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
@@ -103,7 +100,7 @@ export class UserController {
   @UseGuards(UserAccessGuard)
   @ApiBearerAuth('access-token')
   @Get('feedback')
-  async getFeedback(@Request() { user }, @Body() dto: FeedbackDto) {
+  async getFeedback(@Request() { user }) {
     try {
       if (user.userType == 'admin' || user.userType == 'system') {
         let feedbacks = await this.feedbackModel
