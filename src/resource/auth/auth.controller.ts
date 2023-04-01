@@ -76,9 +76,12 @@ export class AuthController {
     if (user.status) {
       
         const token = await this.service.signPayload(user.user.email);
-        return { user: user.user, token };
+        console.log(user)
+        console.log(user.user)
+        return {status: user.status, user: user.user, token };
       
     } else {
+      console.log(user)
       return {status: user.status, message: user.message};
     }
   }

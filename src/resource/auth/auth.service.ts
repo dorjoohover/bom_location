@@ -62,7 +62,7 @@ export class AuthService {
                 const check = await bcrypt.compare(dto.password, password)
                 if(check) {
                     
-                    return {status: false, user: user}
+                    return {status: true, user: user}
                 } else {
                  
                     return {status: false, message: 'password not match'}
