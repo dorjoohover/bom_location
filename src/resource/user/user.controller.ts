@@ -105,7 +105,7 @@ export class UserController {
     try {
       if (user.userType == 'admin' || user.userType == 'system') {
         let feedbacks = await this.feedbackModel
-          .find()
+          .find().populate('user', 'username phone email', this.model)
           .sort({ createdAt: 'desc' });
         if (!feedbacks) return false;
         return feedbacks;
