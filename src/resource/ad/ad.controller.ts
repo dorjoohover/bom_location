@@ -28,7 +28,7 @@ import {
 import mongoose, { Model } from 'mongoose';
 import { S3Service } from 'src/aws/s3.service';
 
-import { AdStatus, AdType, AdTypes, PointSendType } from 'src/config/enum';
+import { AdStatus, AdTypes, PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import {
   Ad,
@@ -98,7 +98,8 @@ export class AdController {
       switch (dto.adTypes) {
         case 'sharing': {
           dto.adStatus = AdStatus.checking;
-          return this.service.createAd(dto, user);
+          let isView = dto.isView == 'show'
+          return this.service.createAd(dto, user, isView);
         }
         case 'poster':
           return {
@@ -107,7 +108,7 @@ export class AdController {
           };
         case 'special': {
           if (user.point >= 10000) {
-            return this.service.createAd(dto, user);
+            return this.service.createAd(dto, user, true);
           } else {
             return {
               message: 'not enough Eunit',
@@ -115,7 +116,7 @@ export class AdController {
           }
         }
         default:
-          return this.service.createAd(dto, user);
+          return this.service.createAd(dto, user, true);
       }
     }
   }

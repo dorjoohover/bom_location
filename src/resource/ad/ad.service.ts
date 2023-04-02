@@ -22,7 +22,7 @@ export class AdService {
     private categoryService: CategoryService,
   ) {}
 
-  async createAd(dto: CreateAdDto, user: any) {
+  async createAd(dto: CreateAdDto, user: any, isView: boolean) {
     let prevAd = await this.model.findOne().sort({ createdAt: 'desc' });
     let adNum = 1;
     if (prevAd) adNum = prevAd?.num + 1;
@@ -37,7 +37,7 @@ export class AdService {
         filters: dto.filters,
         user: user['_id'],
         file: dto.file,
-        isView: false,
+        isView: isView,
         category: dto.category,
         adStatus: dto.adStatus,
         adType: dto.adTypes,
