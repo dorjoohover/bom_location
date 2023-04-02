@@ -174,7 +174,7 @@ export class AdController {
       let ads =
         type == AdTypes.sharing
           ? await this.model
-              .find()
+              .find({ adType: AdTypes.sharing })
               .populate('category', 'id name', this.categoryModel)
               .populate('subCategory', 'id name', this.categoryModel)
           : await this.model
