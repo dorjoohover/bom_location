@@ -104,7 +104,7 @@ export class CreateAdDto {
     @ApiProperty({isArray: true})
     file: string[]
     @ApiProperty()
-    isView: boolean
+    isView: string
 
 }
 
