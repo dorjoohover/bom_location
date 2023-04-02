@@ -100,7 +100,7 @@ export class UserController {
 
   @UseGuards(UserAccessGuard)
   @ApiBearerAuth('access-token')
-  @Get('feedback')
+  @Get('feedback/get')
   async getFeedback(@Request() { user }) {
     try {
       if (user.userType == 'admin' || user.userType == 'system') {
