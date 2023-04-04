@@ -128,7 +128,7 @@ export class UserController {
     @Param('id') id: string,
     @Param('point') point: number,
     @Param('type') type,
-    @Query('message') message: string,
+  @Query('message') message: string,
   ) {
     if (!user) throw new HttpException('user not found', 400);
     let receiver = await this.service.getUserById(id);

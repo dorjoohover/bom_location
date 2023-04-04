@@ -41,6 +41,7 @@ import {
 import { CreateAdDto, FilterAdDto } from './ad.dto';
 import { AdService } from './ad.service';
 
+import { getJson } from 'src/utils/functions/json';
 import { SuggestionService } from './suggestion.service';
 
 @ApiTags('Ads')
@@ -183,8 +184,23 @@ export class AdController {
               .populate('subCategory', 'id name', this.categoryModel);
 
       if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
+      let {
+        apartmentJson,
+        officeJson,
+        factoryJson,
+        garageJson,
+        landJson,
+        serviceJson,
+      } = getJson(ads);
+      return {
 
-      return ads;
+        apartment: apartmentJson,
+        office: officeJson,
+        factory: factoryJson,
+        garage: garageJson,
+        land: landJson,
+        service: serviceJson,
+      };
     }
     return false;
   }
