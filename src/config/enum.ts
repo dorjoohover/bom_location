@@ -11,7 +11,7 @@ export enum Action {
 
 export enum AdTypes {
   special = 'special',
-  sharing = 'sharing',
+sharing = 'sharing',
   default = 'default',
   poster = 'poster'
 }

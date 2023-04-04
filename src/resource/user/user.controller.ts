@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common/decorators';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PointSendType, PointTitle } from 'src/config/enum';
+import { PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
 import { Feedback, FeedbackDocument, User, UserDocument } from 'src/schema';
 import { S3Service } from '../ad/s3.service';
@@ -118,14 +118,16 @@ export class UserController {
 
   @UseGuards(UserAccessGuard)
   @ApiBearerAuth('access-token')
-  @Get('point/:id/:point/:message')
+  @Get('point/:id/:point/:type/:message')
   @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'type' })
   @ApiParam({ name: 'point' })
   @ApiQuery({ name: 'message' })
   async sendPoint(
     @Request() { user },
     @Param('id') id: string,
     @Param('point') point: number,
+    @Param('type') type,
     @Query('message') message: string,
   ) {
     if (!user) throw new HttpException('user not found', 400);
@@ -140,7 +142,7 @@ export class UserController {
         sender: user['_id'],
         receiver: receiver._id,
         type: PointSendType.sender,
-        title: PointTitle.default ?? undefined,
+        title: type,
         message: message ?? '',
       });
       await user.save();
@@ -152,7 +154,7 @@ export class UserController {
         sender: user['_id'],
         receiver: receiver._id,
         type: PointSendType.receiver,
-        title: PointTitle.default ?? undefined,
+        title: type,
         message: message ?? '',
       });
       await receiver.save();
