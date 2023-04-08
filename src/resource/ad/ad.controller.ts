@@ -193,7 +193,7 @@ export class AdController {
         serviceJson,
       } = getJson(ads);
       return {
-
+        
         apartment: apartmentJson,
         office: officeJson,
         factory: factoryJson,
