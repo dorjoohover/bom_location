@@ -109,7 +109,7 @@ export class AdController {
           };
         case 'special': {
           if (user.point >= 10000) {
-            return this.service.createAd(dto, user, true);
+            return this.service.createAd(dto, user);
           } else {
             return {
               message: 'not enough Eunit',
@@ -117,7 +117,7 @@ export class AdController {
           }
         }
         default:
-          return this.service.createAd(dto, user, true);
+          return this.service.createAd(dto, user);
       }
     }
   }
@@ -193,13 +193,14 @@ export class AdController {
         serviceJson,
       } = getJson(ads);
       return {
-        
+
         apartment: apartmentJson,
         office: officeJson,
         factory: factoryJson,
         garage: garageJson,
         land: landJson,
         service: serviceJson,
+        limit: ads.length
       };
     }
     return false;
