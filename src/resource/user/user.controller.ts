@@ -183,7 +183,7 @@ export class UserController {
         let org = dto.organizationAddition.trim()
         dto.organizationAddition = JSON.parse(dto.organizationAddition);
     }
-    let key;
+
 
     return this.service.editUser(user, dto,);
   }
