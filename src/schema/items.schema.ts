@@ -1,51 +1,36 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
-import { ItemType, ItemTypes } from "src/config/enum";
+import { ItemPosition, ItemTypes } from "src/config/enum";
 
 export type ItemDocument = Item & Document
 
-export class ItemDetail {
-  @Prop()
-  id: string
-  
-  @Prop()
-  value: string
 
-
-  @Prop()
-  parentId?: string
-
-  @Prop({ type: String, enum: ItemTypes })
-  parent?: ItemTypes
-
-}
 
 @Schema()
 export class Item {
     @Prop({required: true})
     name: string
-  
-    @Prop()
-    value: ItemDetail[]
+
+    @Prop({required: true})
+    index: number
 
     @Prop({ type: String, enum: ItemTypes, required: true})
     types: ItemTypes
 
-    @Prop({ type: String, enum: ItemType, required: true })
-    type: ItemType
-
     @Prop()
-    parentId?: string
+    parentId?: Item
     
-    @Prop()
-    input?: string
-    @Prop()
-    max?: string
+    @Prop({ type: String, enum: ItemPosition, default: ItemPosition.default })
+    position: ItemPosition;
+
     @Prop()
     other: boolean
 
     @Prop({default: false})
     isSearch: boolean
+
+    @Prop({default: true})
+    isUse: boolean
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item)

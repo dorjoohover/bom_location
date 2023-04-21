@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNotEmpty, IsString } from "class-validator";
-import { AdStatus, AdTypes, CategorySuggestionTypes } from "src/config/enum";
+import { AdSellType, AdStatus, AdTypes, CategorySuggestionTypes, ItemPosition, ItemTypes } from "src/config/enum";
 import { enumToArray } from "src/typeformat";
 
 
@@ -22,90 +22,81 @@ export class CreateFilterDto {
     @ApiProperty()
     name: string
 }
-export class FilterDto {
-    
 
-    @IsString()
+export class AdItemDto {
     @ApiProperty()
-    input: string
+    @IsString()
+    id: string
+
+    @ApiProperty()
+    @IsString()
+    value: string;
+
+    @ApiProperty({  enum: ItemPosition, default: ItemPosition.default })
+    position: ItemPosition;
+    
+    @ApiProperty({  enum: ItemTypes})
+    type: ItemTypes;
     
     @ApiProperty()
-    max: string
-    
-    @IsString()
-    @ApiProperty()
-    name: string
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    type: string
+    index: number
+
+    @ApiProperty({ default: false})
+    isSearch: boolean
+    @ApiProperty({default: true})
+    isUse: boolean
 }
-export class AdPosition {
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    district_id: string
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    committee_id: string
 
+export class AdDto {
+    @ApiProperty({maxLength: 100})
     @IsString()
+    title: string;
+  
+    @ApiProperty()
+    @IsArray()
+    images: [];
+  
+    @ApiProperty({maxLength: 1000})
+    description: string;
+  
+    @ApiProperty({type: AdLocation})
+    location: AdLocation
 
     @ApiProperty()
-    location_id:string
     @IsString()
-
-    @ApiProperty({type: CreateFilterDto, })
-    town: CreateFilterDto
+    subCategory: string;
     
-
-}
-export class CreateAdDto {
-    @IsNotEmpty()
+    @ApiProperty()
     @IsString()
-    @ApiProperty()
-    title:string
-    
-    @IsString()
-    @ApiProperty()
-    description:string
-    
-
-    @ApiProperty()
-    location: any
-
-    
-    @ApiProperty({enum: AdTypes, default: AdTypes.default})
-    adTypes: AdTypes
-
-    @ApiProperty({enum: AdStatus, default: AdStatus.pending})
-    adStatus: AdStatus
-
-    @ApiProperty()
-    filters: any
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    subCategory: string
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    category: string
-
+    category: string;
+  
+    @ApiProperty({  enum: AdSellType})
+    sellType: AdSellType;
+  
     @ApiProperty({isArray: true})
-    types: string[]
-
-
-    @ApiProperty({isArray: true})
-    images: any
-
-    @ApiProperty({isArray: true})
-    file: string[]
+    @IsArray()
+    items: AdItemDto[]
+  
+  
+    @ApiProperty({  enum: AdTypes, default: AdTypes.default })
+    adType: AdTypes;
+  
+    @ApiProperty({  enum: AdStatus, default: AdStatus.pending })
+    adStatus: AdStatus;
+  
     @ApiProperty()
-    isView: string
-
+    image: string;
+  
+    @ApiProperty()
+    file?: string
+  
+    @ApiProperty({default: true})
+    isView: boolean
+  
+    @ApiProperty()
+    @IsString()
+    user: string;
+    
 }
 
 export class FilterAdDto {

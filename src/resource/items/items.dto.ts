@@ -1,51 +1,31 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsString } from 'class-validator';
-import { ItemType, ItemTypes } from "src/config/enum";
-export class ItemDetailDto {
-  @ApiProperty()
-  id: string
-  
-  @ApiProperty()
-  value: string
-  
-  @ApiProperty()
-  parentId: string
+import { IsNumber, IsString } from 'class-validator';
+import { ItemPosition, ItemTypes } from "src/config/enum";
 
-  @ApiProperty()
-  parent: string
-  
-}
-
-export class CreateItemDto {
+export class ItemDto {
   @ApiProperty()
   @IsString()
   name: string
 
-  @ApiProperty({isArray: true, type: ItemDetailDto})
-  @IsArray()
-  value: ItemDetailDto[]
+  @ApiProperty()
+  @IsNumber()
+  index: number
 
-  @ApiProperty({enum: ItemTypes, default: ItemTypes.dropdown})
+  @ApiProperty({  enum: ItemTypes})
   types: ItemTypes
 
-  @ApiProperty({enum: ItemType, })
-  type: ItemType
+  @ApiProperty()
+  parentId?: string
+    
+  @ApiProperty({  enum: ItemPosition, default: ItemPosition.default})
+  position: ItemPosition;
 
   @ApiProperty()
-  parentId: string
+  other: boolean
 
-  @ApiProperty({default: ''})
-  input: string
-  @ApiProperty({default: ""})
-  max: string
-}
+  @ApiProperty({default: false})
+  isSearch: boolean
 
-export class updateItemDetail {
-  @ApiProperty()
-  @IsString()
-  id: string
-
-  @ApiProperty({isArray: true})
-  @IsArray()
-  value: ItemDetailDto[]
+  @ApiProperty({default: true})
+  isUse: boolean
 }

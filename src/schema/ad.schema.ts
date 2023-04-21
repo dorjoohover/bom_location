@@ -1,11 +1,27 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { AdStatus, AdTypes } from 'src/config/enum';
+import { AdSellType, AdStatus, AdTypes, ItemPosition, ItemTypes } from 'src/config/enum';
 import { Category } from './category.schema';
 import { User } from './user.schema';
 
 export type AdDocument = Document & Ad;
 
+export class AdItems {
+  @Prop({required: true})
+  id: string
+  @Prop({ required: true })
+  value: string;
+  @Prop({ type: String, enum: ItemPosition })
+  position: ItemPosition;
+  @Prop({ type: String, enum: ItemTypes })
+  type: ItemTypes;
+  @Prop({required: true})
+  index: number
+  @Prop({required: true, default: false})
+  isSearch: boolean
+  @Prop({required: true})
+  isUse: boolean
+}
 export class AdLocation {
   
   @Prop()
@@ -35,18 +51,11 @@ export class Ad {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'categories' })
   category: Category;
 
-  @Prop()
-  types: []
+  @Prop({ type: String, enum: AdSellType })
+  sellType: AdSellType;
 
-  @Prop()
-  filters: [
-    {
-      input: string;
-      type: string
-      name: string;
-      max?: string
-    },
-  ];
+  @Prop([AdItems])
+  items: AdItems[]
 
 
   @Prop({ type: String, enum: AdTypes, default: AdTypes.default })
