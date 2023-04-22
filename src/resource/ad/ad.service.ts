@@ -1,7 +1,7 @@
-import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AdStatus, AdTypes } from 'src/config/enum';
+import { AdStatus, AdTypes, AdView } from 'src/config/enum';
 import {
   Ad,
   AdDocument,
@@ -11,7 +11,8 @@ import {
   UserDocument
 } from 'src/schema';
 import { CategoryService } from '../category/category.service';
-import { CreateAdDto, FilterAdDto } from './ad.dto';
+import { AdDto } from './ad.dto';
+
 
 @Injectable()
 export class AdService {
@@ -22,28 +23,29 @@ export class AdService {
     private categoryService: CategoryService,
   ) {}
 
-  async createAd(dto: CreateAdDto, user: any, isView? : boolean) {
+  async createAd(dto: AdDto, user: string) {
     let prevAd = await this.model.findOne().sort({ createdAt: 'desc' });
     let adNum = 1;
     if (prevAd) adNum = prevAd?.num + 1;
     try {
       let ad = await this.model.create({
         num: adNum,
+        user: user,
         images: dto.images,
         title: dto.title,
         description: dto.description,
         location: dto.location,
-        subCategory: dto.subCategory,
-        filters: dto.filters,
-        user: user['_id'],
-        file: dto.file,
-        isView: isView ?? false,
         category: dto.category,
-        adStatus: dto.adStatus,
-        adType: dto.adTypes,
-        types: dto.types,
+        subCategory: dto.subCategory,
+        sellType: dto.sellType,
+        items: dto.items,
+        adType: dto.adType,
+        adStatus: AdStatus.pending,
+        image: dto.image,
+        file: dto.file,
+        view: dto.view,
       });
-      await this.userModel.findByIdAndUpdate(user['_id'], {
+      await this.userModel.findByIdAndUpdate(user, {
         $push: { ads: ad._id },
       });
     } catch (error) {
@@ -53,12 +55,36 @@ export class AdService {
     return true;
   }
 
+  async  getAds(num: number, limit: number, view: boolean, type: AdTypes, isType: boolean ) {
+    let ads =  await this.model
+      .find( isType && view ? {
+        view: AdView.show,
+        type: type,
+      } : isType ? {
+        type: type
+      } : view ? 
+        {view: view} : {}
+      )
+      .populate('user', 'id phone email username profileImg', this.userModel)
+      .populate('category', 'id name', this.categoryModel)
+      .populate('subCategory', 'id name', this.categoryModel)
+      .limit(limit)
+      .skip(num * limit)
+ 
+    if (!ads)
+      throw new HttpException('not found ads', HttpStatus.BAD_REQUEST);
+    return {ads:ads, limit: ads.length}
+  }
+
+
+
+
   async updateStatusTimed() {
     const date = Date.now();
     const deletedDate = date - 3 * 24 * 60 * 60 * 1000;
     const lateDate = date - 60 * 24 * 60 * 60 * 1000;
 
-    let ads = await this.model.find({
+    let ads = await this.model.updateMany({
       $or: [
         {
           $and: [
@@ -73,11 +99,13 @@ export class AdService {
           ],
         },
       ],
+    }, {
+      adStatus: AdStatus.timed,
+      view: AdView.hide,
+
     });
 
-    ads.map(async (ad) => {
-      return await this.updateStatusAd(ad._id, AdStatus.timed, false, '', true);
-    });
+
     return ads;
   }
 
@@ -112,7 +140,7 @@ export class AdService {
   async updateStatusAd(
     id: string,
     status: AdStatus,
-    isView: boolean,
+    view: AdView,
     user: string,
     isAdmin: boolean,
     message?: string,
@@ -122,26 +150,77 @@ export class AdService {
         if (status == AdStatus.returned) {
           let ad = await this.model.findByIdAndUpdate(id, {
             adStatus: status,
-            isView: isView,
+            view: view,
             returnMessage: message ?? '',
           });
           return ad;
         } else {
           let ad = await this.model.findByIdAndUpdate(id, {
             adStatus: status,
-            isView: isView,
+            view: view,
           });
           return ad;
         }
       } else {
         let ad = await this.model.findOne({ _id: id, user: user });
         ad.adStatus = status;
+        ad.view = view
         ad.save();
         return ad;
       }
     } catch (error) {
       throw new HttpException('server error', 500);
     }
+  }
+
+  async addAdView(id: string, userId: string) {
+    let ad = await this.model.findById(id);
+    if (
+      ad.views.find((a) => a.toString() == userId) == undefined &&
+      ad.user.toString() != userId
+    ) {
+      await this.model.findByIdAndUpdate(ad._id, {
+        $push: { views: userId },
+      });
+      return ad.views.length + 1;
+    }
+  }
+
+  async searchAd(value: string) {
+    let ads = await this.model.find({
+      $text: { $search: value },
+      isView: true,
+    });
+    let limit = 0;
+    limit = await this.model.count({ $text: { $search: value }, isView: true });
+
+    if (!ads) throw new HttpException('not found', 403);
+    return { ads, limit };
+  }
+
+  async getManyAds(dto: [], num: number, view: AdView, isView: boolean) {
+    let ads = [],
+    limit = 0;
+  try {
+    ads = await this.model
+      .find(isView ? {
+        _id: { $in: dto } ,
+       view: view
+   } : {
+    _id: { $in: dto } ,
+
+})
+      .populate('category', 'id name', this.categoryModel)
+      .populate('subCategory', 'id name', this.categoryModel)
+      .limit((num + 1) * 10)
+      .skip(num * 10);
+    limit = ads.length;
+  } catch (error) {
+    throw new HttpException(error, 500);
+  }
+
+  if (!ads) throw new HttpException('not found', HttpStatus.NOT_FOUND);
+  return { ads, limit };
   }
   async getAdById(id: string) {
     try {
@@ -172,13 +251,8 @@ export class AdService {
 
       let defaultAds = await this.model
         .find({
-          $and: [
-            {
               $or: [{ subCategory: category._id }, { category: category._id }],
-            },
-            { $or: [{ adType: AdTypes.default }, { adType: AdTypes.sharing }] },
-          ],
-          isView: true,
+          view: AdView.show 
         })
         .populate('category', 'id name', this.categoryModel)
         .populate('subCategory', 'id name', this.categoryModel)
@@ -189,12 +263,11 @@ export class AdService {
         )
         .limit((num + 1) * 20)
         .skip(num * 20);
-      let defaultLimit = 0;
-      defaultLimit = defaultAds.length;
+
       let specialAds = await this.model
         .find({
           $or: [{ subCategory: category._id }, { category: category._id }],
-          isView: true,
+          view: AdView.show,
           adType: AdTypes.special,
         })
         .populate('category', 'id name', this.categoryModel)
@@ -206,8 +279,7 @@ export class AdService {
         )
         .limit((num + 1) * 20)
         .skip(num * 20);
-      let specialLimit = 0;
-      specialLimit = specialAds.length;
+
 
       if (!defaultAds) throw new ForbiddenException('not found default ad');
       if (!specialAds) throw new ForbiddenException('not found special ad');
@@ -215,11 +287,11 @@ export class AdService {
       return {
         defaultAds: {
           ads: defaultAds,
-          limit: defaultLimit,
+          limit: defaultAds.length,
         },
         specialAds: {
           ads: specialAds,
-          limit: specialLimit,
+          limit: specialAds.length,
         },
       };
     } catch (error) {
@@ -227,80 +299,26 @@ export class AdService {
     }
   }
 
-  async getAdByFilterValue(
-    categoryId: string,
-    id: string,
-    value: string,
-    num: number,
-  ) {
+  async updateAd(id: string, dto: AdDto) {
     try {
- 
-      let ads = await this.model
-        .find({
-          $and: [
-            { 'filters.input': value },
-            { 'filters.type': id },
-            { isView: true },
-            { subCategory: categoryId },
-          ],
-        })
-        .limit((num + 1) * 10)
-        .skip(num * 10);
-      let limit = 0;
-      limit = await this.model.count({
-        $and: [
-          { 'filters.input': value },
-          { 'filters.type': id },
-          { isView: true },
-          { subCategory: categoryId },
-        ],
-      });
-      return { ads, limit };
+      return await this.model.findByIdAndUpdate(id, {
+        images: dto.images,
+        title: dto.title,
+        description: dto.description,
+        location: dto.location,
+        sellType: dto.sellType,
+        items: dto.items,
+        adStatus: AdStatus.pending,
+        image: dto.image,
+        file: dto.file,
+        view: dto.view,
+      })
     } catch (error) {
       throw new HttpException(error, 500);
     }
   }
-
-  async getAdByFilter(filterAd: FilterAdDto) {
-    try {
-      // 'filters': {$elemMatch: {'name': {$in: filtersValue}, 'value': {$in: filtersValue} }},
-      let ads = await this.model.find({
-        types: { $in: filterAd.adTypes },
-        subCategory: filterAd.subCategory,
-        isView: true,
-      });
-
-      let filteredAds = [];
-      ads.forEach((ad) => {
-        let fad = [];
-        ad.filters.forEach((a) => {
-          let add = filterAd.filters.find((f) => {
-            if (f.max != '') {
-              if (f.input != '')
-                return (
-                  f.type == a.type &&
-                  parseInt(f.max) >= parseInt(a.input) &&
-                  parseInt(a.input) >= parseInt(f.input)
-                );
-            } else {
-              if (f.input != '') return f.input == a.input && f.type == a.type;
-            }
-          });
-          if (add == undefined) {
-            return;
-          }
-          fad.push(a);
-        });
-
-        if (fad.length == filterAd.filters.length) filteredAds.push(ad);
-      });
-
-      return {
-        ads: filteredAds,
-        limit: filteredAds.length,
-      };
-    } catch (error) {
-      throw new HttpException(error, 500);
-    }
+  
+  async delete() {
+    return await this.model.deleteMany()
   }
 }

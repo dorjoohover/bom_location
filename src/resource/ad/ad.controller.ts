@@ -4,18 +4,15 @@ import {
   Delete,
   Get,
   HttpException,
-  HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Request,
   UploadedFiles,
   UseGuards,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
-import { Put } from '@nestjs/common/decorators';
-
-import { InjectModel } from '@nestjs/mongoose';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Cron } from '@nestjs/schedule/dist';
 import {
@@ -25,35 +22,22 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import mongoose, { Model } from 'mongoose';
+import mongoose from 'mongoose';
 import { S3Service } from 'src/aws/s3.service';
 
-import { AdStatus, AdTypes, PointSendType } from 'src/config/enum';
+import { AdStatus, AdTypes, AdView, PointSendType } from 'src/config/enum';
 import { UserAccessGuard } from 'src/guard/user.guard';
-import {
-  Ad,
-  AdDocument,
-  Category,
-  CategoryDocument,
-  User,
-  UserDocument,
-} from 'src/schema';
-import { CreateAdDto, FilterAdDto } from './ad.dto';
+
+import { AdDto } from './ad.dto';
 import { AdService } from './ad.service';
 
-import { getJson } from 'src/utils/functions/json';
-import { SuggestionService } from './suggestion.service';
 
 @ApiTags('Ads')
 @Controller('ad')
 export class AdController {
   constructor(
     private readonly service: AdService,
-    private suggestionService: SuggestionService,
-    @InjectModel(Ad.name) private model: Model<AdDocument>,
     private s3Service: S3Service,
-    @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
   @UseGuards(UserAccessGuard)
   @ApiBearerAuth('access-token')
@@ -74,9 +58,6 @@ export class AdController {
     let imagesUrl = [];
     for (let i = 0; i < (files?.images?.length ?? 0); i++) {
       const key = `${files.images[i].originalname}${Date.now()}`;
-      console.log(files.images[i].destination);
-      console.log(files.images[i].mimetype);
-      console.log(files.images[i].filename);
       const imageUrl = await this.s3Service.uploadFile(files.images[i], key);
       await imagesUrl.push(imageUrl);
     }
@@ -87,20 +68,13 @@ export class AdController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ description: 'ad create' })
   @Post()
-  async createAd(@Request() { user }, @Body() dto: CreateAdDto) {
+  async ad(@Request() { user }, @Body() dto: AdDto) {
     if (!user) throw new HttpException('UNAUTHORIZATION_ERROR', 403);
 
-    dto.filters = JSON.parse(dto.filters);
-    if (dto.location) dto.location = JSON.parse(dto.location);
-    if (dto.images) {
-      let image = dto.images.split(',');
-      dto.images = image;
-
-      switch (dto.adTypes) {
+      switch (dto.adType) {
         case 'sharing': {
           dto.adStatus = AdStatus.checking;
-          let isView = dto.isView == 'show'
-          return this.service.createAd(dto, user, isView);
+          return this.service.createAd(dto, user['_id']);
         }
         case 'poster':
           return {
@@ -109,7 +83,7 @@ export class AdController {
           };
         case 'special': {
           if (user.point >= 10000) {
-            return this.service.createAd(dto, user);
+            return this.service.createAd(dto, user['_id']);
           } else {
             return {
               message: 'not enough Eunit',
@@ -117,93 +91,28 @@ export class AdController {
           }
         }
         default:
-          return this.service.createAd(dto, user);
+          return this.service.createAd(dto, user['_id']);
       }
-    }
+    
   }
 
   @Get(':num')
   // @ApiCreatedResponse({ description: 'Created Succesfully' })
   @ApiOperation({ description: 'buh zariig harna' })
   @ApiParam({ name: 'num' })
-  async getAllAds(@Param('num') num: number) {
-    let defaultAds = await this.model
-      .find({
-        isView: true,
-        $or: [{ adType: AdTypes.default }, { adType: AdTypes.sharing }],
-      })
-      .populate('user', 'id phone email username profileImg', this.userModel)
-      .populate('category', 'id name', this.categoryModel)
-      .populate('subCategory', 'id name', this.categoryModel)
-      .limit(10)
-      .skip(num * 10);
-    let defaultLimit = defaultAds.length;
-    if (!defaultAds)
-      throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
-    let specialAds = await this.model
-      .find({ isView: true, adType: AdTypes.special })
-      .populate('user', 'id phone email username profileImg', this.userModel)
-      .populate('category', 'id name', this.categoryModel)
-      .populate('subCategory', 'id name', this.categoryModel)
-      .limit(10)
-      .skip(num * 4);
-    let specialLimit = specialAds.length;
-
-    if (!specialAds)
-      throw new HttpException('not found special ad', HttpStatus.NOT_FOUND);
-    if (!specialAds)
-      throw new HttpException('not found default ad', HttpStatus.NOT_FOUND);
-
+  getAllAds(@Param('num') num: number) {
+    let defaultAds = this.service.getAds(num, 10, true, AdTypes.default, false)
+    let specialAds = this.service.getAds(num , 4, true, AdTypes.special, true)
     return {
       defaultAds: {
         ads: defaultAds,
-        limit: defaultLimit,
+        limit: 10
       },
       specialAds: {
         ads: specialAds,
-        limit: specialLimit,
-      },
-    };
-  }
-
-  @Get('admin/:type')
-  @UseGuards(UserAccessGuard)
-  @ApiBearerAuth('access-token')
-  @ApiParam({ name: 'type' })
-  async getAll(@Request() { user }, @Param('type') type) {
-    if (user.userType == 'admin' || user.userType == 'system') {
-      let ads =
-        type == AdTypes.sharing
-          ? await this.model
-              .find({ adType: AdTypes.sharing })
-              .populate('category', 'id name', this.categoryModel)
-              .populate('subCategory', 'id name', this.categoryModel)
-          : await this.model
-              .find()
-              .populate('category', 'id name', this.categoryModel)
-              .populate('subCategory', 'id name', this.categoryModel);
-
-      if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
-      let {
-        apartmentJson,
-        officeJson,
-        factoryJson,
-        garageJson,
-        landJson,
-        serviceJson,
-      } = getJson(ads);
-      return {
-
-        apartment: apartmentJson,
-        office: officeJson,
-        factory: factoryJson,
-        garage: garageJson,
-        land: landJson,
-        service: serviceJson,
-        limit: ads.length
-      };
+        limit: 4
+      }
     }
-    return false;
   }
 
   @Get('admin/:type/:num')
@@ -211,43 +120,37 @@ export class AdController {
   @ApiBearerAuth('access-token')
   @ApiParam({ name: 'num' })
   @ApiParam({ name: 'type' })
-  async getAllByNum(
-    @Request() { user },
-    @Param('type') type,
-    @Param('num') num: number,
-  ) {
+   getAll(@Request() { user },     @Param('type') type,
+  @Param('num') num: number,) {
     if (user.userType == 'admin' || user.userType == 'system') {
-      let ads =
-        type == 'sharing'
-          ? await this.model
-              .find({ adType: AdTypes.sharing })
-              .populate('category', 'id name', this.categoryModel)
-              .populate('subCategory', 'id name', this.categoryModel)
-              .limit(20)
-              .skip(num * 20)
-          : await this.model
-              .find()
-              .populate('category', 'id name', this.categoryModel)
-              .populate('subCategory', 'id name', this.categoryModel)
-              .limit(20)
-              .skip(num * 20);
-      let limit = 0;
-      limit = ads.length;
-      if (!ads) throw new HttpException('not found ads', HttpStatus.NOT_FOUND);
-
-      return {
-        ads: ads,
-        limit: limit,
-      };
+     let ads = this.service.getAds(num, 20, false, AdTypes.sharing, true)
+     if (!ads) throw new HttpException('not found ads', 402);
+      // let {
+      //   apartmentJson,
+      //   officeJson,
+      //   factoryJson,
+      //   garageJson,
+      //   landJson,
+      //   serviceJson,
+      // } = getJson(ads);
+      // return {
+      //   apartment: apartmentJson,
+      //   office: officeJson,
+      //   factory: factoryJson,
+      //   garage: garageJson,
+      //   land: landJson,
+      //   service: serviceJson,
+      // };
+      
     }
     return false;
   }
 
-  @Get('update/:id/:status/:isView/:message')
+  @Get('update/:id/:status/:view/:message')
   @UseGuards(UserAccessGuard)
   @ApiParam({ name: 'id' })
   @ApiParam({ name: 'status' })
-  @ApiParam({ name: 'isView' })
+  @ApiParam({ name: 'view' })
   @ApiQuery({ name: 'message' })
   @ApiBearerAuth('access-token')
   @ApiOperation({ description: 'change ad status' })
@@ -255,60 +158,35 @@ export class AdController {
     @Request() { user },
     @Query('message') message,
     @Param('id') id,
-    @Param('isView') isView,
+    @Param('view') view,
     @Param('status') status,
   ) {
     if (!user) throw new HttpException('UNAUTHORIZATION_ERROR', 403);
-    if (user.userType == 'admin' || user.userType == 'system') {
+
       return this.service.updateStatusAd(
         id,
         status,
-        isView == 'true',
-        '',
-        true,
+        view ,
+        user['_id'],
+        user.userType == 'admin' || user.userType == 'system',
         message,
       );
-    } else {
-      return this.service.updateStatusAd(
-        id,
-        status,
-        isView == 'true',
-        user['_id'],
-        false,
-        message ?? '',
-      );
-    }
+    
   }
 
   @Get('view/:id/:userId')
   @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'userId' })
   @ApiOperation({ description: 'add ad views' })
-  async viewAd(@Param('id') id: string, @Param('userId') userId: string) {
-    let ad = await this.service.getAdById(id);
-    if (
-      ad.views.find((a) => a.toString() == userId) == undefined &&
-      ad.user.toString() != userId
-    ) {
-      await this.model.findByIdAndUpdate(ad._id, {
-        $push: { views: userId },
-      });
-      return ad.views.length + 1;
-    }
+   viewAd(@Param('id') id: string, @Param('userId') userId: string) {
+    return this.service.addAdView(id, userId)
   }
 
   @Get('search/:value')
   @ApiQuery({ name: 'value' })
   @ApiOperation({ description: 'search ad' })
   async searchAd(@Query('value') value: string) {
-    let ads = await this.model.find({
-      $text: { $search: value },
-      isView: true,
-    });
-    let limit = 0;
-    limit = await this.model.count({ $text: { $search: value }, isView: true });
-
-    if (!ads) throw new HttpException('not found', 403);
-    return { ads, limit };
+   return this.service.searchAd(value)
   }
 
   @Post('many/:num/:self')
@@ -320,29 +198,11 @@ export class AdController {
     @Param('num') num: number,
     @Param('self') self: string,
   ) {
-    let ads = [],
-      limit = 0;
-    try {
-      ads = await this.model
-        .find({
-          $and: [
-            { _id: { $in: dto } },
-            self == 'true'
-              ? { $ne: { adStatus: AdStatus.timed } }
-              : { isView: true },
-          ],
-        })
-        .populate('category', 'id name', this.categoryModel)
-        .populate('subCategory', 'id name', this.categoryModel)
-        .limit((num + 1) * 10)
-        .skip(num * 10);
-      limit = ads.length;
-    } catch (error) {
-      throw new HttpException(error, 500);
+    if(self == 'true') {
+      return this.service.getManyAds(dto, num, AdView.end, true)
+    } else {
+      return this.service.getManyAds(dto, num , AdView.show, false)
     }
-
-    if (!ads) throw new HttpException('not found', HttpStatus.NOT_FOUND);
-    return { ads, limit };
   }
 
   @Cron('* * * 1 * *')
@@ -350,9 +210,9 @@ export class AdController {
   @ApiOperation({
     description: 'todorhoi hugatsaa heterwel status g ni timed bolgono',
   })
-  updateStatisTimed() {
-    let ad = this.service.updateStatusTimed();
-    return ad;
+  updateStatusTimed() {
+   return this.service.updateStatusTimed()
+
   }
 
   @Get('adType/:id/:message')
@@ -399,8 +259,9 @@ export class AdController {
 
   @ApiOperation({ description: 'filter ad' })
   @Post('filter')
-  getFilterAd(@Body() filterAd: FilterAdDto) {
-    return this.service.getAdByFilter(filterAd);
+  getFilterAd(@Body() filterAd: any) {
+    // return this.service.getAdByFilter(filterAd);
+    return
   }
 
   @ApiOperation({ description: 'filter and suggest ad by value ' })
@@ -414,8 +275,9 @@ export class AdController {
     @Param('value') value: string,
     @Param('num') num: number,
   ) {
-    let input = Buffer.from(value, 'utf-8').toString();
-    return this.service.getAdByFilterValue(cateId, id, input, num);
+    // let input = Buffer.from(value, 'utf-8').toString();
+    // return this.service.getAdByFilterValue(cateId, id, input, num);
+    return
   }
 
   @ApiOperation({ description: 'suggest ad by enum' })
@@ -426,8 +288,9 @@ export class AdController {
     @Param('id') id: string,
     num: number,
   ) {
-    let input = Buffer.from(value, 'utf-8').toString();
-    return this.service.getAdByFilterValue(id, type, input, num);
+    // let input = Buffer.from(value, 'utf-8').toString();
+    // return this.service.getAdByFilterValue(id, type, input, num);
+    return
   }
 
   @Get('id/:id')
@@ -445,51 +308,16 @@ export class AdController {
   async editAd(
     @Request() { user },
     @Param('id') id: string,
-    @Body() dto: CreateAdDto,
+    @Body() dto: AdDto,
   ) {
     if (!user) throw new HttpException('UNAUTHORIZATION_ERROR', 403);
-    dto.filters = JSON.parse(dto.filters);
-    if (dto.location) {
-      dto.location = JSON.parse(dto.location);
-    }
-    if (dto.images) {
-      let image = dto.images.split(',');
-      dto.images = image;
-    }
-    let ad = await this.model.findById(id);
-
-    try {
-      ad.filters = dto.filters;
-      ad.location = dto.location;
-      ad.images = dto.images;
-      ad.title = dto.title;
-      (ad.description = dto.description), (ad.adType = dto.adTypes);
-      ad.adStatus = AdStatus.pending;
-      await ad.save();
-      return ad;
-    } catch (error) {
-      throw new HttpException(error, 500);
-    }
+    
+    return this.service.updateAd(id, dto)
   }
 
-  // @Delete('/:id')
-  // @ApiParam({name: 'id'})
-  // @UseGuards(UserAccessGuard)
-  // @ApiBearerAuth('access-token')
-  // @ApiOperation({description: "delete ad by id"})
-
-  // async deleteAdById(@Request() {user}, @Param('id') id: string) {
-  //     try {
-  //         let ad = await this.service.updateStatusAd(id, AdStatus.deleted, user['_id'], false)
-  //         if(ad) return true
-  //         throw new HttpException('can not delete ad', 400)
-  //     } catch (error) {
-  //         throw new HttpException(error, 500)
-  //     }
-  // }
   @Delete()
   @ApiOperation({ description: 'delete all ads' })
-  async deleteAds() {
-    return await this.model.deleteMany();
+  deleteAds() {
+    return this.service.delete();
   }
 }

@@ -13,11 +13,8 @@ import {
   Item,
   ItemDocument
 } from 'src/schema';
-import {
-  CreateCategoryDto,
-  CreateSubCategory,
-  UpdateCategoryDto
-} from './category.dto';
+import { CategoryDto } from './category.dto';
+
 
 
 @Injectable()
@@ -27,16 +24,18 @@ export class CategoryService {
     @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
   ) {}
 
-  async createCategory(dto: CreateCategoryDto) {
+  async createCategory(dto: CategoryDto) {
     let category = await this.model.findOne({ name: dto.name });
     if (category) throw new ForbiddenException('found that category');
 
     try {
       category = await this.model.create({
         name: dto.name,
-        isParent: dto.isParent,
+        parent: dto.parent,
         href: dto.href,
-        english: dto.english
+        english: dto.english,
+        steps: dto.steps, 
+        suggestionItem: dto.suggestionItem,
       });
       return category;
     } catch (error) {
@@ -44,28 +43,6 @@ export class CategoryService {
     }
   }
 
-  async createSubCategory(dto: CreateSubCategory) {
-    try {
-      let subCategory = await this.model.findOne({ name: dto.name });
-      if (subCategory) throw new HttpException('found', HttpStatus.FOUND);
-      subCategory = await this.model.create({
-        name: dto.name,
-        href: dto.href,
-        english: dto.english,
-        isParent: dto.isParent,
-        filters: dto.filters,
-        steps: dto.steps,
-        suggessionType: dto.suggestionType,
-      });
-      let category = await this.model.findByIdAndUpdate(dto.id, {
-        $push: { subCategory: subCategory._id },
-      });
-
-      return subCategory;
-    } catch (e) {
-      throw new HttpException(e, 500)
-    }
-  }
   async getAllCategories() {
     try {
       let categories = await this.model
@@ -93,20 +70,10 @@ export class CategoryService {
     {
       category = await this.model
       .findById(id)
-      .populate(
-        'subCategory',
-        'id name subCategory href english steps filters viewFilters suggessionType',
-        this.model,
-      )
       .exec();
     } else {
       category = await this.model
       .findOne({href: id})
-      .populate(
-        'subCategory',
-        'id name subCategory href english steps filters viewFilters',
-        this.model,
-      )
       .exec();
     }
     return category;  
@@ -134,18 +101,16 @@ export class CategoryService {
     }
   }
 
-  async updateCategoryById(id: string, dto: UpdateCategoryDto) {
+  async updateCategoryById(id: string, dto: CategoryDto) {
 
-   
     try {
      await this.model.findByIdAndUpdate(id, {
-        name: dto.name,
-          href: dto.href,
-          english: dto.english,
-          isParent: dto.isParent,
-          filters: dto.filters,
-          steps: dto.steps,
-          suggessionType: dto.suggestionType,
+      name: dto.name,
+      parent: dto.parent,
+      href: dto.href,
+      english: dto.english,
+      steps: dto.steps, 
+      suggestionItem: dto.suggestionItem,
       })
       return true
     } catch (error) {

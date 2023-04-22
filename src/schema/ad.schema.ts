@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { AdSellType, AdStatus, AdTypes, ItemPosition, ItemTypes } from 'src/config/enum';
+import { AdSellType, AdStatus, AdTypes, AdView, ItemPosition, ItemTypes } from 'src/config/enum';
 import { Category } from './category.schema';
 import { User } from './user.schema';
 
@@ -29,7 +29,7 @@ export class AdLocation {
   @Prop()
   lng: string;
 }
-@Schema({ timestamps: true })
+@Schema({ timestamps: true , toJSON: {getters: true, minimize: false}})
 export class Ad {
 
   @Prop({default: 1})
@@ -70,8 +70,8 @@ export class Ad {
   @Prop()
   file?: string
 
-  @Prop({default: true})
-  isView: boolean
+  @Prop({ type: String, enum: AdView, })
+  view: AdView;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'users' })
   user: User;

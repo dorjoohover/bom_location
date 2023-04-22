@@ -69,7 +69,7 @@ export class PointHistory {
     message: string
 
 }
-@Schema({timestamps: true})
+@Schema({timestamps: true,  toJSON: {getters: true, minimize: false}})
 export class User  {
     @Prop()
     username: string

@@ -30,9 +30,15 @@ export enum Socials {
 // ad 
 export enum AdTypes {
   special = 'special',
-sharing = 'sharing',
+  sharing = 'sharing',
   default = 'default',
   poster = 'poster'
+}
+
+export enum AdView {
+  show = 'show',
+  hide = 'hide',
+  end = 'end'
 }
 
 export enum AdStatus {
@@ -77,15 +83,6 @@ export enum PointTitle {
 
 }
 
-// category
-export enum CategorySuggestionTypes {
-  'room',
-  'location',
-  'floor',
-  'usage',
-  'buildingFloor',
-  'map'
-}
 export enum CreateAdSteps {
   type = 'type',
   adType = 'adType',

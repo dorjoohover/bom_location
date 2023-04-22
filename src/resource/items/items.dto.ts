@@ -12,7 +12,7 @@ export class ItemDto {
   index: number
 
   @ApiProperty({  enum: ItemTypes})
-  types: ItemTypes
+  type: ItemTypes
 
   @ApiProperty()
   parentId?: string

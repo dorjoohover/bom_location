@@ -7,7 +7,6 @@ import { CategoryService } from '../category/category.service';
 import { AdController } from './ad.controller';
 import { AdService } from './ad.service';
 
-import { SuggestionService } from './suggestion.service';
 
 
 
@@ -15,7 +14,7 @@ import { SuggestionService } from './suggestion.service';
   imports: [MongooseModule.forFeature([{name: Ad.name, schema: AdSchema}, {name: Category.name, schema: CategorySchema}, {name: User.name, schema: UserSchema}, {name: Item.name, schema: ItemSchema}  ]), 
 ],
   controllers: [AdController, ],
-  providers: [AdService, SuggestionService, S3Service, CategoryService,  ],
+  providers: [AdService,  S3Service, CategoryService,  ],
 
 })
 export class AdModule {}

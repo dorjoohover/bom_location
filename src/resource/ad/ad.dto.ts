@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNotEmpty, IsString } from "class-validator";
-import { AdSellType, AdStatus, AdTypes, CategorySuggestionTypes, ItemPosition, ItemTypes } from "src/config/enum";
-import { enumToArray } from "src/typeformat";
+import { AdSellType, AdStatus, AdTypes, AdView, ItemPosition, ItemTypes } from "src/config/enum";
 
 
 export class AdLocation {
@@ -74,7 +73,7 @@ export class AdDto {
     sellType: AdSellType;
   
     @ApiProperty({isArray: true})
-    @IsArray()
+
     items: AdItemDto[]
   
   
@@ -85,13 +84,13 @@ export class AdDto {
     adStatus: AdStatus;
   
     @ApiProperty()
-    image: string;
+    image?: string;
   
     @ApiProperty()
     file?: string
   
-    @ApiProperty({default: true})
-    isView: boolean
+    @ApiProperty({  enum: AdView,})
+    view: AdView;
   
     @ApiProperty()
     @IsString()
@@ -99,34 +98,4 @@ export class AdDto {
     
 }
 
-export class FilterAdDto {
-    
-    @IsArray()
-    @IsNotEmpty() 
-    @ApiProperty({isArray: true, type: FilterDto})
-    filters: FilterDto[]
 
-    @IsArray()
-    @IsNotEmpty()
-    @ApiProperty({isArray: true, })
-    adTypes: []
-
-    @IsString()
-    @ApiProperty()
-    subCategory: string
-
-}
-
-export class SuggestionDto {
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    suggestion: string
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty({enum: enumToArray(CategorySuggestionTypes), example: 'position'})
-    type: keyof typeof CategorySuggestionTypes
-
-
-}

@@ -5,26 +5,27 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { Model } from 'mongoose';
 import { Item, ItemDocument } from 'src/schema';
-import { CreateItemDto, updateItemDetail } from './items.dto';
-import { ItemsService } from './items.service';
+import { ItemDto } from './items.dto';
+
 @Controller('items')
 @ApiTags('Items')
 export class ItemsController {
-  constructor(private service: ItemsService, @InjectModel(Item.name) private model: Model<ItemDocument>){}
+  constructor( @InjectModel(Item.name) private model: Model<ItemDocument>){}
 
   @Post()
-  async createItem(@Body() dto: CreateItemDto) {
+  async createItem(@Body() dto: ItemDto) {
     try {
       let item = await this.model.findOne({$or: [{name: dto.name}, {type: dto.type}]})
       if(item) throw new HttpException('found', HttpStatus.FOUND)
       item = await this.model.create({
         name: dto.name,
+        index: dto.index,
         type: dto.type, 
-        types: dto.types, 
-        value: dto.value,
+        position: dto.position,
         parentId: dto.parentId,
-        input: dto.input, 
-        max: dto.max
+        other: dto.other, 
+        isSearch: dto.isSearch,
+        isUse: dto.isUse
       })
       return item 
     } catch (error) {
@@ -65,11 +66,19 @@ export class ItemsController {
     }
   }
 
-  @Patch()
-  async updateItemById(@Body() dto: updateItemDetail,) {
+  @Patch(':id')
+  @ApiParam({name: 'id'})
+  async updateItemById(@Param('id') id: string, @Body() dto: ItemDto,) {
     try {
-      let item = await this.model.findByIdAndUpdate(dto.id, {
-        value : dto.value
+      let item = await this.model.findByIdAndUpdate(id, {
+        name: dto.name,
+        index: dto.index,
+        type: dto.type, 
+        position: dto.position,
+        parentId: dto.parentId,
+        other: dto.other, 
+        isSearch: dto.isSearch,
+        isUse: dto.isUse
       })
       return item
     } catch (error) {

@@ -41,10 +41,10 @@ import { UserModule } from './resource/user/user.module';
       
     }),
     AwsModule,
+    AuthModule,
     UserModule,
     AdModule,
     CategoryModule,
-    AuthModule,
     ItemsModule,
    
 

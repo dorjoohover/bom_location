@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { Put } from '@nestjs/common/decorators';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { CreateCategoryDto, CreateSubCategory, UpdateCategoryDto } from './category.dto';
+
+import { CategoryDto } from './category.dto';
 import { CategoryService } from './category.service';
 @ApiTags('Category')
 @Controller('category')
@@ -10,14 +11,8 @@ export class CategoryController {
 
     @Post()
     @ApiOperation({description: "admin aas category create leh"})
-    createCategory(@Body() dto: CreateCategoryDto) {
+    createCategory(@Body() dto: CategoryDto) {
         return this.service.createCategory(dto)
-    }
-
-    @ApiOperation({description: "category luu id gaar ni sub category nemeh  "})
-    @Post('subcategory')
-    createSubCategory(@Body() dto: CreateSubCategory, ) {
-        return this.service.createSubCategory(dto)
     }
 
     @Get()
@@ -45,7 +40,7 @@ export class CategoryController {
     @ApiParam({name: 'id'})
     @Put(':id')
     @ApiOperation({description: "category update hiih "})
-    updateCategoryId( @Param('id') id: string, @Body() dto: UpdateCategoryDto,) {
+    updateCategoryId( @Param('id') id: string, @Body() dto: CategoryDto,) {
         return this.service.updateCategoryById( id, dto)
     }
     // @Delete()

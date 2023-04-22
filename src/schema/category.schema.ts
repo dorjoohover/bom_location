@@ -20,9 +20,8 @@ export class Category {
     @Prop()
     english: string
 
-    @Prop({default: false})
-    isParent: boolean
-
+    @Prop({default: null, type: mongoose.Types.ObjectId, ref: 'categories'})
+    parent: Category
 
     @Prop([CategorySteps])
     steps: CategorySteps[]

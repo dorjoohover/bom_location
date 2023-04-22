@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsString } from "class-validator";
+import { IsArray, IsString, ValidateIf } from "class-validator";
 import { CreateAdSteps } from "src/config/enum";
 
 export class CategoryStepsDto {
@@ -18,8 +18,9 @@ export class CategoryDto {
     @IsString()
     english: string
 
-    @ApiProperty({default: false})
-    isParent: boolean
+    @ApiProperty()
+    @ValidateIf((object, value) => value !== null)
+    parent: string | null
 
     @ApiProperty({isArray: true})
     steps?: CategoryStepsDto[]
@@ -27,9 +28,6 @@ export class CategoryDto {
     @ApiProperty({isArray: true})
     @IsArray()
     suggestionItem: string[]
-    
-    @ApiProperty({isArray: true}) 
-    subCategory: string[]
 
     @ApiProperty()
     @IsString()
