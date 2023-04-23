@@ -1,36 +1,34 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
-import { ItemPosition, ItemTypes } from "src/config/enum";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose, { Document } from 'mongoose';
+import { ItemPosition, ItemTypes } from 'src/config/enum';
 
-export type ItemDocument = Item & Document
-
-
+export type ItemDocument = Item & Document;
 
 @Schema()
 export class Item {
-    @Prop({required: true})
-    name: string
+  @Prop({ required: true })
+  name: string;
 
-    @Prop({required: true})
-    index: number
+  @Prop({ required: true })
+  index: number;
 
-    @Prop({ type: String, enum: ItemTypes, required: true})
-    types: ItemTypes
+  @Prop({ type: String, enum: ItemTypes, required: true })
+  types: ItemTypes;
 
-    @Prop()
-    parentId?: Item
-    
-    @Prop({ type: String, enum: ItemPosition, default: ItemPosition.default })
-    position: ItemPosition;
+  @Prop({ type: mongoose.Types.ObjectId, ref: 'items' })
+  parentId?: Item;
 
-    @Prop()
-    other: boolean
+  @Prop({ type: String, enum: ItemPosition, default: ItemPosition.default })
+  position: ItemPosition;
 
-    @Prop({default: false})
-    isSearch: boolean
+  @Prop()
+  other: boolean;
 
-    @Prop({default: true})
-    isUse: boolean
+  @Prop({ default: false })
+  isSearch: boolean;
+
+  @Prop({ default: true })
+  isUse: boolean;
 }
 
-export const ItemSchema = SchemaFactory.createForClass(Item)
+export const ItemSchema = SchemaFactory.createForClass(Item);
