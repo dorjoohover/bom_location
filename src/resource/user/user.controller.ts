@@ -9,11 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-import {
-  Param,
-  Query,
-  UseGuards
-} from '@nestjs/common/decorators';
+import { Param, Query, UseGuards } from '@nestjs/common/decorators';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PointSendType } from 'src/config/enum';
@@ -27,7 +23,6 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(
     private readonly service: UserService,
-    private s3Service: S3Service,
     @InjectModel(User.name) private model: Model<UserDocument>,
     @InjectModel(Feedback.name) private feedbackModel: Model<FeedbackDocument>,
   ) {}
@@ -56,20 +51,24 @@ export class UserController {
     return this.service.getUserById(id);
   }
 
-  @Get("update/:id/:status/:message")
-  @ApiParam({name: 'id'})
-  @ApiParam({name: 'status'})
-  @ApiQuery({name: 'message'})
+  @Get('update/:id/:status/:message')
+  @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'status' })
+  @ApiQuery({ name: 'message' })
   @UseGuards(UserAccessGuard)
   @ApiBearerAuth('access-token')
-  async updateUser(@Request() {user}, @Param("id") id, @Param('status') status, @Query('message') message) {
+  async updateUser(
+    @Request() { user },
+    @Param('id') id,
+    @Param('status') status,
+    @Query('message') message,
+  ) {
     try {
       if (user.userType == 'admin' || user.userType == 'system') {
-        let client = await this.model
-          .findByIdAndUpdate(id, {
-            message: message,
-            status: status,
-          })
+        let client = await this.model.findByIdAndUpdate(id, {
+          message: message,
+          status: status,
+        });
 
         if (!client) return false;
         return true;
@@ -91,9 +90,9 @@ export class UserController {
         message: dto.message,
       });
       if (feedback) return true;
-       return false;
+      return false;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw new HttpException('error', 500);
     }
   }
@@ -105,7 +104,8 @@ export class UserController {
     try {
       if (user.userType == 'admin' || user.userType == 'system') {
         let feedbacks = await this.feedbackModel
-          .find().populate('user', 'username phone email', this.model)
+          .find()
+          .populate('user', 'username phone email', this.model)
           .sort({ createdAt: 'desc' });
         if (!feedbacks) return false;
         return feedbacks;
@@ -128,7 +128,7 @@ export class UserController {
     @Param('id') id: string,
     @Param('point') point: number,
     @Param('type') type,
-  @Query('message') message: string,
+    @Query('message') message: string,
   ) {
     if (!user) throw new HttpException('user not found', 400);
     let receiver = await this.service.getUserById(id);
@@ -167,24 +167,19 @@ export class UserController {
   @UseGuards(UserAccessGuard)
   @ApiBearerAuth('access-token')
   @Put()
-  async editUser(
-    @Request() { user },
-    @Body() dto: UpdateUserDto,
-  ) {
+  async editUser(@Request() { user }, @Body() dto: UpdateUserDto) {
     if (!user) throw new HttpException('user not found', 400);
     dto.socials = JSON.parse(dto.socials);
-    
-    
+
     if (dto.agentAddition) {
-        let agent = dto.agentAddition.trim()
-        dto.agentAddition = JSON.parse(agent);
+      let agent = dto.agentAddition.trim();
+      dto.agentAddition = JSON.parse(agent);
     }
     if (dto.organizationAddition) {
-        let org = dto.organizationAddition.trim()
-        dto.organizationAddition = JSON.parse(dto.organizationAddition);
+      let org = dto.organizationAddition.trim();
+      dto.organizationAddition = JSON.parse(dto.organizationAddition);
     }
 
-
-    return this.service.editUser(user, dto,);
+    return this.service.editUser(user, dto);
   }
 }
